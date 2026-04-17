@@ -6,9 +6,6 @@ import 'package:yemen_store/features/home/presentation/pages/favorites_screen.da
 import 'package:yemen_store/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:yemen_store/features/home/presentation/pages/home_screen.dart';
 import 'package:yemen_store/features/markets/presentation/pages/markets_screen.dart';
-import 'package:yemen_store/features/orders/presentation/pages/cart_screen.dart';
-import 'package:yemen_store/features/orders/presentation/pages/order_tracking_screen.dart';
-import 'package:yemen_store/features/orders/presentation/pages/orders_screen.dart';
 import 'package:yemen_store/features/profile/presentation/pages/profile_screen.dart';
 import 'package:yemen_store/features/wallet/presentation/pages/recharge_wallet_screen.dart';
 
@@ -31,8 +28,7 @@ class AppRoutes {
       FavoritesScreen.id: (context) => const FavoritesScreen(),
       ProfileScreen.id: (context) => const ProfileScreen(),
       RechargeWalletScreen.id: (context) => const RechargeWalletScreen(),
-      OrdersScreen.id: (context) => const OrdersScreen(),
-      CartScreen.id: (context) => const CartScreen(),
+  
   
     };
   }
