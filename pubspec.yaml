@@ -1,0 +1,43 @@
+name: yemen_store
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  flutter_launcher_icons: "^0.13.1"
+  flutter_lints: ^6.0.0
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/back.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/images/backing.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    
+
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo/Cairo-Bold.ttf
+          weight: 700
