@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/widgets/app_drawer.dart';
-import 'package:yemen_store/features/orders/presentation/pages/cart_screen.dart';
-import 'package:yemen_store/features/orders/presentation/pages/orders_screen.dart';
+
 import '../widgets/markets_grid.dart';
 import '../widgets/home_balance_card.dart';
 import '../widgets/home_banner_slider.dart';
 import '../widgets/home_bottom_nav.dart';
 import 'recommendations_screen.dart';
-
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -84,9 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        IconButton(onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
-        }, icon: Icon(Icons.shopping_cart_outlined)),
+        IconButton(onPressed: () {}, icon: Icon(Icons.shopping_cart_outlined)),
         const SizedBox(width: 5),
       ],
     );
@@ -99,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const RecommendationsScreen(); // صفحة المقترحات
       case 2:
-        return const OrdersScreen();
+        return const Center(child: Text("صفحة الطلبات قيد التطوير"));
       case 3:
         return const Center(child: Text("صفحة الخدمات قيد التطوير"));
       default:
@@ -131,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const MarketsGrid(),
 
           const SizedBox(height: 25),
-         
         ],
       ),
     );
@@ -165,14 +160,11 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
-        TextButton(
-          onPressed: () {},
-          child: const Text("عرض الكل"),
-        ),
+        TextButton(onPressed: () {}, child: const Text("عرض الكل")),
       ],
     );
   }
