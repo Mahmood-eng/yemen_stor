@@ -4,7 +4,6 @@ import 'package:yemen_store/core/theme/app_theme.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
 
 void main() {
-
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const YemenStoreApp());
 }
@@ -14,7 +13,9 @@ class YemenStoreApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: AppRoutes.router, // استخدام GoRouter
+
       title: 'Yemen Store',
       debugShowCheckedModeBanner: false,
 
@@ -30,13 +31,13 @@ class YemenStoreApp extends StatelessWidget {
       locale: const Locale('ar', 'YE'),
 
       // --- ربط الثيمات الذكية ---
-      theme: AppTheme.lightTheme, 
-      darkTheme: AppTheme.darkTheme, 
-      themeMode: ThemeMode.system, 
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
 
-      // --- نظام التنقل (Routes) ---
-      initialRoute: AppRoutes.initialRoute, 
-      routes: AppRoutes.routes,
+      //   // --- نظام التنقل (Routes) ---
+      //   initialRoute: AppRoutes.initialRoute,
+      //   routes: AppRoutes.routes,
     );
   }
 }

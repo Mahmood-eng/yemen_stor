@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/widgets/CustomTextField.dart';
 import 'package:yemen_store/core/widgets/custom_button.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/features/auth/presentation/widgets/social_divider.dart';
 import 'package:yemen_store/features/auth/presentation/widgets/social_icons_row.dart';
 
@@ -167,13 +169,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text("لديك حساب بالفعل؟", style: TextStyle(color: Colors.white70)),
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(
-            "تسجيل الدخول",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
+            TextButton(
+              onPressed: () => context.go(AppRoutes.login),
+              child: const Text(
+                "تسجيل الدخول",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
       ],
     );
   }
