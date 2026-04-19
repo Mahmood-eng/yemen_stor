@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/widgets/CustomTextField.dart';
 import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/pages/signup_screen.dart';
 import 'package:yemen_store/features/auth/presentation/widgets/social_divider.dart';
 import 'package:yemen_store/features/auth/presentation/widgets/social_icons_row.dart';
-import 'package:yemen_store/features/home/presentation/pages/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomButton(
                     text: "دخول",
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, HomeScreen.id);
+                      context.go(AppRoutes.home);
                     },
                   ),
 
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
             
             // استثناء: نص "إنشاء حساب" يظهر باللون الأبيض ليبرز فوق الخلفية الكحلية
             TextButton(
-              onPressed: () => Navigator.pushNamed(context, SignUpScreen.id),
+              onPressed: () => context.push(AppRoutes.signup),
               child: const Text(
                 "ليس لديك حساب؟ أنشئ حساباً جديداً",
                 style: TextStyle(

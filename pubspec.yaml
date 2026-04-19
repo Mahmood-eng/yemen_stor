@@ -8,6 +8,7 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
+  go_router: ^10.1.1
   flutter:
     sdk: flutter
   flutter_localizations:

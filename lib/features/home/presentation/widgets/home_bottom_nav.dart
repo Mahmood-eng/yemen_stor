@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // ضروري جداً
 import 'package:yemen_store/core/theme/app_colors.dart';
 
 class HomeBottomNav extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
+
+  final StatefulNavigationShell navigationShell;
 
   const HomeBottomNav({
     super.key,
-    required this.currentIndex,
-    required this.onTap,
+    required this.navigationShell,
   });
 
   @override
@@ -26,8 +26,15 @@ class HomeBottomNav extends StatelessWidget {
         ],
       ),
       child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: onTap,
+        
+        currentIndex: navigationShell.currentIndex,
+        
+        onTap: (index) {
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
         type: BottomNavigationBarType.fixed,
         backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         selectedItemColor: AppColors.primary,

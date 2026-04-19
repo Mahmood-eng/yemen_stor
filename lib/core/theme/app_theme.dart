@@ -76,7 +76,7 @@ class AppTheme {
 
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primary,
-        brightness: Brightness.dark, // مطابقة للثيم
+        brightness: Brightness.dark, 
         primary: AppColors.primary,
         onPrimary: AppColors.white,
         surface: AppColors.backgroundDark,

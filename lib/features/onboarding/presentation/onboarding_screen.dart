@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/pages/login_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -114,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   text: _currentPage == _onboardingData.length - 1 ? "ابدأ الآن" : "التالي",
                   onPressed: () {
                     if (_currentPage == _onboardingData.length - 1) {
-                      Navigator.pushReplacementNamed(context, LoginScreen.id);
+                      context.go(AppRoutes.login);
                     } else {
                       _controller.nextPage(
                         duration: const Duration(milliseconds: 500),

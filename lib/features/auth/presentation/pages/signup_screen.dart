@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/widgets/CustomTextField.dart';
 import 'package:yemen_store/core/widgets/custom_button.dart';
@@ -86,7 +88,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // الزر يعتمد على elevatedButtonTheme
                   CustomButton(
                     text: "إنشاء الحساب",
-                    onPressed: _acceptTerms ? () {} : null,
+                    onPressed: _acceptTerms ? () {
+                      context.go(AppRoutes.home);
+                    } : null,
                   ),
 
                   const SizedBox(height: 25),
@@ -168,7 +172,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       children: [
         const Text("لديك حساب بالفعل؟", style: TextStyle(color: Colors.white70)),
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.go(AppRoutes.login),
           child: const Text(
             "تسجيل الدخول",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
