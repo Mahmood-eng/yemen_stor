@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
+import '../../data/models/product_model.dart';
+import '../providers/favorites_provider.dart';
+import '../../../orders/presentation/providers/cart_provider.dart';
 
 class FavoritesScreen extends StatelessWidget {
   static const String id = 'favorites_screen';
@@ -10,26 +14,36 @@ class FavoritesScreen extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      // الخلفية تسحب تلقائياً من الثيم
       appBar: AppBar(
         title: const Text("المفضلات"),
-       
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: 5, 
-        itemBuilder: (context, index) {
-          return _buildFavoriteItem(context, isDark);
+      body: Consumer<FavoritesProvider>(
+        builder: (context, favoritesProvider, child) {
+          final favorites = favoritesProvider.favorites;
+          
+          if (favorites.isEmpty) {
+            return const Center(
+              child: Text("لا توجد منتجات في المفضلة"),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: favorites.length, 
+            itemBuilder: (context, index) {
+              return _buildFavoriteItem(context, isDark, favorites[index]);
+            },
+          );
         },
       ),
     );
   }
 
-  Widget _buildFavoriteItem(BuildContext context, bool isDark) {
+  Widget _buildFavoriteItem(BuildContext context, bool isDark, ProductModel product) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(12),
@@ -39,7 +53,7 @@ class FavoritesScreen extends StatelessWidget {
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -54,8 +68,11 @@ class FavoritesScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark ? Colors.white10 : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: AssetImage(product.image),
+                fit: BoxFit.cover,
+              ),
             ),
-            child: const Icon(Icons.image_outlined, color: Colors.grey),
           ),
           const SizedBox(width: 15),
 
@@ -65,17 +82,15 @@ class FavoritesScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "اسم المنتج المفضل",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.displayLarge?.copyWith(fontSize: 14),
+                  product.name,
+                  style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 14),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  "وصف قصير للمنتج يظهر هنا...",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontSize: 12),
+                  product.description,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -84,16 +99,20 @@ class FavoritesScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "2,500 ر.ي",
-                      style: TextStyle(
+                      "\$${product.price.toStringAsFixed(2)}",
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
-                   
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.read<CartProvider>().addToCart(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('تم إضافة المنتج للسلة'), duration: Duration(seconds: 1)),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(80, 32),
                         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -115,7 +134,9 @@ class FavoritesScreen extends StatelessWidget {
           // زر الحذف من المفضلات
           IconButton(
             icon: const Icon(Icons.favorite, color: Colors.redAccent),
-            onPressed: () {},
+            onPressed: () {
+              context.read<FavoritesProvider>().toggleFavorite(product);
+            },
           ),
         ],
       ),

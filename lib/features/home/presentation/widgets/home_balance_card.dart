@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/features/wallet/presentation/pages/recharge_wallet_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:yemen_store/features/auth/presentation/providers/auth_provider.dart';
 
 class HomeBalanceCard extends StatefulWidget {
   const HomeBalanceCard({super.key});
@@ -17,16 +19,21 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 100,
-          child: PageView(
-            onPageChanged: (i) => setState(() => _currentPage = i),
-            children: [
-              _buildItem("رصيد اليمني", "0 YR"),
-              _buildItem("رصيد السعودي", "0 SR"),
-              _buildItem("رصيد الدولار", "0 \$"),
-            ],
-          ),
+        Consumer<AuthProvider>(
+          builder: (context, authProvider, _) {
+            final balance = authProvider.currentUser?.balance ?? 0.0;
+            return SizedBox(
+              height: 100,
+              child: PageView(
+                onPageChanged: (i) => setState(() => _currentPage = i),
+                children: [
+                  _buildItem("رصيد اليمني", "$balance YR"),
+                  _buildItem("رصيد السعودي", "0 SR"),
+                  _buildItem("رصيد الدولار", "0 \$"),
+                ],
+              ),
+            );
+          },
         ),
         const SizedBox(height: 8),
         Row(

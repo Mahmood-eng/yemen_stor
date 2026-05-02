@@ -10,9 +10,13 @@ import 'package:yemen_store/features/home/presentation/pages/recommendations_scr
 import 'package:yemen_store/features/orders/presentation/pages/orders_screen.dart';
 import 'package:yemen_store/features/orders/presentation/pages/order_tracking_screen.dart';
 import 'package:yemen_store/features/profile/presentation/pages/profile_screen.dart';
+import 'package:yemen_store/features/orders/presentation/pages/cart_screen.dart';
 import 'package:yemen_store/features/wallet/presentation/pages/recharge_wallet_screen.dart';
 import 'package:yemen_store/features/digitalservices/presentation/pages/digital_services_screen.dart';
 import 'package:yemen_store/features/notifcation/presentation/pages/notifications_screen.dart';
+import 'package:yemen_store/features/home/presentation/pages/product_details_screen.dart';
+import 'package:yemen_store/features/home/data/models/product_model.dart';
+import 'package:yemen_store/features/profile/presentation/pages/settings_screen.dart';
 
 class AppRoutes {
   static const String onboarding = '/onboarding';
@@ -30,8 +34,9 @@ class AppRoutes {
   static const String orderTrackingNamed = 'orderTracking';
   static const String digitalServices = '/digital-services';
   static const String notifications = '/notifications';
-
-
+  static const String cart = '/cart';
+  static const String productDetails = '/product-details';
+  static const String settings = '/settings';
   static final router = GoRouter(
     initialLocation: onboarding,
     debugLogDiagnostics: true, // مفيد جداً لتتبع الأخطاء في الـ Console
@@ -62,6 +67,21 @@ class AppRoutes {
       GoRoute(
         path: favorites,
         builder: (context, state) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: cart,
+        builder: (context, state) => const CartScreen(),
+      ),
+      GoRoute(
+        path: productDetails,
+        builder: (context, state) {
+          final product = state.extra as ProductModel;
+          return ProductDetailsScreen(product: product);
+        },
+      ),
+      GoRoute(
+        path: settings,
+        builder: (context, state) => const SettingsScreen(),
       ),
       // 2. هيكل التطبيق الرئيسي مع الشريط السفلي
       StatefulShellRoute.indexedStack(

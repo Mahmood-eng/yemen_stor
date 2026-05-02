@@ -4,6 +4,8 @@ import '../../../../core/routes/app_routes.dart';
 import '../widgets/order_card.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_status.dart';
+import 'package:provider/provider.dart';
+import '../providers/orders_provider.dart';
 
 class OrdersScreen extends StatelessWidget {
   const OrdersScreen({super.key});
@@ -44,19 +46,8 @@ class OrdersScreen extends StatelessWidget {
   }
 
   Widget _buildOrdersList(BuildContext context, List<OrderStatus> filterStatus) {
-    // بيانات تجريبية لمحمود [Yemen Store Mock Data]
-    final mockOrders = [
-      OrderModel(
-        id: "5421",
-        title: "عطر ساواج ديور الرجالي - 100 مل",
-        price: "45,000",
-        status: OrderStatus.onWay,
-        imageset: Image.asset("assets/images/perfume.jpg", width: 85, height: 85, fit: BoxFit.cover),
-        storeName: "متجر النخبة للعطور - شارع جمال",
-        time: "اليوم، 10:30 ص",
-      ),
-      // ... بقية البيانات
-    ];
+    final ordersProvider = context.watch<OrdersProvider>();
+    final mockOrders = ordersProvider.orders;
 
     final filteredOrders = mockOrders.where((o) => filterStatus.contains(o.status)).toList();
 

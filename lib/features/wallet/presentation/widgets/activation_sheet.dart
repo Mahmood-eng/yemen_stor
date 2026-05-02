@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 
 class ActivationSheet extends StatelessWidget {
@@ -98,7 +99,40 @@ class ActivationSheet extends StatelessWidget {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  final LocalAuthentication auth = LocalAuthentication();
+                  try {
+                    final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+                    final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+                    if (canAuthenticate) {
+                      final bool didAuthenticate = await auth.authenticate(
+                        localizedReason: 'يرجى التحقق باستخدام البصمة لتفعيل الحساب',
+                      );
+
+                      if (didAuthenticate && context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('تم تفعيل الحساب بنجاح')),
+                        );
+                      }
+                    } else {
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('جهازك لا يدعم البصمة. تم إرسال الطلب.')),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('حدث خطأ: $e')),
+                      );
+                    }
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

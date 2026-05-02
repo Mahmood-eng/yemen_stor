@@ -6,47 +6,59 @@ class CustomTextField extends StatelessWidget {
   final bool isPassword;
   final Widget? suffixIcon;
 
+  // --- إضافات جديدة لدعم الـ Provider والـ Form ---
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final void Function(String)? onChanged;
+
   const CustomTextField({
     super.key,
     required this.hintText,
     required this.icon,
     this.isPassword = false,
     this.suffixIcon,
+    this.controller,
+    this.validator,
+    this.keyboardType,
+    this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    // جلب بيانات الثيم الحالية
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return TextFormField(
+      controller: controller,
+      validator: validator,
+      onChanged: onChanged,
       obscureText: isPassword,
+      keyboardType: keyboardType,
       textAlign: TextAlign.right,
-      // ستايل النص المدخل يتبع الثيم تلقائياً
       style: theme.textTheme.bodyMedium?.copyWith(
         fontSize: 14,
       ),
       decoration: InputDecoration(
         hintText: hintText,
-        // ستايل نص التلميح (Hint) من الثيم
         hintStyle: theme.inputDecorationTheme.hintStyle,
-        
-        // الأيقونة تأخذ لون الـ primary من الثيم
         prefixIcon: Icon(icon, color: theme.primaryColor, size: 20),
         suffixIcon: suffixIcon,
-        
         filled: true,
-        // لون الخلفية يتم جلبه من إعدادات الحقول في الثيم
         fillColor: theme.inputDecorationTheme.fillColor,
-
         contentPadding: const EdgeInsets.all(8.0),
-        
-
-        // الحدود (Borders) يتم التحكم بها مركزياً من ملف الثيم
         border: theme.inputDecorationTheme.border,
         enabledBorder: theme.inputDecorationTheme.enabledBorder,
         focusedBorder: theme.inputDecorationTheme.focusedBorder,
+        // إطار الخطأ من الـ Form validation
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
       ),
     );
   }

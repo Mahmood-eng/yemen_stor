@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/recommendation_product_card.dart';
+import '../../data/models/product_model.dart';
+import 'package:provider/provider.dart';
+import '../providers/products_provider.dart';
 
 class RecommendationsScreen extends StatefulWidget {
   static const String id = 'recommendations_screen';
@@ -35,20 +38,30 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
 
           // 2. شبكة المنتجات
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(15),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.65, // لضمان ظهور الزر والبيانات بوضوح
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-              ),
-              itemCount: 10, // عدد تجريبي
-              itemBuilder: (context, index) {
-                return RecommendationProductCard(
-                  onLinkTap: () {
-                    // هنا نضع الكود للانتقال لصفحة المحل
-                    print("الانتقال إلى متجر المنتج رقم $index");
+            child: Consumer<ProductsProvider>(
+              builder: (context, productsProvider, child) {
+                final products = productsProvider.products;
+                if (products.isEmpty) {
+                  return const Center(child: Text("لا توجد منتجات مطابقة"));
+                }
+                return GridView.builder(
+                  padding: const EdgeInsets.all(15),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.65, // لضمان ظهور الزر والبيانات بوضوح
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return RecommendationProductCard(
+                      product: product,
+                      onLinkTap: () {
+                        // هنا نضع الكود للانتقال لصفحة المحل
+                        debugPrint("الانتقال إلى متجر المنتج: ${product.name}");
+                      },
+                    );
                   },
                 );
               },

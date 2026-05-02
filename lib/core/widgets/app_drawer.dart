@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
+import 'package:yemen_store/features/auth/presentation/providers/auth_provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -45,7 +48,7 @@ class AppDrawer extends StatelessWidget {
                   Divider(
                     indent: 20, 
                     endIndent: 20, 
-                    color: theme.dividerColor.withOpacity(0.1)
+                    color: theme.dividerColor.withValues(alpha: 0.1)
                   ),
                   
                   _buildSectionTitle(context, "خدمات الأعمال"),
@@ -62,11 +65,13 @@ class AppDrawer extends StatelessWidget {
                   Divider(
                     indent: 20, 
                     endIndent: 20, 
-                    color: theme.dividerColor.withOpacity(0.1)
+                    color: theme.dividerColor.withValues(alpha: 0.1)
                   ),
                   
                   _buildSectionTitle(context, "الإعدادات والدعم"),
-                  _buildDrawerItem(context, Icons.settings_outlined, "الإعدادات", () {}),
+                  _buildDrawerItem(context, Icons.settings_outlined, "الإعدادات", () {
+                    context.push(AppRoutes.settings);
+                  }),
                   _buildDrawerItem(context, Icons.info_outline, "حول التطبيق", () {}),
                 ],
               ),
@@ -87,31 +92,45 @@ class AppDrawer extends StatelessWidget {
         color: isDark ? theme.colorScheme.surface : theme.primaryColor,
         borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30)),
       ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 35,
-            backgroundColor: Colors.white24,
-            child: Icon(Icons.person, size: 40, color: Colors.white),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Consumer<AuthProvider>(
+        builder: (context, authProvider, _) {
+          final user = authProvider.currentUser;
+          final name = user?.fullName ?? "مستخدم ضيف";
+          final phone = user?.phone ?? "غير محدد";
+          final imagePath = user?.profileImage;
+
+          return Row(
             children: [
-              Text(
-                "محمود المقطري",
-                style: theme.textTheme.displayLarge?.copyWith(
-                  color: Colors.white, 
-                  fontSize: 16
+              CircleAvatar(
+                radius: 35,
+                backgroundColor: Colors.white24,
+                backgroundImage: imagePath != null ? FileImage(File(imagePath)) : null,
+                child: imagePath == null ? const Icon(Icons.person, size: 40, color: Colors.white) : null,
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        color: Colors.white, 
+                        fontSize: 16
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      phone,
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
-              const Text(
-                "ID: #992837",
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -158,7 +177,7 @@ class AppDrawer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(15),
       ),
       child: ListTile(
@@ -169,7 +188,7 @@ class AppDrawer extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle, 
-          style: TextStyle(fontSize: 11, color: color.withOpacity(0.7))
+          style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.7))
         ),
         onTap: onTap,
       ),
@@ -180,7 +199,12 @@ class AppDrawer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: InkWell(
-        onTap: () {},
+        onTap: () async {
+          await context.read<AuthProvider>().logout();
+          if (context.mounted) {
+            context.go(AppRoutes.login);
+          }
+        },
         child: const Row(
           children: [
             Icon(Icons.logout_rounded, color: Colors.redAccent),

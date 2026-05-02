@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_store/features/orders/presentation/providers/cart_provider.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
 import '../../../../core/widgets/app_drawer.dart';
 import '../widgets/markets_grid.dart';
@@ -62,12 +64,48 @@ class _HomeScreenState extends State<HomeScreen> {
             context.push(AppRoutes.notifications);
           },
         ),
-        IconButton(
-          icon: Icon(
-            Icons.shopping_cart_outlined,
-            color: theme.appBarTheme.foregroundColor,
-          ),
-          onPressed: () {},
+        Consumer<CartProvider>(
+          builder: (context, cart, child) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.shopping_cart_outlined,
+                    color: theme.appBarTheme.foregroundColor,
+                  ),
+                  onPressed: () {
+                    context.push(AppRoutes.cart);
+                  },
+                ),
+                if (cart.itemCount > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '${cart.itemCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ],
     );
@@ -111,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -119,6 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: TextField(
         textAlign: TextAlign.right,
+        onSubmitted: (query) {
+          if (query.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('جاري البحث عن: $query')),
+            );
+          }
+        },
         decoration: InputDecoration(
           hintText: "ابحث عن خدمة...",
           hintStyle: const TextStyle(

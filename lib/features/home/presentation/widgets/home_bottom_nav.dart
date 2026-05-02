@@ -32,7 +32,7 @@ class HomeBottomNav extends StatelessWidget {
         onTap: (index) {
           navigationShell.goBranch(
             index,
-            initialLocation: index == navigationShell.currentIndex,
+            initialLocation: true, // تغيير هذا السطر ليقوم بتفريغ الستاك عند التنقل بين الصفحات
           );
         },
         type: BottomNavigationBarType.fixed,
