@@ -20,11 +20,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       // AppBar يتبع ثيم التطبيق تلقائياً
       appBar: AppBar(
         title: const Text("اقتراحات لك"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.pushReplacementNamed(context, 'home_screen.id'),
+        centerTitle: true,
         ),
-      ),
       body: Column(
         children: [
           // 1. التبويبات العلوية

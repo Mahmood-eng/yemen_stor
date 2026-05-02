@@ -2,33 +2,24 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTheme {
-  // دالة مساعدة لتوحيد شكل الحدود (Borders)
+  // دالة مساعدة موحدة للحدود لتجنب التكرار
   static OutlineInputBorder _border(Color color) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(15),
-    borderSide: BorderSide(color: color, width: 1),
+    borderRadius: BorderRadius.all(Radius.circular(15)),
+     borderSide: BorderSide.none,
+
   );
 
-  // --- الثيم الفاتح (Light Mode) ---
+  // --- الثيم الفاتح (Light Theme) ---
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
-        brightness: Brightness.light, // مطابقة للثيم
-        primary: AppColors.primary,
-        onPrimary: AppColors.white,
-        surface: AppColors.white,
-        onSurface: AppColors.textDark,
-      ),
-
-      scaffoldBackgroundColor: AppColors.background,
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.bgLight,
       fontFamily: 'Cairo',
 
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.primary,
+        backgroundColor: AppColors.bgLight,
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: AppColors.primary),
@@ -40,83 +31,87 @@ class AppTheme {
         ),
       ),
 
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.white,
-          minimumSize: const Size(double.infinity, 55),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          textStyle: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
-        ),
-      ),
+      cardColor: AppColors.cardLight,
+      dividerColor: Colors.grey.withOpacity(0.1),
 
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        hintStyle: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: Colors.grey.shade400),
-        prefixIconColor: AppColors.primary,
-        suffixIconColor: AppColors.primary,
-        border: _border(Colors.grey.shade200),
-        enabledBorder: _border(Colors.grey.shade100),
-        focusedBorder: _border(AppColors.primary),
-      ),
+      elevatedButtonTheme: _buttonTheme(AppColors.primary, AppColors.white),
 
       textTheme: const TextTheme(
-        displayLarge: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: AppColors.textDark),
-        bodyMedium: TextStyle(fontFamily: 'Cairo', color: AppColors.textDark),
+        displayLarge: TextStyle(
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.bold,
+          color: AppColors.primary,
+        ),
+        bodyMedium: TextStyle(
+          fontFamily: 'Cairo',
+          color: AppColors.textSecondary,
+        ),
       ),
     );
   }
 
-  // --- الثيم المظلم (Dark Mode) ---
+  // --- الثيم المظلم (Dark Theme) ---
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark, 
-
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
-        brightness: Brightness.dark, // مطابقة للثيم
-        primary: AppColors.primary,
-        onPrimary: AppColors.white,
-        surface: AppColors.backgroundDark,
-        onSurface: AppColors.white,
-      ),
-
-      scaffoldBackgroundColor: AppColors.backgroundDark,
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.bgDark,
       fontFamily: 'Cairo',
 
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1E1E1E),
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.cardDark,
         elevation: 0,
         centerTitle: true,
-      ),
-
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.white,
-          minimumSize: const Size(double.infinity, 55),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        iconTheme: IconThemeData(color: AppColors.white),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: AppColors.white,
         ),
       ),
 
+      cardColor: AppColors.cardDark,
+      dividerColor: Colors.white10,
+
+      elevatedButtonTheme: _buttonTheme(AppColors.primary, AppColors.white),
+
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.bold,
+          color: AppColors.white,
+        ),
+        bodyMedium: TextStyle(fontFamily: 'Cairo', color: Colors.white70),
+      ),
+
+      // تحسين شكل الحقول في الوضع المظلم
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white.withOpacity(0.05),
-        hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 13, color: Colors.white38),
-        prefixIconColor: AppColors.primary,
-        suffixIconColor: AppColors.primary,
         border: _border(Colors.white10),
         enabledBorder: _border(Colors.white10),
         focusedBorder: _border(AppColors.primary),
       ),
-
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: AppColors.white),
-        bodyMedium: TextStyle(fontFamily: 'Cairo', color: Colors.white70),
-      ),
     );
   }
+
+  // دالة مساعدة لتوحيد ثيم الأزرار
+  static ElevatedButtonThemeData _buttonTheme(Color bg, Color fg) =>
+      ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bg,
+          foregroundColor: fg,
+          minimumSize: const Size(double.infinity, 55),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          textStyle: const TextStyle(
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      );
 }

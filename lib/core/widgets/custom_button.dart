@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/core/theme/app_colors.dart'; 
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -17,8 +16,8 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // التحقق مما إذا كان التطبيق في وضع الـ Dark Mode
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    // جلب بيانات الثيم الحالية
+    final theme = Theme.of(context);
 
     return SizedBox(
       width: double.infinity,
@@ -26,29 +25,27 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          // إذا لم نمرر لون مخصص، نأخذ اللون الرئيسي من ملف الألوان
-          backgroundColor: backgroundColor ?? AppColors.primary,
+          // إذا لم نمرر لون مخصص، فإنه سيأخذ اللون الرئيسي (primary) تلقائياً من الثيم
+          backgroundColor: backgroundColor ?? theme.primaryColor,
 
-          // لون الزر عند التعطيل (يصبح شفافاً قليلاً)
-          disabledBackgroundColor: (backgroundColor ?? AppColors.primary)
-              .withOpacity(0.4),
+          // لون النص داخل الزر يسحب من الثيم (غالباً الأبيض)
+          foregroundColor: textColor ?? theme.colorScheme.onPrimary,
 
-          // لون النص والأيقونات داخل الزر
-          foregroundColor: textColor ?? AppColors.white,
+          // لون الزر عند التعطيل (Disabled)
+          disabledBackgroundColor: (backgroundColor ?? theme.primaryColor).withOpacity(0.4),
 
-          // الحواف (تأخذ شكلها من الثيم أو القيمة الثابتة)
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          elevation: 0, // تصميم مسطح (Flat) أكثر عصرية
+          // الحواف والشكل يتم سحبها من إعدادات الثيم الموحدة
+          shape: theme.elevatedButtonTheme.style?.shape?.resolve({}),
+          elevation: 0,
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: textColor ?? AppColors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            // التأكد من استخدام خط Cairo الموحد
             fontFamily: 'Cairo',
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: textColor ?? theme.colorScheme.onPrimary,
           ),
         ),
       ),

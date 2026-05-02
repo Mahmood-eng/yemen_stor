@@ -39,7 +39,12 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
      
-        appBar: AppBar(title: const Text("تغذية رصيدي")),
+        appBar: AppBar(title: const Text("تغذية رصيدي"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
+        ),
+        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(

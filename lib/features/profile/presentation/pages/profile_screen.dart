@@ -54,7 +54,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("الملف الشخصي"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -80,6 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+        
     );
   }
 

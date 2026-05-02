@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/core/widgets/CustomTextField.dart';
-import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/social_divider.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/social_icons_row.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../core/widgets/CustomTextField.dart';
+import '../../../../core/widgets/custom_button.dart';
 
 class SignUpScreen extends StatefulWidget {
-  static const String id = 'signup_screen';
   const SignUpScreen({super.key});
 
   @override
@@ -14,119 +12,71 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  bool _isPasswordVisible = false;
   bool _acceptTerms = false;
-  final List<String> _yemenGovernorates = ["تعز", "صنعاء", "عدن", "إب", "الحديدة", "حضرموت", "مأرب"];
   String _selectedCity = "تعز";
 
   @override
   Widget build(BuildContext context) {
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      // يعتمد على خلفية الثيم مباشرة
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.primary,
+      backgroundColor: isDark ? theme.scaffoldBackgroundColor : theme.primaryColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            _buildLogo(),
-            const SizedBox(height: 15),
-            
-            // استثناء: اللون الأبيض للنصوص فوق الخلفية الكحلية (في الوضع الفاتح)
-            Text(
-              "إنشاء حساب جديد",
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                color: Colors.white, 
-                fontSize: 24,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            children: [
+              Text(
+                "إنشاء حساب جديد",
+                style: theme.textTheme.displayLarge?.copyWith(color: Colors.white, fontSize: 24),
               ),
-            ),
-            const Text(
-              "استمتع بتجربة تسوق فريدة مع يمن ستور",
-              style: TextStyle(color: Colors.white70, fontSize: 13),
-            ),
-
-            const SizedBox(height: 25),
-
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(25),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E1E1E) : AppColors.background,
-                borderRadius: BorderRadius.circular(30),
+              const SizedBox(height: 30),
+              const CustomTextField(hintText: "الاسم الكامل", icon: Icons.person_outline),
+              const SizedBox(height: 15),
+              const CustomTextField(hintText: "رقم الهاتف", icon: Icons.phone_android_outlined),
+              const SizedBox(height: 15),
+              _buildCityDropdown(theme),
+              const SizedBox(height: 15),
+              const CustomTextField(hintText: "كلمة المرور", icon: Icons.lock_outline, isPassword: true),
+              const SizedBox(height: 20),
+              _buildTermsCheckbox(theme),
+              const SizedBox(height: 30),
+              CustomButton(
+                text: "إنشاء الحساب",
+                backgroundColor: isDark ? theme.primaryColor : Colors.white,
+                textColor: isDark ? Colors.white : theme.primaryColor,
+                onPressed: _acceptTerms ? () {} : null,
               ),
-              child: Column(
-                children: [
-                  const CustomTextField(hintText: "الاسم الكامل", icon: Icons.person_outline),
-                  const SizedBox(height: 15),
-                  const CustomTextField(hintText: "رقم الهاتف أو البريد الإلكتروني", icon: Icons.contact_mail_outlined),
-                  const SizedBox(height: 15),
-
-                  // حقل المدينة (يعتمد الآن على inputDecorationTheme من الثيم)
-                  _buildCityDropdown(isDark),
-
-                  const SizedBox(height: 15),
-                  CustomTextField(
-                    hintText: "كلمة المرور",
-                    icon: Icons.lock_outline,
-                    isPassword: !_isPasswordVisible,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                        color: AppColors.primary,
-                      ),
-                      onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-                  _buildTermsCheckbox(isDark),
-                  const SizedBox(height: 20),
-
-                  // الزر يعتمد على elevatedButtonTheme
-                  CustomButton(
-                    text: "إنشاء الحساب",
-                    onPressed: _acceptTerms ? () {} : null,
-                  ),
-
-                  const SizedBox(height: 25),
-                  const SocialDivider(),
-                  const SizedBox(height: 15),
-                  const SocialIconsRow(),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            _buildLoginRedirect(isDark),
-            const SizedBox(height: 30),
-          ],
+              const SizedBox(height: 20),
+              _buildLoginRedirect(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildLogo() {
-    return Image.asset(
-      'assets/images/logo.png',
-      height: 100,
-      errorBuilder: (context, error, stackTrace) => const Icon(Icons.store, size: 80, color: Colors.white),
-    );
-  }
-
-  Widget _buildCityDropdown(bool isDark) {
-    // استخدمنا InputDecorator ليرث خصائص التصميم من الثيم العام للحقول
-    return InputDecorator(
-      decoration: const InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-        prefixIcon: Icon(Icons.location_on_outlined),
+  Widget _buildCityDropdown(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: theme.inputDecorationTheme.fillColor,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white12),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedCity,
           isExpanded: true,
-          dropdownColor: isDark ? const Color(0xFF2C2C2C) : Colors.white,
-          items: _yemenGovernorates.map((city) => DropdownMenuItem(
+          dropdownColor: theme.primaryColor,
+          style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+          items: ["تعز", "صنعاء", "عدن"].map((city) => DropdownMenuItem(
             value: city,
             child: Text(city),
           )).toList(),
@@ -136,43 +86,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildTermsCheckbox(bool isDark) {
+  Widget _buildTermsCheckbox(ThemeData theme) {
     return Row(
       children: [
         Checkbox(
           value: _acceptTerms,
-          // الخصائص مسحوبة من checkboxTheme في الثيم
+          activeColor: Colors.white,
+          checkColor: theme.primaryColor,
           onChanged: (value) => setState(() => _acceptTerms = value!),
         ),
-        Expanded(
-          child: GestureDetector(
-            onTap: () => setState(() => _acceptTerms = !_acceptTerms),
-            child: Text(
-              "أوافق على شروط الاستخدام وسياسة الخصوصية",
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 11,
-                decoration: TextDecoration.underline,
-                // استثناء لوني لتمييز النص كلياً
-                color: isDark ? Colors.white70 : AppColors.primary,
-              ),
-            ),
+        const Expanded(
+          child: Text(
+            "أوافق على شروط الاستخدام وسياسة الخصوصية",
+            style: TextStyle(color: Colors.white70, fontSize: 12, decoration: TextDecoration.underline),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildLoginRedirect(bool isDark) {
+  Widget _buildLoginRedirect() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text("لديك حساب بالفعل؟", style: TextStyle(color: Colors.white70)),
         TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(
-            "تسجيل الدخول",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
+          onPressed: () => context.go(AppRoutes.login),
+          child: const Text("تسجيل الدخول", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
     );

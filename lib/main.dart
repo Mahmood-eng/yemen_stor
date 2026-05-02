@@ -4,7 +4,6 @@ import 'package:yemen_store/core/theme/app_theme.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
 
 void main() {
-
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const YemenStoreApp());
 }
@@ -14,9 +13,13 @@ class YemenStoreApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    // تم التغيير هنا إلى .router ليعمل نظام GoRouter
+    return MaterialApp.router(
       title: 'Yemen Store',
       debugShowCheckedModeBanner: false,
+
+      // --- إعدادات GoRouter ---
+      routerConfig: AppRoutes.router, 
 
       // --- إعدادات اللغة العربية وواجهة RTL ---
       localizationsDelegates: const [
@@ -33,10 +36,6 @@ class YemenStoreApp extends StatelessWidget {
       theme: AppTheme.lightTheme, 
       darkTheme: AppTheme.darkTheme, 
       themeMode: ThemeMode.system, 
-
-      // --- نظام التنقل (Routes) ---
-      initialRoute: AppRoutes.initialRoute, 
-      routes: AppRoutes.routes,
     );
   }
 }
