@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/features/markets/data/models/market_model.dart';
 
@@ -6,7 +8,11 @@ class MarketExpansionCard extends StatelessWidget {
   final MarketModel market;
   final bool isDark;
 
-  const MarketExpansionCard({super.key, required this.market, required this.isDark});
+  const MarketExpansionCard({
+    super.key,
+    required this.market,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +28,13 @@ class MarketExpansionCard extends StatelessWidget {
       child: ExpansionTile(
         shape: const RoundedRectangleBorder(side: BorderSide.none),
         leading: CircleAvatar(
-          backgroundColor: isArta ? Colors.orange.withOpacity(0.1) : AppColors.primary.withOpacity(0.1),
-          child: Icon(market.icon, color: isArta ? Colors.orange : AppColors.primary),
+          backgroundColor: isArta
+              ? Colors.orange.withOpacity(0.1)
+              : AppColors.primary.withOpacity(0.1),
+          child: Icon(
+            market.icon,
+            color: isArta ? Colors.orange : AppColors.primary,
+          ),
         ),
         title: Text(
           market.name,
@@ -32,12 +43,21 @@ class MarketExpansionCard extends StatelessWidget {
             color: isArta ? Colors.orange : null,
           ),
         ),
-        children: market.subCategories.map((sub) => ListTile(
-          leading: Icon(sub['icon'], size: 18, color: Colors.grey),
-          title: Text(sub['title'], style: const TextStyle(fontSize: 14)),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 12),
-          onTap: () { /* التنقل لصفحة المحلات */ },
-        )).toList(),
+        children: market.subCategories
+            .map(
+              (sub) => ListTile(
+                leading: Icon(sub['icon'], size: 18, color: Colors.grey),
+                title: Text(sub['title'], style: const TextStyle(fontSize: 14)),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+                onTap: () {
+                  context.push(
+                    AppRoutes.subcategories,
+                    extra: {'market': market.toJson(), 'subcategory': sub},
+                  );
+                },
+              ),
+            )
+            .toList(),
       ),
     );
   }

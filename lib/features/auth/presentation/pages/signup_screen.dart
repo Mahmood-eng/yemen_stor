@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/widgets/CustomTextField.dart';
+import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/custom_button.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -21,7 +21,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? theme.scaffoldBackgroundColor : theme.primaryColor,
+      backgroundColor: isDark
+          ? theme.scaffoldBackgroundColor
+          : theme.primaryColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -34,16 +36,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               Text(
                 "إنشاء حساب جديد",
-                style: theme.textTheme.displayLarge?.copyWith(color: Colors.white, fontSize: 24),
+                style: theme.textTheme.displayLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontSize: 24,
+                ),
               ),
               const SizedBox(height: 30),
-              const CustomTextField(hintText: "الاسم الكامل", icon: Icons.person_outline),
+              const CustomTextField(
+                hintText: "الاسم الكامل",
+                icon: Icons.person_outline,
+              ),
               const SizedBox(height: 15),
-              const CustomTextField(hintText: "رقم الهاتف", icon: Icons.phone_android_outlined),
+              const CustomTextField(
+                hintText: "رقم الهاتف",
+                icon: Icons.phone_android_outlined,
+              ),
               const SizedBox(height: 15),
               _buildCityDropdown(theme),
               const SizedBox(height: 15),
-              const CustomTextField(hintText: "كلمة المرور", icon: Icons.lock_outline, isPassword: true),
+              const CustomTextField(
+                hintText: "كلمة المرور",
+                icon: Icons.lock_outline,
+                isPassword: true,
+              ),
               const SizedBox(height: 20),
               _buildTermsCheckbox(theme),
               const SizedBox(height: 30),
@@ -76,10 +91,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           isExpanded: true,
           dropdownColor: theme.primaryColor,
           style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-          items: ["تعز", "صنعاء", "عدن"].map((city) => DropdownMenuItem(
-            value: city,
-            child: Text(city),
-          )).toList(),
+          items: ["تعز", "صنعاء", "عدن"]
+              .map((city) => DropdownMenuItem(value: city, child: Text(city)))
+              .toList(),
           onChanged: (val) => setState(() => _selectedCity = val!),
         ),
       ),
@@ -98,7 +112,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const Expanded(
           child: Text(
             "أوافق على شروط الاستخدام وسياسة الخصوصية",
-            style: TextStyle(color: Colors.white70, fontSize: 12, decoration: TextDecoration.underline),
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              decoration: TextDecoration.underline,
+            ),
           ),
         ),
       ],
@@ -109,10 +127,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("لديك حساب بالفعل؟", style: TextStyle(color: Colors.white70)),
+        const Text(
+          "لديك حساب بالفعل؟",
+          style: TextStyle(color: Colors.white70),
+        ),
         TextButton(
           onPressed: () => context.go(AppRoutes.login),
-          child: const Text("تسجيل الدخول", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          child: const Text(
+            "تسجيل الدخول",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );

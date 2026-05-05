@@ -5,7 +5,6 @@ import '../../../../core/widgets/app_drawer.dart';
 import '../widgets/markets_grid.dart';
 import '../widgets/home_balance_card.dart';
 import '../widgets/home_banner_slider.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -111,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: theme.shadowColor.withAlpha((0.1 * 255).round()),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -121,18 +120,20 @@ class _HomeScreenState extends State<HomeScreen> {
         textAlign: TextAlign.right,
         decoration: InputDecoration(
           hintText: "ابحث عن خدمة...",
-          hintStyle: const TextStyle(
+          hintStyle: TextStyle(
             fontFamily: 'Cairo',
             fontSize: 13,
-            color: Colors.grey,
+            color: theme.hintColor,
           ),
-          prefixIcon: Icon(Icons.search, color: AppColors.primary),
+          prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
           suffixIcon: Icon(
             Icons.qr_code_scanner_rounded,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
           ),
           filled: true,
-          fillColor: const Color(0xFFF3F5F7),
+          fillColor:
+              theme.inputDecorationTheme.fillColor ??
+              theme.colorScheme.surfaceContainerHighest,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -160,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Text(
             "عرض الكل",
             style: TextStyle(
-              color: theme.primaryColor,
+              color: theme.colorScheme.primary,
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
             ),

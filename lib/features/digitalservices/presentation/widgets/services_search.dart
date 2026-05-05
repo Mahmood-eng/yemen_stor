@@ -11,14 +11,20 @@ class ServicesSearchField extends StatelessWidget {
     return Container(
       height: 55,
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : const Color(0xFFF2F5F9),
+        color: isDark
+            ? Colors.white.withAlpha((0.05 * 255).round())
+            : const Color(0xFFF2F5F9),
         borderRadius: BorderRadius.circular(15),
       ),
       child: TextField(
         textAlign: TextAlign.right,
         decoration: InputDecoration(
           hintText: "ابحث عن خدمة...",
-          hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 13, color: Colors.grey),
+          hintStyle: const TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 13,
+            color: Colors.grey,
+          ),
           prefixIcon: const Icon(Icons.search, color: AppColors.primary),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),

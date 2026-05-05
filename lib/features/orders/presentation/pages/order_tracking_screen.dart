@@ -20,15 +20,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        
         body: Stack(
-          
           children: [
-            
-           
-           
             const TrackingMapWidget(),
-            _buildBackButton(isDark),
+            _buildBackButton(theme),
             _buildDraggableSheet(theme, isDark),
           ],
         ),
@@ -36,12 +31,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildBackButton(bool isDark) {
+  Widget _buildBackButton(ThemeData theme) {
     return Positioned(
-      top: 50, right: 20,
+      top: 50,
+      right: 20,
       child: FloatingActionButton.small(
-        backgroundColor: isDark ? Colors.grey[800] : Colors.white,
-        child: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : const Color.fromARGB(242, 3, 44, 116)),
+        backgroundColor: theme.colorScheme.surface,
+        child: Icon(Icons.arrow_back_ios, color: theme.colorScheme.onSurface),
         onPressed: () => Navigator.pop(context),
       ),
     );
@@ -57,13 +53,27 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-            boxShadow: [BoxShadow(color: isDark ? Colors.black54 : Colors.black12, blurRadius: 10)],
+            boxShadow: [
+              BoxShadow(
+                color: theme.shadowColor.withOpacity(isDark ? 0.6 : 0.2),
+                blurRadius: 10,
+              ),
+            ],
           ),
           child: ListView(
             controller: scrollController,
             padding: const EdgeInsets.all(25),
             children: [
-              Center(child: Container(width: 40, height: 5, decoration: BoxDecoration(color: theme.dividerColor, borderRadius: BorderRadius.circular(10)))),
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: theme.dividerColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               const DriverInfoWidget(name: "أحمد سعيد المقطري"),
               const Divider(height: 40),
@@ -78,6 +88,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   Widget _buildOrderSummary(ThemeData theme) {
-    return Text("طلب رقم: #${widget.orderId}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16));
+    return Text(
+      "طلب رقم: #${widget.orderId}",
+      style: theme.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+    );
   }
 }

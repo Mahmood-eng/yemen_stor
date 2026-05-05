@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/widgets/custom_button.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -11,7 +10,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
- 
   final String _origName = "محمود عبدالسلام محمد";
   final String _origPhone = "770500596";
   final String _origEmail = "mahmoodalmaqtari@gmail.com";
@@ -32,7 +30,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emailController = TextEditingController(text: _origEmail);
     _addressController = TextEditingController(text: _origAddress);
 
-   
     _nameController.addListener(_checkChanges);
     _phoneController.addListener(_checkChanges);
     _emailController.addListener(_checkChanges);
@@ -40,7 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _checkChanges() {
-    bool changed = _nameController.text != _origName ||
+    bool changed =
+        _nameController.text != _origName ||
         _phoneController.text != _origPhone ||
         _emailController.text != _origEmail ||
         _addressController.text != _origAddress;
@@ -66,14 +64,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             _buildProfileHeader(isDark),
             const SizedBox(height: 30),
-            
-            _buildProfileField(label: "الاسم الكامل", controller: _nameController, icon: Icons.person_outline),
-            _buildProfileField(label: "رقم الهاتف", controller: _phoneController, icon: Icons.phone_android, keyboardType: TextInputType.phone),
-            _buildProfileField(label: "البريد الإلكتروني", controller: _emailController, icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
-            _buildProfileField(label: "العنوان", controller: _addressController, icon: Icons.location_on_outlined, maxLines: 2),
+
+            _buildProfileField(
+              label: "الاسم الكامل",
+              controller: _nameController,
+              icon: Icons.person_outline,
+            ),
+            _buildProfileField(
+              label: "رقم الهاتف",
+              controller: _phoneController,
+              icon: Icons.phone_android,
+              keyboardType: TextInputType.phone,
+            ),
+            _buildProfileField(
+              label: "البريد الإلكتروني",
+              controller: _emailController,
+              icon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            _buildProfileField(
+              label: "العنوان",
+              controller: _addressController,
+              icon: Icons.location_on_outlined,
+              maxLines: 2,
+            ),
 
             const SizedBox(height: 30),
-            
+
             if (_isEdited)
               CustomButton(
                 text: "حفظ التغييرات",
@@ -85,7 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
-        
     );
   }
 
@@ -97,22 +113,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             CircleAvatar(
               radius: 55,
-              backgroundColor: isDark ? Colors.white10 : AppColors.primary.withOpacity(0.1),
-              child: Icon(Icons.person, size: 60, color: AppColors.primary),
+              backgroundColor: isDark
+                  ? Colors.white10
+                  : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              child: Icon(
+                Icons.person,
+                size: 60,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
             CircleAvatar(
               radius: 18,
-              backgroundColor: AppColors.primary,
-              child: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: const Icon(
+                Icons.camera_alt,
+                size: 18,
+                color: Colors.white,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 15),
         Text(
           _origName,
-          style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 20),
+          style: Theme.of(
+            context,
+          ).textTheme.displayLarge?.copyWith(fontSize: 20),
         ),
-        const Text("عميل ذهبي", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+        const Text(
+          "عميل ذهبي",
+          style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }

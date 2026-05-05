@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yemen_store/core/theme/app_colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -8,34 +9,36 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final Color _primaryColor = const Color(0xFF0D3B66);
-
   // بيانات تجريبية للإشعارات
   final List<Map<String, dynamic>> _notifications = [
     {
       "title": "تم شحن الرصيد بنجاح",
-      "body": "تم إضافة 10,000 ر.ي إلى محفظتك عبر بنك الكريمي. رقم العملية: #88210",
+      "body":
+          "تم إضافة 10,000 ر.ي إلى محفظتك عبر بنك الكريمي. رقم العملية: #88210",
       "time": "منذ 5 دقائق",
       "isRead": false,
       "type": "success", // success, alert, promo
     },
     {
       "title": "فشل سداد فاتورة الكهرباء",
-      "body": "نعتذر، تعذر إتمام عملية سداد فاتورة الكهرباء لعدم توفر خدمة المزود حالياً. تم إعادة المبلغ لمحفظتك.",
+      "body":
+          "نعتذر، تعذر إتمام عملية سداد فاتورة الكهرباء لعدم توفر خدمة المزود حالياً. تم إعادة المبلغ لمحفظتك.",
       "time": "منذ ساعتين",
       "isRead": false,
       "type": "alert",
     },
     {
       "title": "عرض خاص لمحبي الألعاب 🎮",
-      "body": "احصل على خصم 15% عند شراء بطاقات Google Play باستخدام رصيد المحفظة. العرض ساري لـ 24 ساعة!",
+      "body":
+          "احصل على خصم 15% عند شراء بطاقات Google Play باستخدام رصيد المحفظة. العرض ساري لـ 24 ساعة!",
       "time": "أمس، 09:30 م",
       "isRead": true,
       "type": "promo",
     },
     {
       "title": "تحديث أمني للحساب",
-      "body": "لقد قمت بتغيير عنوان التوصيل الخاص بك بنجاح من إعدادات الملف الشخصي.",
+      "body":
+          "لقد قمت بتغيير عنوان التوصيل الخاص بك بنجاح من إعدادات الملف الشخصي.",
       "time": "15 مارس 2026",
       "isRead": true,
       "type": "info",
@@ -44,64 +47,85 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFD),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor:
+              theme.appBarTheme.backgroundColor ?? colorScheme.surface,
           elevation: 0.5,
           title: Text(
             "الإشعارات",
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, color: _primaryColor, fontSize: 18),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+            ),
           ),
           centerTitle: true,
           actions: [
-            // زر تحديد الكل كمقروء
             TextButton(
               onPressed: () {},
-              child: const Text("تحديد الكل", style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.blue)),
-            )
+              style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
+              child: const Text(
+                "تحديد الكل",
+                style: TextStyle(fontFamily: 'Cairo', fontSize: 12),
+              ),
+            ),
           ],
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: _primaryColor, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: theme.appBarTheme.foregroundColor ?? colorScheme.onSurface,
+              size: 20,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: _notifications.isEmpty 
-          ? _buildEmptyState() 
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              itemCount: _notifications.length,
-              itemBuilder: (context, index) {
-                return _buildNotificationItem(_notifications[index]);
-              },
-            ),
+        body: _notifications.isEmpty
+            ? _buildEmptyState(theme)
+            : ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                itemCount: _notifications.length,
+                itemBuilder: (context, index) {
+                  return _buildNotificationItem(context, _notifications[index]);
+                },
+              ),
       ),
     );
   }
 
-  Widget _buildNotificationItem(Map<String, dynamic> item) {
+  Widget _buildNotificationItem(
+    BuildContext context,
+    Map<String, dynamic> item,
+  ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     Color iconColor;
     IconData iconData;
-    Color bgColor = item['isRead'] ? Colors.white : const Color(0xFFE3F2FD).withOpacity(0.4);
+    final bool isRead = item['isRead'] as bool;
+    final Color bgColor = isRead
+        ? colorScheme.surface
+        : colorScheme.primary.withOpacity(0.08);
 
-    // تحديد شكل الإشعار بناءً على نوعه
     switch (item['type']) {
       case 'success':
-        iconColor = Colors.green;
+        iconColor = AppColors.success;
         iconData = Icons.check_circle_outline;
         break;
       case 'alert':
-        iconColor = Colors.redAccent;
+        iconColor = AppColors.error;
         iconData = Icons.error_outline;
         break;
       case 'promo':
-        iconColor = Colors.orange;
+        iconColor = AppColors.warning;
         iconData = Icons.local_offer_outlined;
         break;
       default:
-        iconColor = _primaryColor;
+        iconColor = colorScheme.primary;
         iconData = Icons.notifications_none_outlined;
     }
 
@@ -110,16 +134,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: item['isRead'] ? Colors.grey.shade200 : _primaryColor.withOpacity(0.1)),
+        border: Border.all(
+          color: isRead
+              ? theme.dividerColor
+              : colorScheme.primary.withOpacity(0.14),
+        ),
         boxShadow: [
-          if (item['isRead'] == false)
-            BoxShadow(color: _primaryColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+          if (!isRead)
+            BoxShadow(
+              color: colorScheme.primary.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(12),
         leading: CircleAvatar(
-          backgroundColor: iconColor.withOpacity(0.1),
+          backgroundColor: iconColor.withOpacity(0.15),
           child: Icon(iconData, color: iconColor, size: 24),
         ),
         title: Row(
@@ -128,16 +160,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Expanded(
               child: Text(
                 item['title'],
-                style: TextStyle(
-                  fontFamily: 'Cairo', 
-                  fontWeight: item['isRead'] ? FontWeight.w600 : FontWeight.bold,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontFamily: 'Cairo',
+                  fontWeight: isRead ? FontWeight.w600 : FontWeight.bold,
                   fontSize: 14,
-                  color: _primaryColor
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
-            if (!item['isRead'])
-              const CircleAvatar(radius: 4, backgroundColor: Colors.blue),
+            if (!isRead)
+              CircleAvatar(radius: 4, backgroundColor: colorScheme.primary),
           ],
         ),
         subtitle: Column(
@@ -146,12 +178,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 5),
             Text(
               item['body'],
-              style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.black54, height: 1.4),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontFamily: 'Cairo',
+                fontSize: 12,
+                color: colorScheme.onSurface.withOpacity(0.8),
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               item['time'],
-              style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
           ],
         ),
@@ -165,15 +204,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   // واجهة في حال لا توجد إشعارات
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ThemeData theme) {
+    final colorScheme = theme.colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_off_outlined, size: 80, color: Colors.grey.shade300),
+          Icon(
+            Icons.notifications_off_outlined,
+            size: 80,
+            color: colorScheme.onSurface.withOpacity(0.35),
+          ),
           const SizedBox(height: 20),
-          Text("لا توجد إشعارات حالياً", 
-            style: TextStyle(fontFamily: 'Cairo', color: Colors.grey.shade400, fontSize: 16)),
+          Text(
+            "لا توجد إشعارات حالياً",
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontFamily: 'Cairo',
+              color: colorScheme.onSurface.withOpacity(0.65),
+              fontSize: 16,
+            ),
+          ),
         ],
       ),
     );

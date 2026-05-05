@@ -12,7 +12,11 @@ class MarketsScreen extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("كل الأسواق والأقسام")),
+      appBar: AppBar(title: const Text("كل الأسواق والأقسام"),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios_new),
+        onPressed: () => Navigator.pop(context),
+      ),),
       body: Column(
         children: [
           _buildSearchHeader(isDark),

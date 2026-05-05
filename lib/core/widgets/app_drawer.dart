@@ -30,24 +30,37 @@ class AppDrawer extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 children: [
                   _buildSectionTitle(context, "الحساب الشخصي"),
-                  _buildDrawerItem(context, Icons.person_outline, "الملف الشخصي", () {
-                    context.push( AppRoutes.profile);
-                    
-                  }),
-                  _buildDrawerItem(context, Icons.favorite_border, "مفضلاتي", () {
-                    context.push  (AppRoutes.favorites);
-                  }),
-                  _buildDrawerItem(context, Icons.account_balance_wallet_outlined, "تغذية الحساب", () {
-
-                    context.push(AppRoutes.wallet);
-                  }),
-                  
-                  Divider(
-                    indent: 20, 
-                    endIndent: 20, 
-                    color: theme.dividerColor.withOpacity(0.1)
+                  _buildDrawerItem(
+                    context,
+                    Icons.person_outline,
+                    "الملف الشخصي",
+                    () {
+                      context.push(AppRoutes.profile);
+                    },
                   ),
-                  
+                  _buildDrawerItem(
+                    context,
+                    Icons.favorite_border,
+                    "مفضلاتي",
+                    () {
+                      context.push(AppRoutes.favorites);
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.account_balance_wallet_outlined,
+                    "تغذية الحساب",
+                    () {
+                      context.push(AppRoutes.wallet);
+                    },
+                  ),
+
+                  Divider(
+                    indent: 20,
+                    endIndent: 20,
+                    color: theme.dividerColor.withAlpha((0.1 * 255).round()),
+                  ),
+
                   _buildSectionTitle(context, "خدمات الأعمال"),
                   _buildSpecialItem(
                     context,
@@ -57,17 +70,32 @@ class AppDrawer extends StatelessWidget {
                     Colors.orange.shade800,
                     () {},
                   ),
-                  _buildDrawerItem(context, Icons.storefront_outlined, "فتح حساب تاجر", () {}),
-                  
-                  Divider(
-                    indent: 20, 
-                    endIndent: 20, 
-                    color: theme.dividerColor.withOpacity(0.1)
+                  _buildDrawerItem(
+                    context,
+                    Icons.storefront_outlined,
+                    "فتح حساب تاجر",
+                    () {},
                   ),
-                  
+
+                  Divider(
+                    indent: 20,
+                    endIndent: 20,
+                    color: theme.dividerColor.withAlpha((0.1 * 255).round()),
+                  ),
+
                   _buildSectionTitle(context, "الإعدادات والدعم"),
-                  _buildDrawerItem(context, Icons.settings_outlined, "الإعدادات", () {}),
-                  _buildDrawerItem(context, Icons.info_outline, "حول التطبيق", () {}),
+                  _buildDrawerItem(
+                    context,
+                    Icons.settings_outlined,
+                    "الإعدادات",
+                    () {},
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.info_outline,
+                    "حول التطبيق",
+                    () {},
+                  ),
                 ],
               ),
             ),
@@ -101,8 +129,8 @@ class AppDrawer extends StatelessWidget {
               Text(
                 "محمود المقطري",
                 style: theme.textTheme.displayLarge?.copyWith(
-                  color: Colors.white, 
-                  fontSize: 16
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
               const Text(
@@ -134,7 +162,12 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, IconData icon, String title, VoidCallback onTap) {
+  Widget _buildDrawerItem(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
     return ListTile(
       leading: Icon(icon, color: theme.primaryColor, size: 24),
@@ -145,31 +178,41 @@ class AppDrawer extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      trailing: Icon(
-        Icons.arrow_forward_ios, 
-        size: 14, 
-        color: theme.hintColor
-      ),
+      trailing: Icon(Icons.arrow_forward_ios, size: 14, color: theme.hintColor),
       onTap: onTap,
     );
   }
 
-  Widget _buildSpecialItem(BuildContext context, IconData icon, String title, String subtitle, Color color, VoidCallback onTap) {
+  Widget _buildSpecialItem(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(15),
       ),
       child: ListTile(
         leading: Icon(icon, color: color, size: 28),
         title: Text(
-          title, 
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
         subtitle: Text(
-          subtitle, 
-          style: TextStyle(fontSize: 11, color: color.withOpacity(0.7))
+          subtitle,
+          style: TextStyle(
+            fontSize: 11,
+            color: color.withAlpha((0.7 * 255).round()),
+          ),
         ),
         onTap: onTap,
       ),
@@ -186,8 +229,11 @@ class AppDrawer extends StatelessWidget {
             Icon(Icons.logout_rounded, color: Colors.redAccent),
             SizedBox(width: 10),
             Text(
-              "تسجيل الخروج", 
-              style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)
+              "تسجيل الخروج",
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

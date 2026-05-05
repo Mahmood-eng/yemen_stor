@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class SocialIconsRow extends StatelessWidget {
   const SocialIconsRow({super.key});
 
@@ -12,11 +11,9 @@ class SocialIconsRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        
         _buildIcon(Icons.apple, isDark ? Colors.white : Colors.black, isDark),
         const SizedBox(width: 15),
 
-       
         _buildIcon(Icons.g_mobiledata, Colors.red, isDark),
         const SizedBox(width: 15),
 
@@ -34,8 +31,10 @@ class SocialIconsRow extends StatelessWidget {
         border: Border.all(
           color: isDark ? Colors.white24 : Colors.grey.shade300,
         ),
-       
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.transparent,
+
+        color: isDark
+            ? Colors.white.withAlpha((0.05 * 255).round())
+            : Colors.transparent,
       ),
       child: Icon(icon, color: color, size: 30),
     );

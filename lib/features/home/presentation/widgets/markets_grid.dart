@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 import '../../../../features/markets/data/models/market_model.dart';
-import '../../../../features/markets/presentation/pages/markets_screen.dart';
 
 class MarketsGrid extends StatelessWidget {
   const MarketsGrid({super.key});
@@ -9,7 +10,7 @@ class MarketsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // 1. نأخذ أول 5 أسواق فقط من الموديل
     final List<MarketModel> displayMarkets = mockMarkets.take(5).toList();
 
@@ -17,9 +18,9 @@ class MarketsGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3, 
-        crossAxisSpacing: 15, 
-        mainAxisSpacing: 15, 
+        crossAxisCount: 3,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 15,
         childAspectRatio: 0.85,
       ),
       // الإجمالي 6 (5 من الموديل + 1 "المزيد")
@@ -29,7 +30,7 @@ class MarketsGrid extends StatelessWidget {
         if (index == displayMarkets.length) {
           return _buildMoreItem(context, isDark);
         }
-        
+
         final market = displayMarkets[index];
         bool isArta = market.name == "عرطة";
         return _buildMarketItem(context, market, isArta, isDark);
@@ -38,7 +39,12 @@ class MarketsGrid extends StatelessWidget {
   }
 
   // ويدجت السوق العادي
-  Widget _buildMarketItem(BuildContext context, MarketModel market, bool isArta, bool isDark) {
+  Widget _buildMarketItem(
+    BuildContext context,
+    MarketModel market,
+    bool isArta,
+    bool isDark,
+  ) {
     return InkWell(
       onTap: () {
         // التنقل لصفحة المحلات التابعة لهذا القسم
@@ -46,15 +52,20 @@ class MarketsGrid extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            height: 70, width: 70,
+            height: 70,
+            width: 70,
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.05) : AppColors.primary.withOpacity(0.05),
+              color: isDark
+                  ? Colors.white.withAlpha((0.05 * 255).round())
+                  : AppColors.primary.withAlpha((0.05 * 255).round()),
               borderRadius: BorderRadius.circular(20),
-              border: isArta ? Border.all(color: Colors.orange, width: 1.5) : null,
+              border: isArta
+                  ? Border.all(color: Colors.orange, width: 1.5)
+                  : null,
             ),
             child: Icon(
-              market.icon, 
-              size: 32, 
+              market.icon,
+              size: 32,
               color: isArta ? Colors.orange : AppColors.primary,
             ),
           ),
@@ -76,25 +87,31 @@ class MarketsGrid extends StatelessWidget {
     return InkWell(
       onTap: () {
         // يودينا لصفحة كل الأسواق
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MarketsScreen()),
-        );
+        context.push(AppRoutes.markets);
       },
       child: Column(
         children: [
           Container(
-            height: 70, width: 70,
+            height: 70,
+            width: 70,
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.1),
+              color: isDark
+                  ? Colors.white.withAlpha((0.05 * 255).round())
+                  : Colors.grey.withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.grid_view_rounded, size: 32, color: Colors.blueGrey),
+            child: const Icon(
+              Icons.grid_view_rounded,
+              size: 32,
+              color: Colors.blueGrey,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             "المزيد",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontSize: 12),
           ),
         ],
       ),
