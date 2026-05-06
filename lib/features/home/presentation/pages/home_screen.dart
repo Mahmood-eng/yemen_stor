@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: theme.appBarTheme.backgroundColor,
       centerTitle: true,
       title: Image.asset(
-        isDark ? 'assets/images/logo_dark.png' : 'assets/images/logo.png',
+        isDark ? 'assets/images/logo.png' : 'assets/images/logo.png',
         height: 40,
       ),
       leading: IconButton(

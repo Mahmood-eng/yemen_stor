@@ -6,11 +6,7 @@ class OrderCard extends StatelessWidget {
   final OrderModel order;
   final VoidCallback onTrackTap;
 
-  const OrderCard({
-    super.key,
-    required this.order,
-    required this.onTrackTap,
-  });
+  const OrderCard({super.key, required this.order, required this.onTrackTap});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +19,15 @@ class OrderCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.cardColor, // يستخدم اللون المحدد في الثيم
         borderRadius: BorderRadius.circular(20),
-        boxShadow: isDark 
-            ? [] 
-            : [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
         border: Border.all(color: theme.dividerColor),
       ),
       child: Column(
@@ -48,7 +50,9 @@ class OrderCard extends StatelessWidget {
                         children: [
                           Text(
                             "طلب رقم: ${order.id}",
-                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           _buildStatusBadge(context, order.status),
                         ],
@@ -56,13 +60,16 @@ class OrderCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         order.time,
-                        style: theme.textTheme.bodySmall, // يستخدم تنسيق الخط من الثيم
+                        style: theme
+                            .textTheme
+                            .bodySmall, // يستخدم تنسيق الخط من الثيم
                       ),
                       const SizedBox(height: 6),
                       Text(
                         "${order.price} ريال",
                         style: TextStyle(
-                          color: colorScheme.primary, // جلب اللون الكحلي من الـ ColorScheme
+                          color: colorScheme
+                              .primary, // جلب اللون الكحلي من الـ ColorScheme
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -75,7 +82,8 @@ class OrderCard extends StatelessWidget {
           ),
 
           // المنطق الذكي للزر
-          if (order.status == OrderStatus.onWay || order.status == OrderStatus.processing)
+          if (order.status == OrderStatus.onWay ||
+              order.status == OrderStatus.processing)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: ElevatedButton(
@@ -90,16 +98,24 @@ class OrderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.05), // اشتقاق لون خفيف من اللون الرئيسي
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+              color: colorScheme.primary.withOpacity(
+                0.05,
+              ), // اشتقاق لون خفيف من اللون الرئيسي
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(20),
+              ),
             ),
             child: Row(
               children: [
-                Icon(Icons.location_on_outlined, size: 16, color: colorScheme.primary),
+                Icon(
+                  Icons.store_mall_directory_rounded,
+                  size: 16,
+                  color: colorScheme.primary,
+                ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    order.storeName,
+                    "${order.marketName}\n${order.categoryName}\n${order.storeName}",
                     style: theme.textTheme.bodySmall,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -116,7 +132,9 @@ class OrderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: status.color.withOpacity(0.12),
+        color: status.color.withOpacity(
+          0.25,
+        ), // زيادة الشفافية لجعل الخلفية أكثر وضوحاً
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(

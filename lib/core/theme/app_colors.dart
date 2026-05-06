@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // الألوان الأساسية للهوية
-  static const Color primary = Color(
-    0xFF0D3B66,
-  ); // الكحلي الأساسي لـ Yemen Store
+  static const Color primary = Color(0xFF0D3B66); // أزرق فاتح أكثر حيوية لـ Yemen Store
   static const Color accent = Color(0xFFFFB300); // الذهبي (العرطة)
 
   // ألوان الخلفيات
@@ -14,7 +12,7 @@ class AppColors {
   static const Color cardDark = Color(0xFF1E1E1E);
 
   // ألوان النصوص
-  static const Color textPrimary = Color(0xFF0D3B66);
+  static const Color textPrimary = Color(0xFF0D3B8A);
   static const Color textSecondary = Color(0xFF2C2C2C);
   static const Color textHint = Colors.grey;
   static const Color white = Colors.white;

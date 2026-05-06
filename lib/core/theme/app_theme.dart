@@ -10,9 +10,12 @@ class AppTheme {
 
   // --- الثيم الفاتح (Light Theme) ---
   static ThemeData get lightTheme {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.light,
+    final colorScheme = ColorScheme.light(
+      primary: AppColors.primary,
+      secondary: AppColors.accent,
+      surface: AppColors.bgLight,
+      onPrimary: Colors.white,
+      onSurface: Colors.black,
     );
 
     return ThemeData(
@@ -38,7 +41,7 @@ class AppTheme {
       ),
 
       cardColor: AppColors.cardLight,
-      dividerColor: colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+      dividerColor: colorScheme.onSurface,
 
       elevatedButtonTheme: _buttonTheme(
         colorScheme.primary,
@@ -54,10 +57,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        border: _border(colorScheme.primary.withAlpha((0.1 * 255).round())),
-        enabledBorder: _border(
-          colorScheme.primary.withAlpha((0.1 * 255).round()),
-        ),
+        border: _border(colorScheme.primary),
+        enabledBorder: _border(colorScheme.primary),
         focusedBorder: _border(colorScheme.primary),
       ),
 
@@ -77,9 +78,12 @@ class AppTheme {
 
   // --- الثيم المظلم (Dark Theme) ---
   static ThemeData get darkTheme {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.dark,
+    final colorScheme = ColorScheme.dark(
+      primary: AppColors.primary,
+      secondary: AppColors.accent,
+      surface: AppColors.bgDark,
+      onPrimary: Colors.white,
+      onSurface: Colors.white,
     );
 
     return ThemeData(
@@ -105,7 +109,7 @@ class AppTheme {
       ),
 
       cardColor: AppColors.cardDark,
-      dividerColor: colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+      dividerColor: colorScheme.onSurface.withOpacity(0.1),
 
       elevatedButtonTheme: _buttonTheme(
         colorScheme.primary,
@@ -120,11 +124,9 @@ class AppTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white.withAlpha((0.05 * 255).round()),
-        border: _border(colorScheme.onSurface.withAlpha((0.1 * 255).round())),
-        enabledBorder: _border(
-          colorScheme.onSurface.withAlpha((0.1 * 255).round()),
-        ),
+        fillColor: Colors.white.withOpacity(0.05),
+        border: _border(colorScheme.onSurface),
+        enabledBorder: _border(colorScheme.onSurface),
         focusedBorder: _border(colorScheme.primary),
       ),
 
@@ -136,7 +138,7 @@ class AppTheme {
         ),
         bodyMedium: TextStyle(
           fontFamily: 'Cairo',
-          color: colorScheme.onSurface.withAlpha((0.85 * 255).round()),
+          color: colorScheme.onSurface.withOpacity(0.85),
         ),
       ),
     );

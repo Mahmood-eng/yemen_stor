@@ -76,7 +76,7 @@ class _ArtaMarketScreenState extends State<ArtaMarketScreen> {
           padding: const EdgeInsets.only(bottom: 10),
           child: FloatingActionButton.extended(
             onPressed: () => _showAddArtaSheet(context, theme, accentColor),
-            backgroundColor: accentColor,
+            backgroundColor: primaryColor,
             elevation: 4,
             icon: const Icon(
               Icons.add_circle_outline_rounded,

@@ -97,7 +97,7 @@ class AiSubscriptionScreen extends StatelessWidget {
           backgroundColor: theme.colorScheme.surface,
           elevation: 0,
           title: Text(
-            'متجر ذكاء يمن ستور',
+            'الذكاء الإصطناعي   ',
             style: theme.textTheme.titleLarge?.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.bold,
@@ -106,8 +106,8 @@ class AiSubscriptionScreen extends StatelessWidget {
           centerTitle: true,
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.onSurface,
+              Icons.arrow_forward_ios,
+              color: theme.colorScheme.primary,
               size: 20,
             ),
             onPressed: () => context.pop(),

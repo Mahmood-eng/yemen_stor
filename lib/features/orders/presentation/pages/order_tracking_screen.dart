@@ -92,12 +92,48 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   Widget _buildOrderSummary(ThemeData theme) {
-    return Text(
-      "طلب رقم: #${widget.orderId}",
-      style: theme.textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
-    );
+    return  Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50], 
+                borderRadius: BorderRadius.circular(18), 
+                border: Border.all(color: Colors.grey[200]!)
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      orderData['image'], // الربط مع الصور المرفوعة (chicken, dress, perfume)
+                      width: 65, 
+                      height: 65, 
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("طلب رقم: #${orderData['id']}", style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text(orderData['items'], style: const TextStyle(fontFamily: 'Cairo', fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 4),
+                        Text(orderData['shop'], style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: _primaryColor, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                  // زر عرض الفاتورة / التفاصيل
+                  TextButton(
+                    onPressed: () {
+                      // هنا يمكنك إضافة منطق عرض الفاتورة
+                    },
+                    child: const Text(
+                      "عرض التفاصيل ", 
+                      style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                ],
+              ),
+            ),
   }
 }

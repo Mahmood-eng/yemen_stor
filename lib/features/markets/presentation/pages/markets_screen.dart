@@ -16,7 +16,7 @@ class MarketsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("كل الأسواق والأقسام"),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new),
+        icon: const Icon(Icons.arrow_forward_ios),
         onPressed: () => context.pop()
       ),
       ),
