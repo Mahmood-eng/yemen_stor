@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AiSubscriptionScreen extends StatelessWidget {
   static const String id = 'ai_subscription_screen';
@@ -109,7 +110,7 @@ class AiSubscriptionScreen extends StatelessWidget {
               color: theme.colorScheme.onSurface,
               size: 20,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
           ),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -431,7 +432,7 @@ class _AiServiceCard extends StatelessWidget {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    context.pop();
                     _showSuccessDialog(context, theme, service['name'], color);
                   },
                   style: ElevatedButton.styleFrom(
@@ -540,7 +541,7 @@ class _AiServiceCard extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => context.pop(),
                     child: const Text(
                       'حسناً',
                       style: TextStyle(

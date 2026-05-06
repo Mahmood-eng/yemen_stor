@@ -47,7 +47,11 @@ class MarketsGrid extends StatelessWidget {
   ) {
     return InkWell(
       onTap: () {
-        // التنقل لصفحة المحلات التابعة لهذا القسم
+        if (isArta) {
+          context.push(AppRoutes.marketsArta);
+        } else {
+          context.push(AppRoutes.markets);
+        }
       },
       child: Column(
         children: [

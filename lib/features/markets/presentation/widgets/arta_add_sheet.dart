@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ArtaAddSheet extends StatelessWidget {
   final Color accentColor;
@@ -81,7 +82,7 @@ class ArtaAddSheet extends StatelessWidget {
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
                   shape: RoundedRectangleBorder(

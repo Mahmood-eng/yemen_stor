@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -82,7 +83,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               color: theme.appBarTheme.foregroundColor ?? colorScheme.onSurface,
               size: 20,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
           ),
         ),
         body: _notifications.isEmpty

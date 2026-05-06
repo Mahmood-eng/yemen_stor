@@ -21,7 +21,7 @@ import 'package:yemen_store/features/markets/presentation/pages/markets_screen.d
 import 'package:yemen_store/features/markets/presentation/pages/subcategories_screen.dart';
 import 'package:yemen_store/features/shops/presentation/pages/shops_list_screen.dart';
 import 'package:yemen_store/features/shops/presentation/pages/shop_details_screen.dart';
-import 'package:yemen_store/features/shops/data/models/shop_model.dart';
+import 'package:yemen_store/features/shops/presentation/pages/product_details_screen.dart';
 import 'package:yemen_store/features/notifcation/presentation/pages/notifications_screen.dart';
 
 class AppRoutes {
@@ -49,6 +49,7 @@ class AppRoutes {
   static const String subcategories = '/markets/subcategories';
   static const String shopsList = '/markets/shops';
   static const String shopDetails = '/markets/shop-details';
+  static const String productDetails = '/markets/product-details';
 
   static final router = GoRouter(
     initialLocation: onboarding,
@@ -86,6 +87,40 @@ class AppRoutes {
         builder: (context, state) => const ArtaMarketScreen(),
       ),
       GoRoute(
+        path: subcategories,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final market = extra['market'] as Map<String, dynamic>;
+          final subcategory = extra['subcategory'] as Map<String, dynamic>;
+          return SubcategoriesScreen(market: market, subcategory: subcategory);
+        },
+      ),
+      GoRoute(
+        path: shopsList,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final market = extra['market'] as Map<String, dynamic>;
+          final subcategory = extra['subcategory'] as Map<String, dynamic>;
+          return ShopsListScreen(market: market, subcategory: subcategory);
+        },
+      ),
+      GoRoute(
+        path: shopDetails,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final shop = extra['shop'] as Map<String, dynamic>;
+          return ShopDetailsScreen(shop: shop);
+        },
+      ),
+      GoRoute(
+        path: productDetails,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final product = extra['product'] as Map<String, dynamic>;
+          return ProductDetailsScreen(product: product);
+        },
+      ),
+      GoRoute(
         path: aiSubscription,
         builder: (context, state) => const AiSubscriptionScreen(),
       ),
@@ -98,28 +133,7 @@ class AppRoutes {
         path: transactionHistory,
         builder: (context, state) => const TransactionHistoryScreen(),
       ),
-      // روتات الأسواق الجديدة
-      GoRoute(
-        path: subcategories,
-        builder: (context, state) {
-          final market = state.extra as Map<String, dynamic>?;
-          return SubcategoriesScreen(market: market);
-        },
-      ),
-      GoRoute(
-        path: shopsList,
-        builder: (context, state) {
-          final category = state.extra as Map<String, dynamic>?;
-          return ShopsListScreen(category: category);
-        },
-      ),
-      GoRoute(
-        path: shopDetails,
-        builder: (context, state) {
-          final shop = state.extra as ShopModel?;
-          return ShopDetailsScreen(shop: shop);
-        },
-      ),
+
       // 2. هيكل التطبيق الرئيسي مع الشريط السفلي
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

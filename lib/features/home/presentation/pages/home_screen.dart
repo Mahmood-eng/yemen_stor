@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeBody(BuildContext context, bool isDark) {
-    final theme = Theme.of(context);
+    Theme.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20),

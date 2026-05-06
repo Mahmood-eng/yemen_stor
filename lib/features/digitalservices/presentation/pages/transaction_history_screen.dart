@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Transaction {
   final String title;
@@ -127,7 +128,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen>
               color: theme.colorScheme.onSurface,
               size: 20,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
           ),
           bottom: TabBar(
             controller: _tabController,

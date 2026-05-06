@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class WifiNetworksScreen extends StatefulWidget {
   static const String id = 'wifi_networks_screen';
@@ -105,11 +106,11 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
             ),
             leading: IconButton(
               icon: Icon(
-                Icons.arrow_back_ios,
+                Icons.arrow_back_ios_new,
                 color: theme.colorScheme.onSurface,
                 size: 20,
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
             ),
             bottom: TabBar(
               labelColor: theme.colorScheme.primary,

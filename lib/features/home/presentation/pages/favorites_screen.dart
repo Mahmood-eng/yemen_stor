@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 
 class FavoritesScreen extends StatelessWidget {
@@ -13,15 +14,15 @@ class FavoritesScreen extends StatelessWidget {
       // الخلفية تسحب تلقائياً من الثيم
       appBar: AppBar(
         title: const Text("المفضلات"),
-       
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: 5, 
+        itemCount: 5,
         itemBuilder: (context, index) {
           return _buildFavoriteItem(context, isDark);
         },
@@ -91,7 +92,7 @@ class FavoritesScreen extends StatelessWidget {
                         fontSize: 15,
                       ),
                     ),
-                   
+
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(

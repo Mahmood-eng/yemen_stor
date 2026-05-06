@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/arta_add_sheet.dart';
 import '../widgets/arta_product_card.dart';
@@ -49,7 +50,7 @@ class _ArtaMarketScreenState extends State<ArtaMarketScreen> {
               color: theme.colorScheme.onSurface,
               size: 20,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
           ),
           title: Text(
             "سوق العرطات",

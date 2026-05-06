@@ -1,140 +1,103 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class SubcategoriesScreen extends StatelessWidget {
-  final Map<String, dynamic>? market;
+  final Map<String, dynamic> market;
+  final Map<String, dynamic> subcategory;
 
-  const SubcategoriesScreen({super.key, required this.market});
+  const SubcategoriesScreen({
+    super.key,
+    required this.market,
+    required this.subcategory,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.colorScheme.primary;
-
-    final marketName = market?['name'] ?? 'السوق';
-    final subCategories = market?['subCategories'] ?? [];
+    final marketName = market['name'] ?? '';
+    final subcategoryName = subcategory['title'] ?? '';
+    final subcategoryIcon = subcategory['icon'];
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: const Color(0xFFF8FAFD),
         appBar: AppBar(
-          backgroundColor: theme.appBarTheme.backgroundColor,
+          backgroundColor: Colors.white,
           elevation: 0,
           title: Text(
-            marketName,
-            style: theme.appBarTheme.titleTextStyle?.copyWith(
-              color: primaryColor,
+            subcategoryName,
+            style: TextStyle(
+              color: AppColors.primary,
+              fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.appBarTheme.foregroundColor,
-              size: 20,
-            ),
+            icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
             onPressed: () => context.pop(),
           ),
         ),
-        body: Column(
-          children: [
-            _buildSearchField(theme, primaryColor),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(15),
-                itemCount: subCategories.length,
-                itemBuilder: (context, index) {
-                  return _buildSubcategoryCard(
-                    context,
-                    subCategories[index],
-                    theme,
-                    primaryColor,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                subcategoryIcon,
+                size: 80,
+                color: AppColors.primary.withOpacity(0.5),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "قسم $subcategoryName",
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "من سوق $marketName",
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: () {
+                  context.push(
+                    AppRoutes.shopsList,
+                    extra: {'market': market, 'subcategory': subcategory},
                   );
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                child: const Text(
+                  "عرض المحلات",
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchField(ThemeData theme, Color primaryColor) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      color: theme.cardColor,
-      child: TextField(
-        textAlign: TextAlign.right,
-        decoration: InputDecoration(
-          hintText: "بحث عن قسم...",
-          hintStyle: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: 13,
-            color: theme.hintColor,
-          ),
-          prefixIcon: Icon(Icons.search, color: primaryColor),
-          filled: true,
-          fillColor: theme.inputDecorationTheme.fillColor,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none,
+            ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSubcategoryCard(
-    BuildContext context,
-    Map<String, dynamic> subcategory,
-    ThemeData theme,
-    Color primaryColor,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withAlpha((0.03 * 255).round()),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(15),
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: primaryColor.withAlpha((0.1 * 255).round()),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Icon(subcategory['icon'], color: primaryColor, size: 24),
-        ),
-        title: Text(
-          subcategory['title'],
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: primaryColor.withAlpha((0.5 * 255).round()),
-        ),
-        onTap: () {
-          context.push(
-            AppRoutes.shopsList,
-            extra: {'category': subcategory, 'marketName': marketName},
-          );
-        },
       ),
     );
   }

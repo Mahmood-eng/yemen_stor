@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TopUpScreen extends StatefulWidget {
   static const String id = 'top_up_screen';
@@ -163,7 +164,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
               color: theme.colorScheme.onSurface,
               size: 20,
             ),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
           ),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,

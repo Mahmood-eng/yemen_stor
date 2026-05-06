@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/tracking_map_widget.dart';
 import '../widgets/driver_info_widget.dart';
 import '../widgets/order_timeline_widget.dart';
@@ -37,8 +38,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       right: 20,
       child: FloatingActionButton.small(
         backgroundColor: theme.colorScheme.surface,
-        child: Icon(Icons.arrow_back_ios, color: theme.colorScheme.onSurface),
-        onPressed: () => Navigator.pop(context),
+        child: Icon(
+          Icons.arrow_back_ios_new,
+          color: theme.colorScheme.onSurface,
+        ),
+        onPressed: () => context.pop(),
       ),
     );
   }
