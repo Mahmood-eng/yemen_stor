@@ -14,10 +14,21 @@ class SocialIconsRow extends StatelessWidget {
         _buildIcon(Icons.apple, isDark ? Colors.white : Colors.black, isDark),
         const SizedBox(width: 15),
 
-        _buildIcon(Icons.g_mobiledata, Colors.red, isDark),
+        _buildIcon(
+          Icons.email_outlined,
+          Colors.redAccent,
+          isDark,
+        ), // قمت بتغييرها لأيقونة قوقل/ايميل أجمل
         const SizedBox(width: 15),
 
         _buildIcon(Icons.facebook, Colors.blue, isDark),
+        const SizedBox(width: 15),
+
+        _buildIcon(
+          Icons.phone_android,
+          Colors.green,
+          isDark,
+        ), // إضافة خيار الهاتف كأيقونة تواصل
       ],
     );
   }
@@ -27,16 +38,20 @@ class SocialIconsRow extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        // تغيير لون الحدود بناءً على الوضع
         border: Border.all(
           color: isDark ? Colors.white24 : Colors.grey.shade300,
         ),
-
-        color: isDark
-            ? Colors.white.withAlpha((0.05 * 255).round())
-            : Colors.transparent,
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+        ],
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
       ),
-      child: Icon(icon, color: color, size: 30),
+      child: Icon(icon, color: color, size: 28),
     );
   }
 }

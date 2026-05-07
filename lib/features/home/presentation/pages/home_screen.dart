@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
-import '../../../../core/widgets/app_drawer.dart';
+
+import '../../../menu/presentation/pages/app_drawer.dart';
 import '../widgets/markets_grid.dart';
 import '../widgets/home_balance_card.dart';
 import '../widgets/home_banner_slider.dart';
@@ -66,7 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Icons.shopping_cart_outlined,
             color: theme.appBarTheme.foregroundColor,
           ),
-          onPressed: () {},
+          onPressed: () {
+            context.push(AppRoutes.cart);
+          },
         ),
       ],
     );
@@ -157,7 +160,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            
+          },
           child: Text(
             "عرض الكل",
             style: TextStyle(

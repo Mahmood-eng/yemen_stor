@@ -13,7 +13,7 @@ class YemenStoreApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // تم التغيير هنا إلى .router ليعمل نظام GoRouter
+    
     return MaterialApp.router(
       title: 'Yemen Store',
       debugShowCheckedModeBanner: false,

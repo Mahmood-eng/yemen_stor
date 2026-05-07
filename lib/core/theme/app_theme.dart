@@ -98,14 +98,14 @@ class AppTheme {
         backgroundColor: AppColors.cardDark,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: colorScheme.onSurface),
+        iconTheme: IconThemeData(color: colorScheme.primary, size: 20),
         titleTextStyle: TextStyle(
           fontFamily: 'Cairo',
           fontWeight: FontWeight.bold,
           fontSize: 18,
-          color: colorScheme.onSurface,
+          color: colorScheme.primary,
         ),
-        foregroundColor: colorScheme.onSurface,
+        foregroundColor: colorScheme.primary,
       ),
 
       cardColor: AppColors.cardDark,

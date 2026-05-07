@@ -35,7 +35,7 @@ class AppDrawer extends StatelessWidget {
                     Icons.person_outline,
                     "الملف الشخصي",
                     () {
-                      context.push(AppRoutes.profile);
+                      context.go(AppRoutes.profile);
                     },
                   ),
                   _buildDrawerItem(
@@ -43,7 +43,7 @@ class AppDrawer extends StatelessWidget {
                     Icons.favorite_border,
                     "مفضلاتي",
                     () {
-                      context.push(AppRoutes.favorites);
+                      context.go(AppRoutes.favorites);
                     },
                   ),
                   _buildDrawerItem(
@@ -51,8 +51,16 @@ class AppDrawer extends StatelessWidget {
                     Icons.account_balance_wallet_outlined,
                     "تغذية الحساب",
                     () {
-                      context.push(AppRoutes.wallet);
+                      context.go(AppRoutes.wallet);
                     },
+                  ),
+                  _buildSpecialItem(
+                    context,
+                    Icons.swap_horiz,
+                    "تبديل الحساب",
+                    "متجري / شبكتي",
+                    theme.primaryColor,
+                    () {},
                   ),
 
                   Divider(
@@ -68,12 +76,22 @@ class AppDrawer extends StatelessWidget {
                     "إدارة الشبكات",
                     "أضف كروت وشبكتك هنا",
                     Colors.orange.shade800,
-                    () {},
+                    () {
+                      context.go(AppRoutes.addPrivateNetwork);
+                    },
                   ),
                   _buildDrawerItem(
                     context,
                     Icons.storefront_outlined,
                     "فتح حساب تاجر",
+                    () {
+                      context.go(AppRoutes.merchantRegistration);
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.credit_card,
+                    "دفع الإشتراك الشهري",
                     () {},
                   ),
 
@@ -116,28 +134,38 @@ class AppDrawer extends StatelessWidget {
         borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30)),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const CircleAvatar(
-            radius: 35,
-            backgroundColor: Colors.white24,
-            child: Icon(Icons.person, size: 40, color: Colors.white),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Text(
-                "محمود المقطري",
-                style: theme.textTheme.displayLarge?.copyWith(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+              const CircleAvatar(
+                radius: 35,
+                backgroundColor: Colors.white24,
+                child: Icon(Icons.person, size: 40, color: Colors.white),
               ),
-              const Text(
-                "ID: #992837",
-                style: TextStyle(color: Colors.white70, fontSize: 12),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "محمود المقطري",
+                    style: theme.textTheme.displayLarge?.copyWith(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const Text(
+                    "ID: #992837",
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
               ),
             ],
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.swap_horiz, color: Colors.white),
+            tooltip: 'تبديل الحساب',
           ),
         ],
       ),
@@ -162,6 +190,11 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
+  void _navigateWithDrawerClose(BuildContext context, VoidCallback action) {
+    Navigator.of(context).pop();
+    Future.microtask(action);
+  }
+
   Widget _buildDrawerItem(
     BuildContext context,
     IconData icon,
@@ -179,7 +212,7 @@ class AppDrawer extends StatelessWidget {
         ),
       ),
       trailing: Icon(Icons.arrow_forward_ios, size: 14, color: theme.hintColor),
-      onTap: onTap,
+      onTap: () => _navigateWithDrawerClose(context, onTap),
     );
   }
 
@@ -214,7 +247,7 @@ class AppDrawer extends StatelessWidget {
             color: color.withAlpha((0.7 * 255).round()),
           ),
         ),
-        onTap: onTap,
+        onTap: () => _navigateWithDrawerClose(context, onTap),
       ),
     );
   }

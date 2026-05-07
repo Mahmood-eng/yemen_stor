@@ -106,7 +106,7 @@ class AiSubscriptionScreen extends StatelessWidget {
           centerTitle: true,
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_forward_ios,
+              Icons.arrow_back_ios_new,
               color: theme.colorScheme.primary,
               size: 20,
             ),

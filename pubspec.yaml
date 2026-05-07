@@ -9,6 +9,8 @@ environment:
 
 dependencies:
   go_router: ^10.1.1
+  lottie: ^2.3.0
+  flutter_riverpod: ^2.4.9
   flutter:
     sdk: flutter
   flutter_localizations:

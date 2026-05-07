@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/routes/app_routes.dart';
-import '../../../../core/widgets/custom_text_field.dart';
-import '../../../../core/widgets/custom_button.dart';
-import '../widgets/social_divider.dart';
-import '../widgets/social_icons_row.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
+import 'package:yemen_store/core/theme/app_colors.dart';
+import 'package:yemen_store/core/widgets/custom_button.dart'; // تأكد من وجود هذا الودجت
+import 'package:yemen_store/features/auth/presentation/widgets/social_divider.dart';
+import 'package:yemen_store/features/auth/presentation/widgets/social_icons_row.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,141 +14,233 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isPasswordVisible = false;
-  bool _rememberMe = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _obscureText = true;
+  bool _rememberMe = false; // إضافة حالة "تذكرني"
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      // استخدام اللون الرئيسي من الثيم مباشرة
-      backgroundColor: isDark
-          ? theme.scaffoldBackgroundColor
-          : theme.primaryColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            children: [
-              const SizedBox(height: 80),
-              _buildLogo(isDark),
-              const SizedBox(height: 40),
+      // لون خلفية الشاشة يتغير حسب الثيم
+      // الخلفية ستكون لون الـ scaffoldBackgroundColor من الثيم
+      body: Container(
+        color: isDark ? const Color(0xFF1E1E1E) : AppColors.primary,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // شعار التطبيق أو أي عنصر علوي (يمكن إضافته هنا)
+                Image.asset('assets/images/logo.png', height: 120),
+                const SizedBox(height: 40),
 
-              Text(
-                "تسجيل الدخول",
-                style: theme.textTheme.displayLarge?.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                  fontSize: 28,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "مرحباً بك مجدداً في Yemen Store",
-                style: TextStyle(
-                  color: theme.colorScheme.onPrimary.withAlpha(
-                    (0.7 * 255).round(),
+                // الحاوية البيضاء التي تحتوي على حقول تسجيل الدخول
+                Container(
+                  padding: const EdgeInsets.all(25.0),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF2C2C2C)
+                        : Colors.white, // لون خلفية الحاوية يتغير حسب الثيم
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  fontSize: 14,
-                ),
-              ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "تسجيل الدخول",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ), // حجم خط معقول ومتناسق
+                      ),
+                      const SizedBox(height: 25),
 
-              const SizedBox(height: 40),
-              const CustomTextField(
-                hintText: "البريد الإلكتروني أو رقم الهاتف",
-                icon: Icons.email_outlined,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                hintText: "كلمة المرور",
-                icon: Icons.lock_outline,
-                isPassword: !_isPasswordVisible,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: theme.primaryColor,
+                      // حقل البريد الإلكتروني/رقم الهاتف
+                      TextField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textAlign: TextAlign.right,
+                        decoration: InputDecoration(
+                          hintText: "البريد الإلكتروني أو رقم الهاتف",
+                          prefixIcon: Icon(
+                            Icons.person_outline,
+                            color: AppColors.primary,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: isDark
+                              ? Colors.white.withOpacity(0.05)
+                              : Colors.grey[100],
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+
+                      // حقل كلمة المرور
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: _obscureText,
+                        textAlign: TextAlign.right,
+                        decoration: InputDecoration(
+                          hintText: "كلمة المرور",
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: AppColors.primary,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: isDark
+                              ? Colors.white.withOpacity(0.05)
+                              : Colors.grey[100],
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+
+                      // صف "تذكرني" و "نسيت كلمة المرور"
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _rememberMe,
+                                activeColor: AppColors.primary,
+                                onChanged: (value) =>
+                                    setState(() => _rememberMe = value!),
+                              ),
+                              const Text(
+                                "تذكرني",
+                                style: TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // منطق التعامل مع نسيان كلمة المرور
+                            },
+                            child: Text(
+                              "نسيت كلمة المرور؟",
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontSize: 13,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // زر تسجيل الدخول
+                      CustomButton(
+                        text: "تسجيل الدخول",
+                        onPressed: () {
+                          context.go(AppRoutes.home);
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // الفاصل "أو سجل عبر"
+                      const SocialDivider(),
+                      const SizedBox(height: 20),
+
+                      // أزرار تسجيل الدخول الاجتماعي الموحدة
+                      const SocialIconsRow(),
+                      
+                      const SizedBox(height: 25),
+
+                      // "ليس لديك حساب؟"
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "ليس لديك حساب؟",
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              context.push(AppRoutes.signup);
+                            },
+                            child: Text(
+                              "إنشاء حساب",
+                              style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  onPressed: () =>
-                      setState(() => _isPasswordVisible = !_isPasswordVisible),
                 ),
-              ),
-
-              _buildRememberMeAndForgot(theme),
-
-              const SizedBox(height: 30),
-              CustomButton(
-                text: "دخول",
-                // تخصيص لون الزر في صفحة التسجيل ليكون بارزاً
-                backgroundColor: isDark ? theme.primaryColor : Colors.white,
-                textColor: isDark ? Colors.white : theme.primaryColor,
-                onPressed: () => context.go(AppRoutes.home),
-              ),
-
-              const SizedBox(height: 30),
-              const SocialDivider(),
-              const SizedBox(height: 20),
-              const SocialIconsRow(),
-
-              const SizedBox(height: 30),
-              TextButton(
-                onPressed: () => context.push(AppRoutes.signup),
-                child: const Text(
-                  "ليس لديك حساب؟ أنشئ حساباً جديداً",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLogo(bool isDark) {
-    return Image.asset(
-      isDark ? 'assets/images/logo.png' : 'assets/images/logo.png',
-      height: 120,
-      errorBuilder: (context, error, stackTrace) =>
-          const Icon(Icons.store, size: 100, color: Colors.white),
-    );
-  }
-
-  Widget _buildRememberMeAndForgot(ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Theme(
-              data: theme.copyWith(unselectedWidgetColor: Colors.white54),
-              child: Checkbox(
-                value: _rememberMe,
-                activeColor: Colors.white,
-                checkColor: theme.primaryColor,
-                onChanged: (value) => setState(() => _rememberMe = value!),
-              ),
-            ),
-            const Text(
-              "تذكرني",
-              style: TextStyle(color: Colors.white, fontSize: 13),
-            ),
-          ],
-        ),
-        TextButton(
-          onPressed: () {},
-          child: const Text(
-            "نسيت كلمة المرور؟",
-            style: TextStyle(color: Colors.white70, fontSize: 13),
-          ),
-        ),
-      ],
+  Widget _buildSocialButton(IconData icon, Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: color),
+        onPressed: () {
+          // منطق تسجيل الدخول الاجتماعي
+        },
+      ),
     );
   }
 }

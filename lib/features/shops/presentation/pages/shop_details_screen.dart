@@ -46,16 +46,19 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
             elevation: 0,
             title: Text(
               shopName,
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
                 color: Colors.white,
               ),
             ),
             centerTitle: true,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 20,
+              ),
               onPressed: () => context.pop(),
             ),
             bottom: TabBar(

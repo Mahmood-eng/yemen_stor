@@ -40,7 +40,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         backgroundColor: theme.colorScheme.surface,
         child: Icon(
           Icons.arrow_back_ios_new,
-          color: theme.colorScheme.onSurface,
+          color: theme.colorScheme.primary,
+          size: 20,
         ),
         onPressed: () => context.pop(),
       ),
@@ -92,48 +93,88 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   Widget _buildOrderSummary(ThemeData theme) {
-    return  Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[50], 
-                borderRadius: BorderRadius.circular(18), 
-                border: Border.all(color: Colors.grey[200]!)
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      orderData['image'], // الربط مع الصور المرفوعة (chicken, dress, perfume)
-                      width: 65, 
-                      height: 65, 
-                      fit: BoxFit.cover,
-                    ),
+    final isDark = theme.brightness == Brightness.dark;
+    // تعريف بيانات الطلب التجريبية لحل مشكلة المتغير غير المعرف
+    final orderData = {
+      'id': widget.orderId,
+      'image': 'assets/images/perfume.jpg',
+      'items': 'عطر ساواج ديور الرجالي - 100 مل',
+      'shop': 'متجر النخبة للعطور',
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? theme.cardColor : Colors.grey[50],
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? theme.dividerColor : Colors.grey[200]!,
+        ),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.asset(
+              orderData['image']!,
+              width: 65,
+              height: 65,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "طلب رقم: #${orderData['id']}",
+                  style: const TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
                   ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("طلب رقم: #${orderData['id']}", style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13)),
-                        Text(orderData['items'], style: const TextStyle(fontFamily: 'Cairo', fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        const SizedBox(height: 4),
-                        Text(orderData['shop'], style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: _primaryColor, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+                ),
+                Text(
+                  orderData['items']!,
+                  style: const TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 10,
+                    color: Colors.grey,
                   ),
-                  // زر عرض الفاتورة / التفاصيل
-                  TextButton(
-                    onPressed: () {
-                      // هنا يمكنك إضافة منطق عرض الفاتورة
-                    },
-                    child: const Text(
-                      "عرض التفاصيل ", 
-                      style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold)
-                    ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  orderData['shop']!,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 11,
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          // زر عرض الفاتورة / التفاصيل
+          TextButton(
+            onPressed: () {
+              // هنا يمكنك إضافة منطق عرض الفاتورة
+            },
+            child: const Text(
+              "عرض التفاصيل ",
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontSize: 12,
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+        ],
+      ),
+    );
   }
 }

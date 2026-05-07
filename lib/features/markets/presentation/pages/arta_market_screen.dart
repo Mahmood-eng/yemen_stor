@@ -45,11 +45,7 @@ class _ArtaMarketScreenState extends State<ArtaMarketScreen> {
           backgroundColor: theme.colorScheme.surface,
           elevation: 0.5,
           leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.onSurface,
-              size: 20,
-            ),
+            icon: Icon(Icons.arrow_back_ios, color: primaryColor, size: 20),
             onPressed: () => context.pop(),
           ),
           title: Text(

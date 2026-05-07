@@ -85,7 +85,7 @@ class OrderCard extends StatelessWidget {
           if (order.status == OrderStatus.onWay ||
               order.status == OrderStatus.processing)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: ElevatedButton(
                 onPressed: onTrackTap,
                 child: const Text("تتبع مسار الطلب"),
@@ -105,19 +105,37 @@ class OrderCard extends StatelessWidget {
                 bottom: Radius.circular(20),
               ),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.store_mall_directory_rounded,
-                  size: 16,
-                  color: colorScheme.primary,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.store_mall_directory_rounded,
+                      size: 16,
+                      color: colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${order.marketName} • ${order.categoryName}',
+                        style: theme.textTheme.bodySmall,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 6),
-                Expanded(
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    "${order.marketName}\n${order.categoryName}\n${order.storeName}",
-                    style: theme.textTheme.bodySmall,
+                    '${order.storeName} (${order.storeAddress})',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                    ),
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
               ],

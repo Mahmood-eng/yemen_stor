@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/widgets/app_drawer.dart';
+
 import 'package:yemen_store/features/digitalservices/presentation/widgets/service_category_card.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_banner.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_search.dart';
@@ -8,6 +8,8 @@ import 'package:yemen_store/core/theme/app_colors.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/section_title.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_grid.dart';
+
+import '../../../menu/presentation/pages/app_drawer.dart';
 
 class DigitalServicesScreen extends StatelessWidget {
   const DigitalServicesScreen({super.key});
@@ -30,6 +32,15 @@ class DigitalServicesScreen extends StatelessWidget {
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () => context.push(AppRoutes.cart),
+            ),
+          ],
         ),
 
         drawer: const AppDrawer(),

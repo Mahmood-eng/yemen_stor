@@ -9,6 +9,8 @@ import 'package:yemen_store/features/home/presentation/pages/home_screen.dart';
 import 'package:yemen_store/features/home/presentation/pages/recommendations_screen.dart';
 import 'package:yemen_store/features/orders/presentation/pages/orders_screen.dart';
 import 'package:yemen_store/features/orders/presentation/pages/order_tracking_screen.dart';
+import 'package:yemen_store/features/orders/presentation/pages/cart_screen.dart';
+import 'package:yemen_store/features/orders/presentation/pages/order_success_screen.dart';
 import 'package:yemen_store/features/profile/presentation/pages/profile_screen.dart';
 import 'package:yemen_store/features/wallet/presentation/pages/recharge_wallet_screen.dart';
 import 'package:yemen_store/features/digitalservices/presentation/pages/ai_subscription_screen.dart';
@@ -16,6 +18,13 @@ import 'package:yemen_store/features/digitalservices/presentation/pages/digital_
 import 'package:yemen_store/features/digitalservices/presentation/pages/top_up_screen.dart';
 import 'package:yemen_store/features/digitalservices/presentation/pages/transaction_history_screen.dart';
 import 'package:yemen_store/features/digitalservices/presentation/pages/wifi_networks_screen.dart';
+import 'package:yemen_store/features/merchant/presentation/pages/merchant_add_product_screen.dart';
+import 'package:yemen_store/features/merchant/presentation/pages/merchant_dashboard_screen.dart';
+import 'package:yemen_store/features/merchant/presentation/pages/merchant_orders_screen.dart';
+import 'package:yemen_store/features/merchant/presentation/pages/merchant_products_screen.dart';
+import 'package:yemen_store/features/merchant/presentation/pages/merchant_registration_screen.dart';
+import 'package:yemen_store/features/menu/presentation/pages/add_private_network_screen.dart';
+import 'package:yemen_store/features/menu/presentation/pages/manage_cards_screen.dart';
 import 'package:yemen_store/features/markets/presentation/pages/arta_market_screen.dart';
 import 'package:yemen_store/features/markets/presentation/pages/markets_screen.dart';
 import 'package:yemen_store/features/markets/presentation/pages/subcategories_screen.dart';
@@ -30,6 +39,8 @@ class AppRoutes {
   static const String signup = '/signup';
   static const String home = '/home';
   static const String recommendations = '/recommendations';
+  static const String cart = '/cart';
+  static const String orderSuccess = '/order-success';
   static const String orders = '/orders';
   static const String orderTracking = '/order-tracking'; // المسار الأساسي
   static const String services = '/services';
@@ -42,6 +53,14 @@ class AppRoutes {
   static const String aiSubscription = '/digital-services/ai-subscription';
   static const String topUp = '/digital-services/top-up';
   static const String wifiNetworks = '/digital-services/wifi-networks';
+  static const String merchantRegistration = '/merchant/registration';
+  static const String merchantDashboard = '/merchant/dashboard';
+  static const String merchantProducts = '/merchant/products';
+  static const String merchantOrders = '/merchant/orders';
+  static const String merchantAddProduct = '/merchant/add-product';
+  static const String addPrivateNetwork =
+      '/manage-networks/add-private-network';
+  static const String manageCards = '/manage-networks/manage-cards';
   static const String transactionHistory = '/digital-services/transactions';
   static const String notifications = '/notifications';
   static const String markets = '/markets';
@@ -77,6 +96,11 @@ class AppRoutes {
       GoRoute(
         path: notifications,
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(path: cart, builder: (context, state) => const CartScreen()),
+      GoRoute(
+        path: orderSuccess,
+        builder: (context, state) => const OrderSuccessScreen(),
       ),
       GoRoute(
         path: markets,
@@ -128,6 +152,34 @@ class AppRoutes {
       GoRoute(
         path: wifiNetworks,
         builder: (context, state) => const WifiNetworksScreen(),
+      ),
+      GoRoute(
+        path: merchantRegistration,
+        builder: (context, state) => const MerchantRegistrationScreen(),
+      ),
+      GoRoute(
+        path: merchantDashboard,
+        builder: (context, state) => const MerchantDashboardScreen(),
+      ),
+      GoRoute(
+        path: merchantProducts,
+        builder: (context, state) => const MerchantProductsScreen(),
+      ),
+      GoRoute(
+        path: merchantOrders,
+        builder: (context, state) => const MerchantOrdersScreen(),
+      ),
+      GoRoute(
+        path: merchantAddProduct,
+        builder: (context, state) => const MerchantAddProductScreen(),
+      ),
+      GoRoute(
+        path: addPrivateNetwork,
+        builder: (context, state) => const AddPrivateNetworkScreen(),
+      ),
+      GoRoute(
+        path: manageCards,
+        builder: (context, state) => const ManageCardsScreen(),
       ),
       GoRoute(
         path: transactionHistory,

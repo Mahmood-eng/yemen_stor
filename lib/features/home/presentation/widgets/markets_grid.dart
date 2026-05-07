@@ -50,7 +50,7 @@ class MarketsGrid extends StatelessWidget {
         if (isArta) {
           context.push(AppRoutes.marketsArta);
         } else {
-          context.push(AppRoutes.markets);
+          _showSubcategoriesBottomSheet(context, market);
         }
       },
       child: Column(
@@ -83,6 +83,126 @@ class MarketsGrid extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // نافذة منبثقة لعرض أقسام السوق
+  void _showSubcategoriesBottomSheet(BuildContext context, MarketModel market) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6, // الارتفاع المبدئي (60% من الشاشة)
+          minChildSize: 0.4, // أقل ارتفاع عند السحب لأسفل قبل الإغلاق
+          maxChildSize: 0.9, // أقصى ارتفاع عند السحب لأعلى
+          expand: false, // لكي لا تأخذ مساحة الشاشة بالكامل فوراً
+          builder: (context, scrollController) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(25),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // مقبض السحب
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+
+                  // رأس النافذة
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Icon(market.icon, color: AppColors.primary, size: 28),
+                        const SizedBox(width: 12),
+                        Text(
+                          "أقسام ${market.name}",
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+
+                  // قائمة الأقسام مع ربط الـ scrollController
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 10,
+                      ),
+                      itemCount: market.subCategories.length,
+                      itemBuilder: (context, index) {
+                        final sub = market.subCategories[index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? Colors.white.withOpacity(0.05)
+                                : Colors.grey[50],
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            leading: Icon(
+                              sub['icon'] as IconData,
+                              color: AppColors.primary,
+                            ),
+                            title: Text(
+                              sub['title'] as String,
+                              style: const TextStyle(
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              context.push(
+                                AppRoutes.shopsList,
+                                extra: {
+                                  'market': market.toJson(),
+                                  'subcategory': sub,
+                                },
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

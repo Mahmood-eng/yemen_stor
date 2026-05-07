@@ -79,8 +79,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.appBarTheme.foregroundColor ?? colorScheme.onSurface,
+              Icons.arrow_back_ios,
+              color: colorScheme.primary,
               size: 20,
             ),
             onPressed: () => context.pop(),

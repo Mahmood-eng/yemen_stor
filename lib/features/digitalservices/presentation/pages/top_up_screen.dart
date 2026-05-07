@@ -160,8 +160,8 @@ class _TopUpScreenState extends State<TopUpScreen> {
           ),
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.onSurface,
+              Icons.arrow_back_ios,
+              color: theme.colorScheme.primary,
               size: 20,
             ),
             onPressed: () => context.pop(),

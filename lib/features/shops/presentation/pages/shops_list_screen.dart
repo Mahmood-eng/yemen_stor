@@ -32,18 +32,29 @@ class ShopsListScreen extends StatelessWidget {
           elevation: 0,
           title: Text(
             subcategoryName,
-            style: TextStyle(
-              color: AppColors.primary,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
-              fontSize: 18,
             ),
           ),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
             onPressed: () => context.pop(),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () => context.push(AppRoutes.cart),
+            ),
+          ],
         ),
         body: Column(
           children: [
