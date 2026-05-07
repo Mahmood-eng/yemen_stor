@@ -220,7 +220,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push(AppRoutes.merchantAddProduct);
+          context.go(AppRoutes.merchantAddProduct);
         },
         child: const Icon(Icons.add),
         tooltip: 'إضافة منتج جديد',
