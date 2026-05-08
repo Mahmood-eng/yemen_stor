@@ -300,7 +300,6 @@ class _MerchantAddProductScreenState extends State<MerchantAddProductScreen> {
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    final theme = Theme.of(context);
     return TextFormField(
       controller: controller,
       validator: validator,

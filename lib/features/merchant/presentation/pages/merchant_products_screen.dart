@@ -176,7 +176,6 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                         PopupMenuButton<String>(
                           onSelected: (value) {
                             if (value == 'edit') {
-                              // TODO: Navigate to edit product screen
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('تعديل المنتج - قريباً'),
@@ -223,7 +222,6 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           context.go(AppRoutes.merchantAddProduct);
         },
         child: const Icon(Icons.add),
-        tooltip: 'إضافة منتج جديد',
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,
@@ -250,7 +248,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             label: 'المنتجات',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping_outlined),
+            icon: Icon(Icons.shopping_bag_outlined),
             label: 'الطلبات',
           ),
         ],
