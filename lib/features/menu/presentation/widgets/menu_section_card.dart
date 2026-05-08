@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class MenuSectionCard extends StatelessWidget {
   final int step;
   final String title;
+  
   final Widget child;
 
   const MenuSectionCard({

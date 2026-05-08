@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontSize: 13,
-                                color: AppColors.primary,
+                                color: const Color.fromARGB(255, 223, 3, 3),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

@@ -176,6 +176,7 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                         PopupMenuButton<String>(
                           onSelected: (value) {
                             if (value == 'edit') {
+                              // هنا نضع الأكشن الخاص بتعديل المنتج (مثلاً فتح صفحة تعديل المنتج)
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('تعديل المنتج - قريباً'),
@@ -219,9 +220,12 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go(AppRoutes.merchantAddProduct);
+          context.push(AppRoutes.merchantAddProduct);
         },
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         child: const Icon(Icons.add),
+       
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,

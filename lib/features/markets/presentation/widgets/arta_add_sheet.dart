@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/theme/app_colors.dart';
 
 class ArtaAddSheet extends StatelessWidget {
   final Color accentColor;
@@ -50,6 +51,11 @@ class ArtaAddSheet extends StatelessWidget {
                 ),
               ),
             ),
+            Icon(   
+              Icons.photo_camera_outlined,
+              size: 40,
+              color: accentColor,
+            ),
             const SizedBox(height: 20),
             const ArtaInputField(
               hint: "اسم البائع",
@@ -84,7 +90,7 @@ class ArtaAddSheet extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => context.pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
+                  backgroundColor: AppColors.textPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),

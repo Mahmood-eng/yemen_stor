@@ -28,7 +28,7 @@ class MerchantMetricCard extends StatelessWidget {
           Text(
             title,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onBackground.withOpacity(0.75),
+              color: theme.colorScheme.onSurface.withOpacity(0.75),
             ),
           ),
           const SizedBox(height: 12),

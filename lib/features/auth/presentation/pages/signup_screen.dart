@@ -136,7 +136,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                       // حقل اختيار المدينة
                       DropdownButtonFormField<String>(
-                        value: _selectedCity,
+                        initialValue: _selectedCity,
                         alignment: Alignment.centerRight,
                         hint: const Text("اختر المدينة", style: TextStyle(fontFamily: 'Cairo', fontSize: 14)),
                         items: _yemeniCities.map((city) {

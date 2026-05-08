@@ -25,8 +25,8 @@ class SocialIconsRow extends StatelessWidget {
         const SizedBox(width: 15),
 
         _buildIcon(
-          Icons.phone_android,
-          Colors.green,
+          Icons.fingerprint,
+          Colors.teal,
           isDark,
         ), // إضافة خيار الهاتف كأيقونة تواصل
       ],

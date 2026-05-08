@@ -55,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text("الملف الشخصي"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () => context.pop(),
+          onPressed: () => context.pushNamed('/home'),
         ),
       ),
 

@@ -23,8 +23,8 @@ class ProductBottomBar extends StatelessWidget {
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {},
-              icon: const Icon(Icons.add_shopping_cart),
-              label: const Text("إضافة للسلة"),
+              icon: const Icon(Icons.bolt),
+              label: const Text("إشتري الآن"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(vertical: 15),
@@ -39,12 +39,12 @@ class ProductBottomBar extends StatelessWidget {
             width: 60,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.1),
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(15),
             ),
             child: IconButton(
               onPressed: () {},
-              icon: Icon(Icons.chat_bubble_outline, color: AppColors.accent),
+              icon: Icon(Icons.add_shopping_cart, color: AppColors.white),
             ),
           ),
         ],

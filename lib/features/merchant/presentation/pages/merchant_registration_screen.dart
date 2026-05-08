@@ -50,6 +50,10 @@ class _MerchantRegistrationScreenState
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => context.go(AppRoutes.home),
+        ),
         title: Text(
           'فتح حساب تاجر',
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),

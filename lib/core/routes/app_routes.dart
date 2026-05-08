@@ -31,6 +31,7 @@ import 'package:yemen_store/features/markets/presentation/pages/subcategories_sc
 import 'package:yemen_store/features/shops/presentation/pages/shops_list_screen.dart';
 import 'package:yemen_store/features/shops/presentation/pages/shop_details_screen.dart';
 import 'package:yemen_store/features/shops/presentation/pages/product_details_screen.dart';
+import 'package:yemen_store/features/ai_assistant/presentation/pages/ai_chat_screen.dart';
 import 'package:yemen_store/features/notifcation/presentation/pages/notifications_screen.dart';
 
 class AppRoutes {
@@ -63,6 +64,7 @@ class AppRoutes {
   static const String manageCards = '/manage-networks/manage-cards';
   static const String transactionHistory = '/digital-services/transactions';
   static const String notifications = '/notifications';
+  static const String aiChat = '/ai-chat';
   static const String markets = '/markets';
   static const String marketsArta = '/markets/arta';
   static const String subcategories = '/markets/subcategories';
@@ -97,6 +99,7 @@ class AppRoutes {
         path: notifications,
         builder: (context, state) => const NotificationsScreen(),
       ),
+      GoRoute(path: aiChat, builder: (context, state) => const ChatPage()),
       GoRoute(path: cart, builder: (context, state) => const CartScreen()),
       GoRoute(
         path: orderSuccess,

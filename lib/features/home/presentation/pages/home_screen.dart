@@ -31,6 +31,17 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: const AppDrawer(),
       appBar: _buildAppBar(context, isDark),
       body: _buildHomeBody(context, isDark),
+      floatingActionButton: Transform.translate(
+        offset: const Offset(0, -10), // رفع الزر لأعلى بمقدار 10 بكسل
+        child: FloatingActionButton(
+          onPressed: () {
+            context.push(AppRoutes.aiChat);
+          },
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          child: const Icon(Icons.smart_toy_rounded),
+        ),
+      ),
     );
   }
 
@@ -99,7 +110,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 15),
           const MarketsGrid(),
 
-          const SizedBox(height: 25),
+          const SizedBox(
+            height: 25,
+          ), // مساحة إضافية لتجنب تغطية الزر العائم للمحتوى
+          const SizedBox(height: 80),
         ],
       ),
     );
@@ -160,9 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         TextButton(
-          onPressed: () {
-            
-          },
+          onPressed: () {},
           child: Text(
             "عرض الكل",
             style: TextStyle(

@@ -16,6 +16,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  firebase_core: any
+  cloud_firestore: any
+  firebase_auth: any
 
 dev_dependencies:
   flutter_test:

@@ -199,7 +199,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      context.push(AppRoutes.orders);
+                      context.push(AppRoutes.merchantOrders);
                     },
                     child: const Text('الطلبات >'),
                   ),
@@ -218,13 +218,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push(AppRoutes.merchantAddProduct);
-        },
-        child: const Icon(Icons.add),
-        tooltip: 'إضافة منتج جديد',
-      ),
+      
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -251,7 +245,7 @@ class _MerchantDashboardScreenState extends State<MerchantDashboardScreen> {
             label: 'المنتجات',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping_outlined),
+            icon: Icon(Icons.shopping_bag_outlined),
             label: 'الطلبات',
           ),
         ],

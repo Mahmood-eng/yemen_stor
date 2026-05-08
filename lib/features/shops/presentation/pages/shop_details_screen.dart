@@ -18,7 +18,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
   final Color _accentColor = AppColors.accent;
 
   late List<ProductModel> _products;
-  String _selectedCategory = "الكل";
+  final String _selectedCategory = "الكل";
 
   @override
   void initState() {

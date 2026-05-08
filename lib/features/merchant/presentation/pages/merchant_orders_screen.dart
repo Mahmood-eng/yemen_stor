@@ -407,7 +407,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
             label: 'المنتجات',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping_outlined),
+            icon: Icon(Icons.shopping_bag_outlined),
             label: 'الطلبات',
           ),
         ],

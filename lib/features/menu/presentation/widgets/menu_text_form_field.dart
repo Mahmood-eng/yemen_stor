@@ -29,7 +29,7 @@ class MenuTextFormField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: textTheme.bodyLarge?.copyWith(
-          color: colorScheme.onBackground.withOpacity(0.75),
+          color: colorScheme.onSurface.withOpacity(0.75),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
         contentPadding: const EdgeInsets.symmetric(

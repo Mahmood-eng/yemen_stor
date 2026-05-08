@@ -5,7 +5,7 @@ class AppTheme {
   // دالة مساعدة موحدة للحدود لتجنب التكرار
   static OutlineInputBorder _border(Color color) => OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(15)),
-    borderSide: BorderSide.none,
+    borderSide: BorderSide(color: color, width: 1.5),
   );
 
   // --- الثيم الفاتح (Light Theme) ---
@@ -15,7 +15,8 @@ class AppTheme {
       secondary: AppColors.accent,
       surface: AppColors.bgLight,
       onPrimary: Colors.white,
-      onSurface: Colors.black,
+      onSurface: AppColors.textPrimary,
+      onSurfaceVariant: AppColors.textSecondary,
     );
 
     return ThemeData(
@@ -55,6 +56,12 @@ class AppTheme {
       ),
 
       inputDecorationTheme: InputDecorationTheme(
+        
+        hintStyle: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 13,
+          color: AppColors.textHint,
+        ),
         filled: true,
         fillColor: Colors.white,
         border: _border(colorScheme.primary),
@@ -71,6 +78,10 @@ class AppTheme {
         bodyMedium: TextStyle(
           fontFamily: 'Cairo',
           color: colorScheme.onSurface,
+        ),
+        bodySmall: TextStyle(
+          fontFamily: 'Cairo',
+          color: colorScheme.onSurfaceVariant,
         ),
       ),
     );

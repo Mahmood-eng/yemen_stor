@@ -49,6 +49,7 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading:IconButton(onPressed: () => context.go(AppRoutes.home), icon: const Icon(Icons.arrow_back_ios_new, size: 20)) ,
         title: Text(
           'أضف شبكتك',
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -66,6 +67,7 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                 MenuSectionCard(
                   step: 1,
                   title: 'معلومات الشبكة الأساسية',
+                 
                   child: Column(
                     children: [
                       MenuTextFormField(
