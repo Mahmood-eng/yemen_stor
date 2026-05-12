@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/features/markets/data/models/market_model.dart';
 import '../widgets/market_expansion_card.dart';
 
@@ -12,7 +13,34 @@ class MarketsScreen extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("كل الأسواق والأقسام")),
+      appBar: AppBar(
+        title: Text(
+          "كل الأسواق والأقسام",
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+          onPressed: () => context.pop(),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.shopping_cart_outlined,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            onPressed: () => context.push(AppRoutes.cart),
+          ),
+        ],
+      ),
+
       body: Column(
         children: [
           _buildSearchHeader(isDark),

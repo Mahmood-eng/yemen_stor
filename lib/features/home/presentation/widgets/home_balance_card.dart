@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/features/wallet/presentation/pages/recharge_wallet_screen.dart';
 
 class HomeBalanceCard extends StatefulWidget {
   const HomeBalanceCard({super.key});
@@ -48,18 +49,12 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          
           Row(
             children: [
               // أيقونة الزائد داخل دائرة لتغذية الرصيد
               GestureDetector(
                 onTap: () {
-                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RechargeWalletScreen(),
-                    ),
-                  );  
+                  context.push(AppRoutes.wallet);
                 },
                 child: Container(
                   padding: const EdgeInsets.all(4),
@@ -70,7 +65,7 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
                   child: const Icon(Icons.add, color: Colors.white, size: 20),
                 ),
               ),
-              const SizedBox(width: 12), 
+              const SizedBox(width: 12),
               // أيقونة العين للإظهار والإخفاء
               IconButton(
                 padding: EdgeInsets.zero,
@@ -84,7 +79,7 @@ class _HomeBalanceCardState extends State<HomeBalanceCard> {
               ),
             ],
           ),
-          
+
           // الجهة اليسرى: النص والمبلغ
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,

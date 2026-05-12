@@ -8,6 +8,9 @@ class OrderModel {
   final String price;
   final Widget imageset;
   final String storeName;
+  final String storeAddress;
+  final String marketName;
+  final String categoryName;
   final String time;
   final OrderStatus status;
 
@@ -17,6 +20,9 @@ class OrderModel {
     required this.price,
     required this.imageset,
     required this.storeName,
+    required this.storeAddress,
+    required this.marketName,
+    required this.categoryName,
     required this.time,
     required this.status,
   });

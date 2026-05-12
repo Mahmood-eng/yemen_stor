@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/bank_card.dart';
 import '../widgets/activation_sheet.dart';
 import '../widgets/amount_input_field.dart';
 
 class RechargeWalletScreen extends StatefulWidget {
-   static const String id = 'recharge_wallet_screen';
+  static const String id = 'recharge_wallet_screen';
   const RechargeWalletScreen({super.key});
 
   @override
@@ -20,30 +21,50 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
   final List<String> _currencies = ["ر.ي", "ر.س", "\$"];
 
   final List<Map<String, String>> banks = [
-    {"name": "بنك الكريمي", "id": "kurimi", "icon": "assets/images/kurimiicon.png"},
-    {"name": "مصرف القطيبي", "id": "qutaibi", "icon": "assets/images/qutaibiicon.png"},
+    {
+      "name": "بنك الكريمي",
+      "id": "kurimi",
+      "icon": "assets/images/kurimiicon.png",
+    },
+    {
+      "name": "مصرف القطيبي",
+      "id": "qutaibi",
+      "icon": "assets/images/qutaibiicon.png",
+    },
     {"name": "جوالي", "id": "jawali", "icon": "assets/images/jawaliicon.png"},
-    {"name": "ون كاش", "id": "onecash", "icon": "assets/images/onecashicon.jpg"},
-    {"name": "بنك التضامن", "id": "tadamon", "icon": "assets/images/tadamnicon.png"},
-    {"name": "بنك اليمن والكويت", "id": "yemenkuit", "icon": "assets/images/yemenKuiticon.png"},
+    {
+      "name": "ون كاش",
+      "id": "onecash",
+      "icon": "assets/images/onecashicon.jpg",
+    },
+    {
+      "name": "بنك التضامن",
+      "id": "tadamon",
+      "icon": "assets/images/tadamnicon.png",
+    },
+    {
+      "name": "بنك اليمن والكويت",
+      "id": "yemenkuit",
+      "icon": "assets/images/yemenKuiticon.png",
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     String? selectedBankName = banks.firstWhere(
-      (b) => b['id'] == _selectedBank, 
-      orElse: () => {"name": ""}
+      (b) => b['id'] == _selectedBank,
+      orElse: () => {"name": ""},
     )['name'];
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-     
-        appBar: AppBar(title: const Text("تغذية رصيدي"),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
-        ),
+        appBar: AppBar(
+          title: const Text("تغذية رصيدي"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () => context.pop(),
+          ),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -55,12 +76,12 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
                 controller: _amountController,
                 selectedCurrency: _selectedCurrency,
                 currencies: _currencies,
-                onCurrencyChanged: (val) => setState(() => _selectedCurrency = val!),
+                onCurrencyChanged: (val) =>
+                    setState(() => _selectedCurrency = val!),
               ),
 
               const SizedBox(height: 15),
 
-            
               const Text("الرمز التعريفي / الفريد (Unique ID)"),
               const SizedBox(height: 8),
               TextField(
@@ -70,25 +91,27 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
                   prefixIcon: Icon(Icons.fingerprint),
                 ),
               ),
-              
+
               if (_selectedBank != null)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "سيتم التحقق والتحويل عبر: $selectedBankName",
-                    style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
 
               const SizedBox(height: 20),
               const Text("اختر وسيلة الدفع"),
               const SizedBox(height: 15),
-              
+
               _buildBanksGrid(),
 
               const SizedBox(height: 30),
 
-             
               ElevatedButton(
                 onPressed: _selectedBank == null ? null : () {},
                 child: const Text("تأكيد العملية والاستمرار"),
@@ -105,7 +128,10 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.1,
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.1,
       ),
       itemCount: banks.length,
       itemBuilder: (context, index) => BankCard(

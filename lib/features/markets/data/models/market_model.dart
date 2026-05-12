@@ -10,8 +10,23 @@ class MarketModel {
     required this.icon,
     this.subCategories = const [],
   });
-}
 
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'icon': icon.codePoint, // IconData to int
+      'subCategories': subCategories,
+    };
+  }
+
+  factory MarketModel.fromJson(Map<String, dynamic> json) {
+    return MarketModel(
+      name: json['name'],
+      icon: IconData(json['icon'], fontFamily: 'MaterialIcons'),
+      subCategories: List<Map<String, dynamic>>.from(json['subCategories']),
+    );
+  }
+}
 
 final List<MarketModel> mockMarkets = [
   MarketModel(
@@ -31,8 +46,8 @@ final List<MarketModel> mockMarkets = [
       {"title": "ملابس نسائي", "icon": Icons.woman},
     ],
   ),
-   MarketModel(
-    name: "الجمال", 
+  MarketModel(
+    name: "الجمال",
     icon: Icons.face_retouching_natural_rounded,
     subCategories: [
       {"title": "عطور", "icon": Icons.opacity},
@@ -48,12 +63,12 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "عرطة", 
+    name: "عرطة",
     icon: Icons.sell_rounded,
     subCategories: [], // قسم العروض
   ),
   MarketModel(
-    name: "المنزل", 
+    name: "المنزل",
     icon: Icons.chair_rounded,
     subCategories: [
       {"title": "أثاث", "icon": Icons.bed},
@@ -61,7 +76,7 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "أجهزة", 
+    name: "أجهزة",
     icon: Icons.settings_input_component_rounded,
     subCategories: [
       {"title": "أجهزة كهربائية", "icon": Icons.bolt},
@@ -69,7 +84,7 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "رياضة", 
+    name: "رياضة",
     icon: Icons.fitness_center_rounded,
     subCategories: [
       {"title": "ملابس رياضية", "icon": Icons.sports_kabaddi},
@@ -77,7 +92,7 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "ألعاب", 
+    name: "ألعاب",
     icon: Icons.sports_esports_rounded,
     subCategories: [
       {"title": "بلايستيشن", "icon": Icons.videogame_asset},
@@ -85,7 +100,7 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "صيدلية", 
+    name: "صيدلية",
     icon: Icons.medical_services_rounded,
     subCategories: [
       {"title": "أدوية", "icon": Icons.medication},
@@ -93,7 +108,7 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "كتب", 
+    name: "كتب",
     icon: Icons.menu_book_rounded,
     subCategories: [
       {"title": "روايات", "icon": Icons.auto_stories},
@@ -101,16 +116,16 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "حيوانات", 
+    name: "حيوانات",
     icon: Icons.pets_rounded,
     subCategories: [
       {"title": "طعام حيوانات", "icon": Icons.set_meal},
       {"title": "إكسسوارات", "icon": Icons.shutter_speed},
     ],
   ),
- 
+
   MarketModel(
-    name: "بقالة", 
+    name: "بقالة",
     icon: Icons.shopping_basket_rounded,
     subCategories: [
       {"title": "خضروات", "icon": Icons.eco},
@@ -118,7 +133,7 @@ final List<MarketModel> mockMarkets = [
     ],
   ),
   MarketModel(
-    name: "سيارات", 
+    name: "سيارات",
     icon: Icons.directions_car_rounded,
     subCategories: [
       {"title": "قطع غيار", "icon": Icons.settings},

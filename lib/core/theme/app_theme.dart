@@ -5,46 +5,83 @@ class AppTheme {
   // دالة مساعدة موحدة للحدود لتجنب التكرار
   static OutlineInputBorder _border(Color color) => OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(15)),
-     borderSide: BorderSide.none,
-
+    borderSide: BorderSide(color: color, width: 1.5),
   );
 
   // --- الثيم الفاتح (Light Theme) ---
   static ThemeData get lightTheme {
+    final colorScheme = ColorScheme.light(
+      primary: AppColors.primary,
+      secondary: AppColors.accent,
+      surface: AppColors.bgLight,
+      onPrimary: Colors.white,
+      onSurface: AppColors.textPrimary,
+      onSurfaceVariant: AppColors.textSecondary,
+    );
+
     return ThemeData(
       useMaterial3: true,
+      colorScheme: colorScheme,
       brightness: Brightness.light,
-      primaryColor: AppColors.primary,
+      primaryColor: colorScheme.primary,
       scaffoldBackgroundColor: AppColors.bgLight,
       fontFamily: 'Cairo',
 
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.bgLight,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.primary),
+        iconTheme: IconThemeData(color: colorScheme.primary),
         titleTextStyle: TextStyle(
           fontFamily: 'Cairo',
           fontWeight: FontWeight.bold,
           fontSize: 18,
-          color: AppColors.primary,
+          color: colorScheme.primary,
         ),
+        foregroundColor: colorScheme.primary,
       ),
 
       cardColor: AppColors.cardLight,
-      dividerColor: Colors.grey.withOpacity(0.1),
+      dividerColor: colorScheme.onSurface,
 
-      elevatedButtonTheme: _buttonTheme(AppColors.primary, AppColors.white),
+      elevatedButtonTheme: _buttonTheme(
+        colorScheme.primary,
+        colorScheme.onPrimary,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(foregroundColor: colorScheme.primary),
+      ),
 
-      textTheme: const TextTheme(
+      inputDecorationTheme: InputDecorationTheme(
+        
+        hintStyle: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 13,
+          color: AppColors.textHint,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: _border(colorScheme.primary),
+        enabledBorder: _border(colorScheme.primary),
+        focusedBorder: _border(colorScheme.primary),
+      ),
+
+      textTheme: TextTheme(
         displayLarge: TextStyle(
           fontFamily: 'Cairo',
           fontWeight: FontWeight.bold,
-          color: AppColors.primary,
+          color: colorScheme.primary,
         ),
         bodyMedium: TextStyle(
           fontFamily: 'Cairo',
-          color: AppColors.textSecondary,
+          color: colorScheme.onSurface,
+        ),
+        bodySmall: TextStyle(
+          fontFamily: 'Cairo',
+          color: colorScheme.onSurfaceVariant,
         ),
       ),
     );
@@ -52,47 +89,68 @@ class AppTheme {
 
   // --- الثيم المظلم (Dark Theme) ---
   static ThemeData get darkTheme {
+    final colorScheme = ColorScheme.dark(
+      primary: AppColors.primary,
+      secondary: AppColors.accent,
+      surface: AppColors.bgDark,
+      onPrimary: Colors.white,
+      onSurface: Colors.white,
+    );
+
     return ThemeData(
       useMaterial3: true,
+      colorScheme: colorScheme,
       brightness: Brightness.dark,
-      primaryColor: AppColors.primary,
+      primaryColor: colorScheme.primary,
       scaffoldBackgroundColor: AppColors.bgDark,
       fontFamily: 'Cairo',
 
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.cardDark,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.white),
+        iconTheme: IconThemeData(color: colorScheme.primary, size: 20),
         titleTextStyle: TextStyle(
           fontFamily: 'Cairo',
           fontWeight: FontWeight.bold,
           fontSize: 18,
-          color: AppColors.white,
+          color: colorScheme.primary,
         ),
+        foregroundColor: colorScheme.primary,
       ),
 
       cardColor: AppColors.cardDark,
-      dividerColor: Colors.white10,
+      dividerColor: colorScheme.onSurface.withOpacity(0.1),
 
-      elevatedButtonTheme: _buttonTheme(AppColors.primary, AppColors.white),
-
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
-          fontFamily: 'Cairo',
-          fontWeight: FontWeight.bold,
-          color: AppColors.white,
-        ),
-        bodyMedium: TextStyle(fontFamily: 'Cairo', color: Colors.white70),
+      elevatedButtonTheme: _buttonTheme(
+        colorScheme.primary,
+        colorScheme.onPrimary,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: colorScheme.onPrimary),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(foregroundColor: colorScheme.onPrimary),
       ),
 
-      // تحسين شكل الحقول في الوضع المظلم
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white.withOpacity(0.05),
-        border: _border(Colors.white10),
-        enabledBorder: _border(Colors.white10),
-        focusedBorder: _border(AppColors.primary),
+        border: _border(colorScheme.onSurface),
+        enabledBorder: _border(colorScheme.onSurface),
+        focusedBorder: _border(colorScheme.primary),
+      ),
+
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          fontFamily: 'Cairo',
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onSurface,
+        ),
+        bodyMedium: TextStyle(
+          fontFamily: 'Cairo',
+          color: colorScheme.onSurface.withOpacity(0.85),
+        ),
       ),
     );
   }

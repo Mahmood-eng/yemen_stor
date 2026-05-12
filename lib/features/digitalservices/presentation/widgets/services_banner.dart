@@ -24,7 +24,11 @@ class ServicesBanner extends StatelessWidget {
             Positioned(
               left: -15,
               bottom: -15,
-              child: Icon(Icons.stars_rounded, size: 110, color: Colors.white.withOpacity(0.12)),
+              child: Icon(
+                Icons.stars_rounded,
+                size: 110,
+                color: Colors.white.withAlpha((0.12 * 255).round()),
+              ),
             ),
             const Padding(
               padding: EdgeInsets.all(22),
@@ -33,12 +37,21 @@ class ServicesBanner extends StatelessWidget {
                 children: [
                   Text(
                     "تفعيل فوري للاشتراكات",
-                    style: TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 17),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Cairo',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                    ),
                   ),
                   SizedBox(height: 6),
                   Text(
                     "أدوات الذكاء الاصطناعي والتصميم في مكان واحد",
-                    style: TextStyle(color: Colors.white70, fontFamily: 'Cairo', fontSize: 12),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontFamily: 'Cairo',
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -46,6 +59,6 @@ class ServicesBanner extends StatelessWidget {
           ],
         ),
       ),
-    ); ;
+    );
   }
 }

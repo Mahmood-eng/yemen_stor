@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/core/widgets/app_drawer.dart';
-import 'package:yemen_store/features/digitalservices/presentation/widgets/service_category_card%20.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:yemen_store/features/digitalservices/presentation/widgets/service_category_card.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_banner.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_search.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/section_title.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_grid.dart';
+
+import '../../../menu/presentation/pages/app_drawer.dart';
 
 class DigitalServicesScreen extends StatelessWidget {
   const DigitalServicesScreen({super.key});
@@ -29,6 +32,15 @@ class DigitalServicesScreen extends StatelessWidget {
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () => context.push(AppRoutes.cart),
+            ),
+          ],
         ),
 
         drawer: const AppDrawer(),
@@ -48,15 +60,17 @@ class DigitalServicesScreen extends StatelessWidget {
               const SizedBox(height: 15),
               ServicesGrid(
                 children: [
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "شحن رصيد",
                     icon: Icons.phone_android,
                     iconColor: AppColors.iconOrange,
+                    onTap: () => context.push(AppRoutes.topUp),
                   ),
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "كروت واي فاي",
                     icon: Icons.wifi,
                     iconColor: AppColors.iconBlue,
+                    onTap: () => context.push(AppRoutes.wifiNetworks),
                   ),
                   const ServiceCategoryCard(
                     title: "باقات",
@@ -77,10 +91,11 @@ class DigitalServicesScreen extends StatelessWidget {
               const SizedBox(height: 15),
               ServicesGrid(
                 children: [
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "ذكاء اصطناعي",
                     icon: Icons.psychology,
                     iconColor: AppColors.iconPurple,
+                    onTap: () => context.push(AppRoutes.aiSubscription),
                   ),
                   const ServiceCategoryCard(
                     title: "برامج تصميم",
@@ -179,6 +194,12 @@ class DigitalServicesScreen extends StatelessWidget {
                     icon: Icons.account_balance_outlined,
                     iconColor: AppColors.iconBlueGrey,
                   ),
+                  ServiceCategoryCard(
+                    title: "سجل العمليات",
+                    icon: Icons.history,
+                    iconColor: AppColors.iconIndigo,
+                    onTap: () => context.push(AppRoutes.transactionHistory),
+                  ),
                 ],
               ),
             ],
@@ -186,22 +207,31 @@ class DigitalServicesScreen extends StatelessWidget {
         ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {},
-          backgroundColor: const Color(0xFF0D3B66),
-          icon: const Icon(Icons.history, color: Colors.white, size: 20),
-          label: const Text(
-            "آخر العمليات",
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 12,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
+        floatingActionButton: Builder(
+          builder: (context) {
+            final theme = Theme.of(context);
+            return FloatingActionButton.extended(
+              onPressed: () => context.push(AppRoutes.transactionHistory),
+              backgroundColor: theme.colorScheme.primary,
+              icon: Icon(
+                Icons.history,
+                color: theme.colorScheme.onPrimary,
+                size: 20,
+              ),
+              label: Text(
+                "آخر العمليات",
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 12,
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+            );
+          },
         ),
       ),
     );

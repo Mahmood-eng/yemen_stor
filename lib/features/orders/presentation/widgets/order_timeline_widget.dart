@@ -5,26 +5,134 @@ class OrderTimelineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final theme = Theme.of(context);
+
+    return Column(
       children: [
-        _step(context, "تم القبول", Icons.check_circle, isDone: true),
-        _step(context, "التجهيز", Icons.inventory_2, isDone: true),
-        _step(context, "في الطريق", Icons.delivery_dining, isCurrent: true),
-        _step(context, "الاستلام", Icons.home),
+        _buildStep(
+          context,
+          title: "تم تأكيد الطلب",
+          time: "10:30 ص",
+          isCompleted: true,
+          isLast: false,
+        ),
+        _buildStep(
+          context,
+          title: "جاري تجهيز طلبك",
+          time: "10:45 ص",
+          isCompleted: true,
+          isLast: false,
+        ),
+        _buildStep(
+          context,
+          title: "السائق في الطريق إليك",
+          time: "يصل خلال 15 دقيقة",
+          isCompleted: false,
+          isActive: true,
+          isLast: false,
+        ),
+        _buildStep(
+          context,
+          title: "تم التسليم",
+          time: "الوقت المتوقع 11:15 ص",
+          isCompleted: false,
+          isLast: true,
+        ),
       ],
     );
   }
 
-  Widget _step(BuildContext context, String label, IconData icon, {bool isDone = false, bool isCurrent = false}) {
+  Widget _buildStep(
+    BuildContext context, {
+    required String title,
+    required String time,
+    required bool isCompleted,
+    bool isActive = false,
+    required bool isLast,
+  }) {
     final theme = Theme.of(context);
-    Color color = isCurrent ? Colors.orange : (isDone ? theme.primaryColor : Colors.grey[400]!);
-    
-    return Column(
+    final primaryColor = theme.colorScheme.primary;
+    final neutralColor = theme.brightness == Brightness.dark
+        ? Colors.white10
+        : Colors.grey[200]!;
+    final iconColor = isCompleted || isActive
+        ? primaryColor
+        : Colors.grey[400]!;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(backgroundColor: color, radius: 20, child: Icon(icon, color: Colors.white, size: 18)),
-        const SizedBox(height: 8),
-        Text(label, style: TextStyle(fontSize: 10, color: color, fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal)),
+        // العمود الجانبي (الأيقونة والخط)
+        Column(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: isCompleted ? primaryColor : Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isCompleted || isActive
+                      ? primaryColor
+                      : Colors.grey[300]!,
+                  width: 2,
+                ),
+              ),
+              child: isCompleted
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : isActive
+                  ? Center(
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            if (!isLast)
+              Container(
+                width: 2,
+                height: 45,
+                color: isCompleted ? primaryColor : neutralColor,
+              ),
+          ],
+        ),
+        const SizedBox(width: 15),
+        // بيانات الحالة
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontWeight: isCompleted || isActive
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  fontSize: 14,
+                  color: isCompleted || isActive
+                      ? theme.colorScheme.onSurface
+                      : Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                time,
+                style: const TextStyle(
+                  fontFamily: 'Cairo',
+                  fontSize: 11,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
-  final Color? backgroundColor; 
+  final Color? backgroundColor;
   final Color? textColor;
 
   const CustomButton({
@@ -26,13 +26,16 @@ class CustomButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           // إذا لم نمرر لون مخصص، فإنه سيأخذ اللون الرئيسي (primary) تلقائياً من الثيم
-          backgroundColor: backgroundColor ?? theme.primaryColor,
+          backgroundColor: backgroundColor ?? theme.colorScheme.primary,
 
           // لون النص داخل الزر يسحب من الثيم (غالباً الأبيض)
           foregroundColor: textColor ?? theme.colorScheme.onPrimary,
 
           // لون الزر عند التعطيل (Disabled)
-          disabledBackgroundColor: (backgroundColor ?? theme.primaryColor).withOpacity(0.4),
+          disabledBackgroundColor:
+              (backgroundColor ?? theme.colorScheme.primary).withAlpha(
+                (0.4 * 255).round(),
+              ),
 
           // الحواف والشكل يتم سحبها من إعدادات الثيم الموحدة
           shape: theme.elevatedButtonTheme.style?.shape?.resolve({}),
