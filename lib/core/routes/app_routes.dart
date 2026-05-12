@@ -82,7 +82,7 @@ class AppRoutes {
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(path: login, builder: (context, state) => const LoginScreen()),
-      GoRoute(path: signup, builder: (context, state) => const SignUpScreen()),
+      GoRoute(path: signup, builder: (context, state) => const RegisterScreen()),
       GoRoute(
         path: profile,
         builder: (context, state) => const ProfileScreen(),
