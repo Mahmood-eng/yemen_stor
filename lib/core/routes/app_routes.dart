@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yemen_store/features/home/presentation/pages/favorites_screen.dart';
 import 'package:yemen_store/features/home/presentation/widgets/home_bottom_nav.dart';
 import 'package:yemen_store/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:yemen_store/features/setting/presentation/pages/settings_screen.dart';
 import 'package:yemen_store/features/auth/presentation/pages/login_screen.dart';
 import 'package:yemen_store/features/auth/presentation/pages/signup_screen.dart';
 import 'package:yemen_store/features/home/presentation/pages/home_screen.dart';
@@ -46,6 +48,7 @@ class AppRoutes {
   static const String orderTracking = '/order-tracking'; // المسار الأساسي
   static const String services = '/services';
   static const String profile = '/profile';
+  static const String settings = '/settings';
   static const String wallet = '/wallet';
   static const String favorites = '/favorites';
   static const String orderTrackingWithId = '/orders/tracking/:orderId';
@@ -73,7 +76,9 @@ class AppRoutes {
   static const String productDetails = '/markets/product-details';
 
   static final router = GoRouter(
-    initialLocation: onboarding,
+    initialLocation: FirebaseAuth.instance.currentUser != null
+        ? home
+        : onboarding,
     debugLogDiagnostics: true, // مفيد جداً لتتبع الأخطاء في الـ Console
     routes: [
       // 1. مسارات مستقلة (Full Screen - بدون شريط سفلي)
@@ -82,10 +87,17 @@ class AppRoutes {
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(path: login, builder: (context, state) => const LoginScreen()),
-      GoRoute(path: signup, builder: (context, state) => const RegisterScreen()),
+      GoRoute(
+        path: signup,
+        builder: (context, state) => const RegisterScreen(),
+      ),
       GoRoute(
         path: profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: settings,
+        builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
         path: wallet,

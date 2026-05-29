@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 
 class FavoritesScreen extends StatelessWidget {
@@ -17,7 +18,7 @@ class FavoritesScreen extends StatelessWidget {
 
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
-          onPressed: () => context.pop(),
+          onPressed: () => context.push(AppRoutes.home),
         ),
       ),
       body: ListView.builder(

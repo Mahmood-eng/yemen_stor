@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/widgets/yemen_store_app_bar.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../widgets/order_card.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_status.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -15,20 +23,43 @@ class OrdersScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "سجل طلباتي",
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+        appBar: YemenStoreAppBar(
+          title: const Text("سجل طلباتي"),
+           leading: IconButton(
+          icon: Icon(
+            Icons.menu_rounded,
+            color: theme.appBarTheme.iconTheme?.color,
           ),
-          elevation: 0,
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
+        
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            onPressed: () {
+              context.push(AppRoutes.notifications);
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.shopping_cart_outlined,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            onPressed: () {
+              context.push(AppRoutes.cart);
+            },
+          ),
+        ],
           bottom: TabBar(
-            indicatorColor: theme.primaryColor,
-            labelColor: theme.primaryColor,
+            indicatorColor: theme.colorScheme.primary,
+            labelColor: theme.colorScheme.primary,
             unselectedLabelColor: theme.brightness == Brightness.dark
                 ? Colors.white38
                 : Colors.grey,
-            labelStyle: const TextStyle(
-              fontFamily: 'Cairo',
+            labelStyle: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 13,
             ),

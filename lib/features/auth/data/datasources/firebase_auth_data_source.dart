@@ -146,7 +146,7 @@ class FirebaseAuthDataSource implements AuthDataSource {
     if (firebaseUser == null) return null;
     return User(
       id: firebaseUser.uid,
-      email: firebaseUser.email!,
+      email: firebaseUser.email ?? firebaseUser.phoneNumber ?? '',
       displayName: firebaseUser.displayName,
       phoneNumber: phoneNumber ?? firebaseUser.phoneNumber,
       city: city,

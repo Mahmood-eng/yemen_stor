@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:yemen_store/core/routes/app_routes.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -59,7 +61,7 @@ class AppDrawer extends StatelessWidget {
                     Icons.swap_horiz,
                     "تبديل الحساب",
                     "متجري / شبكتي",
-                    theme.primaryColor,
+                    theme.colorScheme.primary,
                     () {},
                   ),
 
@@ -75,7 +77,7 @@ class AppDrawer extends StatelessWidget {
                     Icons.wifi_tethering,
                     "إدارة الشبكات",
                     "أضف كروت وشبكتك هنا",
-                    Colors.orange.shade800,
+                    theme.colorScheme.secondary,
                     () {
                       context.go(AppRoutes.addPrivateNetwork);
                     },
@@ -106,7 +108,9 @@ class AppDrawer extends StatelessWidget {
                     context,
                     Icons.settings_outlined,
                     "الإعدادات",
-                    () {},
+                    () {
+                      context.go(AppRoutes.settings);
+                    },
                   ),
                   _buildDrawerItem(
                     context,
@@ -126,51 +130,152 @@ class AppDrawer extends StatelessWidget {
 
   Widget _buildDrawerHeader(BuildContext context, bool isDark) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.only(top: 60, bottom: 20, right: 20, left: 20),
-      decoration: BoxDecoration(
-        // استخدام لون السطح في الوضع الداكن واللون الرئيسي في الفاتح
-        color: isDark ? theme.colorScheme.surface : theme.primaryColor,
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(30)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 35,
-                backgroundColor: Colors.white24,
-                child: Icon(Icons.person, size: 40, color: Colors.white),
-              ),
-              const SizedBox(width: 15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "محمود المقطري",
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      color: Colors.white,
-                      fontSize: 16,
+    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) {
+      return Container(
+        padding: const EdgeInsets.only(
+          top: 60,
+          bottom: 20,
+          right: 20,
+          left: 20,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? theme.colorScheme.surface : theme.primaryColor,
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(30),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.white24,
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'مرحباً',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'تسجيل الدخول',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onPrimary.withOpacity(0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.swap_horiz, color: Colors.white),
+              tooltip: 'تبديل الحساب',
+            ),
+          ],
+        ),
+      );
+    }
+
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .snapshots(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data();
+        final name =
+            data?['displayName'] ??
+            data?['name'] ??
+            fb_auth.FirebaseAuth.instance.currentUser?.displayName ??
+            'غير معروف';
+        final account = data?['accountNumber'] ?? data?['account_no'] ?? '';
+        final photo = (data?['photoUrl'] ?? '') as String;
+
+        return Container(
+          padding: const EdgeInsets.only(
+            top: 60,
+            bottom: 20,
+            right: 20,
+            left: 20,
+          ),
+          decoration: BoxDecoration(
+            color: isDark
+                ? theme.colorScheme.surface
+                : theme.colorScheme.primary,
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: (photo.isNotEmpty)
+                        ? NetworkImage(photo)
+                        : null,
+                    backgroundColor: theme.colorScheme.onPrimary.withOpacity(
+                      0.25,
+                    ),
+                    child: (photo.isEmpty)
+                        ? Icon(Icons.person, color: theme.colorScheme.onPrimary)
+                        : null,
                   ),
-                  const Text(
-                    "ID: #992837",
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (account.isNotEmpty)
+                        Text(
+                          'حساب: $account',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: theme.colorScheme.onPrimary.withOpacity(
+                                  0.85,
+                                ),
+                              ),
+                        ),
+                    ],
                   ),
                 ],
               ),
+
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.swap_horiz,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                tooltip: 'تبديل الحساب',
+              ),
             ],
           ),
-          IconButton(
-            onPressed: () {
-              
-            },
-            icon: const Icon(Icons.swap_horiz, color: Colors.white),
-            tooltip: 'تبديل الحساب',
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -186,7 +291,9 @@ class AppDrawer extends StatelessWidget {
           fontSize: 13,
           fontWeight: FontWeight.bold,
           // حل مشكلة textMain باستخدام ألوان الثيم المباشرة
-          color: isDark ? Colors.white70 : theme.primaryColor,
+          color: isDark
+              ? theme.colorScheme.onPrimary.withOpacity(0.85)
+              : theme.colorScheme.primary,
         ),
       ),
     );
@@ -205,7 +312,7 @@ class AppDrawer extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     return ListTile(
-      leading: Icon(icon, color: theme.primaryColor, size: 24),
+      leading: Icon(icon, color: theme.colorScheme.primary, size: 24),
       title: Text(
         title,
         style: theme.textTheme.bodyMedium?.copyWith(
@@ -255,18 +362,20 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: InkWell(
         onTap: () {},
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.logout_rounded, color: Colors.redAccent),
-            SizedBox(width: 10),
+            Icon(Icons.logout_rounded, color: theme.colorScheme.error),
+            const SizedBox(width: 10),
             Text(
               "تسجيل الخروج",
-              style: TextStyle(
-                color: Colors.redAccent,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.error,
                 fontWeight: FontWeight.bold,
               ),
             ),

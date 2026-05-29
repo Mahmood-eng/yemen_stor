@@ -5,6 +5,14 @@ class User {
   final String? phoneNumber;
   final String? city;
   final bool emailVerified;
+  final String? addressDetails;
+  final String? accountNumber;
+  final String? balance;
+  final String? role;
+  final String? imageUrl;
+  final String? password;
+  final String? confirmPassword;
+
 
   User({
     required this.id,
@@ -13,6 +21,13 @@ class User {
     this.phoneNumber,
     this.city,
     this.emailVerified = false,
+    this.addressDetails,
+    this.accountNumber,
+    this.balance,
+    this.role,
+    this.imageUrl,
+    this.password,
+    this.confirmPassword,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -23,6 +38,13 @@ class User {
       phoneNumber: json['phoneNumber'] as String?,
       city: json['city'] as String?,
       emailVerified: json['emailVerified'] as bool? ?? false,
+      addressDetails: json['addressDetails'] as String?,
+      accountNumber: json['accountNumber'] as String?,
+      balance: json['balance'] as String?,
+      role: json['role'] as String?,
+      imageUrl: json['imageUrl'] as String?,
+      password: json['password'] as String?,
+      confirmPassword: json['confirmPassword'] as String?,
     );
   }
 
@@ -34,6 +56,13 @@ class User {
       'phoneNumber': phoneNumber,
       'city': city,
       'emailVerified': emailVerified,
+      'addressDetails': addressDetails,
+      'accountNumber': accountNumber,
+      'balance': balance,
+      'role': role,
+      'imageUrl': imageUrl,
+      'password': password,
+      'confirmPassword': confirmPassword,
     };
   }
 
@@ -43,7 +72,15 @@ class User {
     String? displayName,
     String? phoneNumber,
     String? city,
+    String? password,
+    String? confirmPassword,
+    String? imageUrl,
     bool? emailVerified,
+    String? addressDetails,
+    String? accountNumber,
+    String? balance,
+    String? role,
+
   }) {
     return User(
       id: id ?? this.id,
@@ -52,6 +89,13 @@ class User {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       city: city ?? this.city,
       emailVerified: emailVerified ?? this.emailVerified,
+      addressDetails: addressDetails ?? this.addressDetails,
+      accountNumber: accountNumber ?? this.accountNumber,
+      balance: balance ?? this.balance,
+      role: role ?? this.role,
+      imageUrl: imageUrl ?? this.imageUrl,
+      password: password ?? this.password,
+      confirmPassword: confirmPassword ?? this.confirmPassword,
     );
   }
 }

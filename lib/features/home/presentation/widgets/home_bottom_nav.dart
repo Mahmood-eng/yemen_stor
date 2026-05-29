@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // ضروري جداً
-import 'package:yemen_store/core/theme/app_colors.dart';
 
 class HomeBottomNav extends StatelessWidget {
-
   final StatefulNavigationShell navigationShell;
 
-  const HomeBottomNav({
-    super.key,
-    required this.navigationShell,
-  });
+  const HomeBottomNav({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final bool isDark = theme.brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
@@ -26,9 +22,8 @@ class HomeBottomNav extends StatelessWidget {
         ],
       ),
       child: BottomNavigationBar(
-        
         currentIndex: navigationShell.currentIndex,
-        
+
         onTap: (index) {
           navigationShell.goBranch(
             index,
@@ -36,16 +31,41 @@ class HomeBottomNav extends StatelessWidget {
           );
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: isDark ? Colors.white38 : Colors.grey,
-        selectedLabelStyle: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 12),
-        unselectedLabelStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 12),
+        backgroundColor:
+            theme.bottomNavigationBarTheme.backgroundColor ??
+            theme.scaffoldBackgroundColor,
+        selectedItemColor:
+            theme.bottomNavigationBarTheme.selectedItemColor ??
+            theme.colorScheme.primary,
+        unselectedItemColor:
+            theme.bottomNavigationBarTheme.unselectedItemColor ??
+            (isDark ? Colors.white38 : Colors.grey),
+        selectedLabelStyle:
+            theme.bottomNavigationBarTheme.selectedLabelStyle ??
+            theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+        unselectedLabelStyle:
+            theme.bottomNavigationBarTheme.unselectedLabelStyle ??
+            theme.textTheme.bodySmall?.copyWith(fontSize: 12),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'الرئيسية'),
-          BottomNavigationBarItem(icon: Icon(Icons.auto_awesome_rounded), label: 'المقترحات'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_rounded), label: 'الطلبات'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_view_rounded), label: 'الخدمات'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: 'الرئيسية',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.auto_awesome_rounded),
+            label: 'المقترحات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag_rounded),
+            label: 'الطلبات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.grid_view_rounded),
+            label: 'الخدمات',
+          ),
         ],
       ),
     );

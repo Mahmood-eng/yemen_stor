@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
+
 import 'package:yemen_store/core/widgets/custom_button.dart';
 import 'package:yemen_store/features/auth/presentation/providers/auth_providers.dart';
 
@@ -123,60 +123,98 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ],
       ),
 
-      body: user == null
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+      body: Builder(
+        builder: (context) {
+          if (authState.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (authState.error != null) {
+            return Center(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildProfileHeader(user, isDark),
-                  const SizedBox(height: 30),
-
-                  _buildProfileField(
-                    label: "الاسم الكامل",
-                    controller: _nameController,
-                    icon: Icons.person_outline,
+                  Text('حدث خطأ: ${authState.error}'),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () => ref.refresh(authNotifierProvider),
+                    child: const Text('إعادة المحاولة'),
                   ),
-                  _buildProfileField(
-                    label: "رقم الهاتف",
-                    controller: _phoneController,
-                    icon: Icons.phone_android,
-                    keyboardType: TextInputType.phone,
-                  ),
-                  _buildProfileField(
-                    label: "البريد الإلكتروني",
-                    controller: _emailController,
-                    icon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    readOnly: true, // Email cannot be changed
-                  ),
-                  _buildProfileField(
-                    label: "المدينة",
-                    controller: _cityController,
-                    icon: Icons.location_city_outlined,
-                  ),
-                  _buildProfileField(
-                    label: "العنوان التفصيلي",
-                    controller: _addressController,
-                    icon: Icons.location_on_outlined,
-                    maxLines: 2,
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  if (_isEdited)
-                    CustomButton(
-                      text: _isLoading ? "جاري التحديث..." : "حفظ التغييرات",
-                      onPressed: _isLoading ? null : _updateProfile,
-                    ),
-
-                  const SizedBox(height: 20),
-
-                  // Additional info section
-                  _buildInfoSection(user, isDark),
                 ],
               ),
+            );
+          }
+
+          if (user == null) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('لم يتم العثور على مستخدم.'),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () => context.go(AppRoutes.login),
+                    child: const Text('تسجيل الدخول'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                _buildProfileHeader(user, isDark),
+                const SizedBox(height: 30),
+
+                _buildProfileField(
+                  label: "الاسم الكامل",
+                  controller: _nameController,
+                  icon: Icons.person_outline,
+                ),
+                _buildProfileField(
+                  label: "رقم الهاتف",
+                  controller: _phoneController,
+                  icon: Icons.phone_android,
+                  keyboardType: TextInputType.phone,
+                ),
+                _buildProfileField(
+                  label: "البريد الإلكتروني",
+                  controller: _emailController,
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  readOnly: true, // Email cannot be changed
+                ),
+                _buildProfileField(
+                  label: "المدينة",
+                  controller: _cityController,
+                  icon: Icons.location_city_outlined,
+                ),
+                _buildProfileField(
+                  label: "العنوان التفصيلي",
+                  controller: _addressController,
+                  icon: Icons.location_on_outlined,
+                  maxLines: 2,
+                ),
+
+                const SizedBox(height: 30),
+
+                if (_isEdited)
+                  CustomButton(
+                    text: _isLoading ? "جاري التحديث..." : "حفظ التغييرات",
+                    onPressed: _isLoading ? null : _updateProfile,
+                  ),
+
+                const SizedBox(height: 20),
+
+                // Additional info section
+                _buildInfoSection(user, isDark),
+              ],
             ),
+          );
+        },
+      ),
     );
   }
 

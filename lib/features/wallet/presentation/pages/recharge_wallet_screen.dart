@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/routes/app_routes.dart';
 import '../widgets/bank_card.dart';
 import '../widgets/activation_sheet.dart';
 import '../widgets/amount_input_field.dart';
@@ -63,7 +64,7 @@ class _RechargeWalletScreenState extends State<RechargeWalletScreen> {
           title: const Text("تغذية رصيدي"),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () => context.pop(),
+            onPressed: () => context.push(AppRoutes.home),
           ),
         ),
         body: SingleChildScrollView(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_status.dart';
+import 'package:yemen_store/core/theme/app_colors.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;
@@ -87,7 +88,17 @@ class OrderCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: ElevatedButton(
+             
                 onPressed: onTrackTap,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(250, 40),
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 child: const Text("تتبع مسار الطلب"),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_store/core/widgets/yemen_store_app_bar.dart';
 
 import 'package:yemen_store/features/digitalservices/presentation/widgets/service_category_card.dart';
 import 'package:yemen_store/features/digitalservices/presentation/widgets/services_banner.dart';
@@ -16,30 +17,38 @@ class DigitalServicesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "الخدمات الرقمية",
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-
+        appBar: YemenStoreAppBar(
+          title: const Text("الخدمات الرقمية"),
           leading: Builder(
             builder: (context) => IconButton(
-              icon: const Icon(Icons.menu),
+              icon: Icon(Icons.menu, color: theme.appBarTheme.iconTheme?.color),
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
           actions: [
             IconButton(
-              icon: Icon(
-                Icons.shopping_cart_outlined,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () => context.push(AppRoutes.cart),
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: theme.appBarTheme.iconTheme?.color,
             ),
+            onPressed: () {
+              context.push(AppRoutes.notifications);
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.shopping_cart_outlined,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            onPressed: () {
+              context.push(AppRoutes.cart);
+            },
+          ),
           ],
         ),
 

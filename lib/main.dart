@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:yemen_store/core/theme/app_theme.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
 import 'package:yemen_store/firebase_options.dart';
+import 'package:yemen_store/core/providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,11 +13,13 @@ void main() async {
   runApp(const ProviderScope(child: YemenStoreApp()));
 }
 
-class YemenStoreApp extends StatelessWidget {
+class YemenStoreApp extends ConsumerWidget {
   const YemenStoreApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeNotifierProvider);
+
     return MaterialApp.router(
       title: 'Yemen Store',
       debugShowCheckedModeBanner: false,
@@ -38,7 +41,7 @@ class YemenStoreApp extends StatelessWidget {
       // --- ربط الثيمات الذكية ---
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
     );
   }
 }

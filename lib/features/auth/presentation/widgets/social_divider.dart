@@ -25,8 +25,6 @@ class SocialDivider extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Cairo',
               fontSize: 12,
-             
-              color: AppColors.textHint,
             ),
           ),
         ),

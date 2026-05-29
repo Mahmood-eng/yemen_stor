@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yemen_store/core/theme/app_colors.dart';
 
+
 class RecommendationProductCard extends StatelessWidget {
   final VoidCallback? onLinkTap;
 
@@ -8,11 +9,13 @@ class RecommendationProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           if (!isDark)
@@ -77,10 +80,12 @@ class RecommendationProductCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: theme.colorScheme.onPrimary,
                       padding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text("أضف للسلة", style: TextStyle(fontSize: 10, color: Colors.white)),
+                    child: const Text("أضف للسلة"),
                   ),
                 ),
               ],

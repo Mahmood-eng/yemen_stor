@@ -15,7 +15,7 @@ class MarketsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "كل الأسواق والأقسام",
+          " الأسواق ",
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontFamily: 'Cairo',
             fontWeight: FontWeight.bold,

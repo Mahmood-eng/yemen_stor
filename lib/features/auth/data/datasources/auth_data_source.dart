@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:yemen_store/features/auth/domain/entities/user.dart';
 
 abstract class AuthDataSource {

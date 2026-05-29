@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
+import 'package:yemen_store/core/widgets/yemen_store_app_bar.dart';
 
 import '../../../menu/presentation/pages/app_drawer.dart';
 import '../widgets/markets_grid.dart';
@@ -29,7 +30,39 @@ class _HomeScreenState extends State<HomeScreen> {
       // الخلفية تأخذ لون Scaffold المحدد في الثيم
       backgroundColor: theme.scaffoldBackgroundColor,
       drawer: const AppDrawer(),
-      appBar: _buildAppBar(context, isDark),
+      appBar: YemenStoreAppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.menu_rounded,
+            color: theme.appBarTheme.iconTheme?.color,
+          ),
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
+        title: Image.asset(
+          isDark ? 'assets/images/logo.png' : 'assets/images/logo.png',
+          height: 40,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            onPressed: () {
+              context.push(AppRoutes.notifications);
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.shopping_cart_outlined,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            onPressed: () {
+              context.push(AppRoutes.cart);
+            },
+          ),
+        ],
+      ),
       body: _buildHomeBody(context, isDark),
       floatingActionButton: Transform.translate(
         offset: const Offset(0, -10), // رفع الزر لأعلى بمقدار 10 بكسل
@@ -42,47 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Icon(Icons.smart_toy_rounded),
         ),
       ),
-    );
-  }
-
-  AppBar _buildAppBar(BuildContext context, bool isDark) {
-    final theme = Theme.of(context);
-    return AppBar(
-      elevation: 0,
-      // اللون يتم جلبه من AppBarTheme في ملف الثيم
-      backgroundColor: theme.appBarTheme.backgroundColor,
-      centerTitle: true,
-      title: Image.asset(
-        isDark ? 'assets/images/logo.png' : 'assets/images/logo.png',
-        height: 40,
-      ),
-      leading: IconButton(
-        icon: Icon(
-          Icons.menu_rounded,
-          color: theme.appBarTheme.foregroundColor,
-        ),
-        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(
-            Icons.notifications_none_rounded,
-            color: theme.appBarTheme.foregroundColor,
-          ),
-          onPressed: () {
-            context.push(AppRoutes.notifications);
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            Icons.shopping_cart_outlined,
-            color: theme.appBarTheme.foregroundColor,
-          ),
-          onPressed: () {
-            context.push(AppRoutes.cart);
-          },
-        ),
-      ],
     );
   }
 
@@ -137,9 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         textAlign: TextAlign.right,
         decoration: InputDecoration(
           hintText: "ابحث عن خدمة...",
-          hintStyle: TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: 13,
+          hintStyle: theme.textTheme.bodySmall?.copyWith(
             color: theme.hintColor,
           ),
           prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
@@ -177,9 +167,8 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {},
           child: Text(
             "عرض الكل",
-            style: TextStyle(
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.primary,
-              fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
             ),
           ),
