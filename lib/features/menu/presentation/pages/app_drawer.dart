@@ -75,9 +75,9 @@ class AppDrawer extends StatelessWidget {
                   _buildSpecialItem(
                     context,
                     Icons.wifi_tethering,
-                    "إدارة الشبكات",
-                    "أضف كروت وشبكتك هنا",
-                    theme.colorScheme.secondary,
+                    "أضف شبكة wifi ",
+                    "بيع كروت شبكتك عبر التطبيق",
+                    theme.colorScheme.primary,
                     () {
                       context.go(AppRoutes.addPrivateNetwork);
                     },
@@ -251,7 +251,7 @@ class AppDrawer extends StatelessWidget {
                       const SizedBox(height: 4),
                       if (account.isNotEmpty)
                         Text(
-                          'حساب: $account',
+                          'رقم حسابك: $account',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: theme.colorScheme.onPrimary.withOpacity(

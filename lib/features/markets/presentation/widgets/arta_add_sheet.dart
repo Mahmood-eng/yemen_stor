@@ -38,7 +38,7 @@ class ArtaAddSheet extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              "عرض منتج جديد",
+              "رفع منتج للبيع",
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

@@ -57,11 +57,25 @@ class FirebaseAuthDataSource implements AuthDataSource {
 
       // حفظ البيانات الإضافية في Firestore
       if (result.user != null) {
+        // determine next account number starting from 1000
+        final usersSnapshot = await _firestore.collection('users').get();
+        int maxAcc = 0;
+        for (final doc in usersSnapshot.docs) {
+          final acc = doc.data()['accountNumber'];
+          if (acc != null) {
+            final num = int.tryParse(acc.toString()) ?? 0;
+            if (num > maxAcc) maxAcc = num;
+          }
+        }
+        final nextAcc = (maxAcc >= 1000) ? (maxAcc + 1) : 1000;
+
         await _firestore.collection('users').doc(result.user!.uid).set({
           'id': result.user!.uid,
           'email': email,
           'displayName': displayName,
           'city': city,
+          'accountNumber': nextAcc.toString(),
+          'role': 'user',
           'createdAt': FieldValue.serverTimestamp(),
         });
       }
@@ -95,6 +109,8 @@ class FirebaseAuthDataSource implements AuthDataSource {
       firebaseUser,
       city: data?['city'],
       phoneNumber: data?['phoneNumber'],
+      accountNumber: data?['accountNumber']?.toString(),
+      role: data?['role']?.toString(),
     );
   }
 
@@ -142,6 +158,8 @@ class FirebaseAuthDataSource implements AuthDataSource {
     firebase_auth.User? firebaseUser, {
     String? city,
     String? phoneNumber,
+    String? accountNumber,
+    String? role,
   }) {
     if (firebaseUser == null) return null;
     return User(
@@ -151,6 +169,8 @@ class FirebaseAuthDataSource implements AuthDataSource {
       phoneNumber: phoneNumber ?? firebaseUser.phoneNumber,
       city: city,
       emailVerified: firebaseUser.emailVerified,
+      accountNumber: accountNumber,
+      role: role,
     );
   }
 }

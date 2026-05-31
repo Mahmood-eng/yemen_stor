@@ -23,7 +23,7 @@ class User {
     this.emailVerified = false,
     this.addressDetails,
     this.accountNumber,
-    this.balance,
+    this.balance = '0',
     this.role,
     this.imageUrl,
     this.password,

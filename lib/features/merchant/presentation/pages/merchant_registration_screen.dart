@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_store/core/routes/app_routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yemen_store/features/merchant/presentation/widgets/merchant_section_card.dart';
+import 'package:yemen_store/features/markets/data/models/market_model.dart';
 
 class MerchantRegistrationScreen extends StatefulWidget {
   const MerchantRegistrationScreen({super.key});
@@ -19,18 +22,17 @@ class _MerchantRegistrationScreenState
   final _addressController = TextEditingController();
   final _ownerNameController = TextEditingController();
   final _documentNumberController = TextEditingController();
+  final _logoUrlController = TextEditingController();
+  final _documentUrlController = TextEditingController();
 
-  String _storeCategory = 'موبايلات وأجهزة ذكية';
+  String? _selectedMarket;
+  String? _selectedSection;
   bool _acceptedTerms = false;
-  String _logoFileName = 'لم يتم اختيار ملف بعد';
-  String _documentFileName = 'لم يتم اختيار ملف بعد';
+  String _logoFileName = '';
+  String _documentFileName = '';
 
-  final List<String> _categories = [
-    'موبايلات وأجهزة ذكية',
-    'أزياء وإكسسوارات',
-    'مستلزمات منزلية',
-    'منتجات تجميل وعناية',
-  ];
+  List<MarketModel> _fetchedMarkets = [];
+  bool _isMarketsLoading = true;
 
   @override
   void dispose() {
@@ -39,7 +41,47 @@ class _MerchantRegistrationScreenState
     _addressController.dispose();
     _ownerNameController.dispose();
     _documentNumberController.dispose();
+    _logoUrlController.dispose();
+    _documentUrlController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMarkets();
+  }
+
+  Future<void> _fetchMarkets() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('app_data/main_config/markets')
+          .get();
+      List<MarketModel> temp = [];
+      for (var doc in snapshot.docs) {
+        final catsSnap = await doc.reference.collection('categories').get();
+        final cats = catsSnap.docs
+            .map((d) => CategoryModel.fromFirestore(d.data(), d.id))
+            .toList();
+        temp.add(
+          MarketModel.fromFirestore(doc.data(), doc.id, categories: cats),
+        );
+      }
+      if (mounted) {
+        setState(() {
+          _fetchedMarkets = temp;
+          _isMarketsLoading = false;
+          if (_fetchedMarkets.isNotEmpty) {
+            _selectedMarket = _fetchedMarkets.first.name;
+            _selectedSection = _fetchedMarkets.first.categories.isNotEmpty
+                ? _fetchedMarkets.first.categories.first.name
+                : null;
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isMarketsLoading = false);
+    }
   }
 
   @override
@@ -84,25 +126,59 @@ class _MerchantRegistrationScreenState
                         },
                       ),
                       const SizedBox(height: 12),
-                      _buildDropdown(
-                        label: 'نوع النشاط / القسم',
-                        value: _storeCategory,
-                        items: _categories,
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() => _storeCategory = value);
-                          }
-                        },
-                      ),
+                      if (_isMarketsLoading)
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        )
+                      else if (_fetchedMarkets.isNotEmpty) ...[
+                        _buildDropdown(
+                          label: 'اختر السوق',
+                          value: _selectedMarket!,
+                          items: _fetchedMarkets.map((m) => m.name).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedMarket = value;
+                                final market = _fetchedMarkets.firstWhere(
+                                  (m) => m.name == value,
+                                );
+                                _selectedSection = market.categories.isNotEmpty
+                                    ? market.categories.first.name
+                                    : null;
+                              });
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        if (_selectedMarket != null)
+                          _buildDropdown(
+                            label: 'القسم',
+                            value: _selectedSection ?? '',
+                            items: _fetchedMarkets
+                                .firstWhere((m) => m.name == _selectedMarket)
+                                .categories
+                                .map((c) => c.name)
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != null)
+                                setState(() => _selectedSection = value);
+                            },
+                          ),
+                      ],
                       const SizedBox(height: 12),
-                      _buildFilePicker(
-                        label: 'شعار المتجر',
-                        fileName: _logoFileName,
-                        onPressed: () {
-                          setState(() {
-                            _logoFileName = 'logo_shop.png';
-                          });
+                      // Logo as URL input (user will paste URL)
+                      _buildTextField(
+                        label: 'رابط شعار المتجر (URL)',
+                        controller: _logoUrlController,
+                        hint: 'https://.../logo.jpg',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'الرجاء إدخال رابط الشعار';
+                          }
+                          return null;
                         },
+                        keyboardType: TextInputType.url,
                       ),
                     ],
                   ),
@@ -130,24 +206,6 @@ class _MerchantRegistrationScreenState
                         },
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.location_on_outlined),
-                        label: Text(
-                          'الموقع على الخريطة',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          minimumSize: const Size.fromHeight(48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -180,16 +238,17 @@ class _MerchantRegistrationScreenState
                         },
                       ),
                       const SizedBox(height: 12),
-                      _buildFilePicker(
-                        label: 'صورة الوثيقة الرسمية',
-                        fileName: _documentFileName,
-                        onPressed: () {
-                          setState(() {
-                            _documentFileName = 'document_id.jpg';
-                          });
+                      _buildTextField(
+                        label: 'رابط صورة الوثيقة (URL)',
+                        controller: _documentUrlController,
+                        hint: 'https://.../id.jpg',
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'الرجاء إدخال رابط الوثيقة';
+                          }
+                          return null;
                         },
-                        extraText:
-                            'يرجى رفع صورة واضحة للهوية أو السجل التجاري.',
+                        keyboardType: TextInputType.url,
                       ),
                       CheckboxListTile(
                         value: _acceptedTerms,
@@ -208,17 +267,58 @@ class _MerchantRegistrationScreenState
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      if (!_acceptedTerms) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('يرجى الموافقة على الشروط والأحكام.'),
+                  onPressed: () async {
+                    if (!(_formKey.currentState?.validate() ?? false)) return;
+                    if (!_acceptedTerms) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('يرجى الموافقة على الشروط والأحكام.'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final uid = FirebaseAuth.instance.currentUser?.uid;
+                      if (uid == null) throw Exception('المستخدم غير مسجل');
+
+                      final shopData = {
+                        'name': _storeNameController.text.trim(),
+                        'market': _selectedMarket,
+                        'section': _selectedSection,
+                        'logoUrl': _logoUrlController.text.trim(),
+                        'phone': _phoneController.text.trim(),
+                        'address': _addressController.text.trim(),
+                        'ownerName': _ownerNameController.text.trim(),
+                        'documentNumber': _documentNumberController.text.trim(),
+                        'documentUrl': _documentUrlController.text.trim(),
+                        'ownerId': uid,
+                        'status': 'pending',
+                        'createdAt': FieldValue.serverTimestamp(),
+                      };
+
+                      final shopRef = await FirebaseFirestore.instance
+                          .collection('shops')
+                          .add(shopData);
+
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(uid)
+                          .update({'role': 'merchant', 'shopId': shopRef.id});
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'تم إضافة محل ${shopData['name']} في ${shopData['market']} إلى قسم ${shopData['section']}',
                           ),
-                        );
-                        return;
-                      }
+                        ),
+                      );
+
                       context.go(AppRoutes.merchantDashboard);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('فشل في إرسال الطلب: $e')),
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(

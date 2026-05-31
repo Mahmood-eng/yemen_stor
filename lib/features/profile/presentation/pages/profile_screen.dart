@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,8 +25,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late TextEditingController _addressController;
   late TextEditingController _cityController;
 
+  late FocusNode _nameFocus;
+  late FocusNode _phoneFocus;
+  late FocusNode _addressFocus;
+  late FocusNode _cityFocus;
+
   bool _isEdited = false;
   bool _isLoading = false;
+
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSub;
+  Map<String, dynamic>? _userDocData;
 
   @override
   void initState() {
@@ -35,28 +47,97 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _addressController = TextEditingController(text: '');
     _cityController = TextEditingController(text: user?.city ?? '');
 
+    _nameFocus = FocusNode();
+    _phoneFocus = FocusNode();
+    _addressFocus = FocusNode();
+    _cityFocus = FocusNode();
+
     _nameController.addListener(_checkChanges);
     _phoneController.addListener(_checkChanges);
     _emailController.addListener(_checkChanges);
     _addressController.addListener(_checkChanges);
     _cityController.addListener(_checkChanges);
+
+    _listenToUserDocument();
+  }
+
+  void _listenToUserDocument() {
+    final uid = fb_auth.FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    _userDocSub = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .listen((snapshot) {
+          final data = snapshot.data();
+          if (data == null) return;
+
+          _userDocData = data;
+
+          final newName = (data['displayName'] ?? data['name'] ?? '') as String;
+          final newPhone = (data['phoneNumber'] ?? '') as String;
+          final newCity = (data['city'] ?? '') as String;
+          final newAddress = (data['addressDetails'] ?? '') as String;
+
+          if (!_nameFocus.hasFocus && _nameController.text != newName) {
+            _nameController.text = newName;
+          }
+          if (!_phoneFocus.hasFocus && _phoneController.text != newPhone) {
+            _phoneController.text = newPhone;
+          }
+          if (!_cityFocus.hasFocus && _cityController.text != newCity) {
+            _cityController.text = newCity;
+          }
+          if (!_addressFocus.hasFocus &&
+              _addressController.text != newAddress) {
+            _addressController.text = newAddress;
+          }
+
+          if (mounted) setState(() {});
+        });
   }
 
   void _checkChanges() {
-    final user = ref.read(authNotifierProvider).user;
-    bool changed =
-        _nameController.text != (user?.displayName ?? '') ||
-        _phoneController.text != (user?.phoneNumber ?? '') ||
-        _emailController.text != (user?.email ?? '') ||
-        _addressController.text.isNotEmpty ||
-        _cityController.text != (user?.city ?? '');
-    if (changed != _isEdited) setState(() => _isEdited = changed);
+    final originalName =
+        _userDocData?['displayName'] ?? _userDocData?['name'] ?? '';
+    final originalPhone = _userDocData?['phoneNumber'] ?? '';
+    final originalCity = _userDocData?['city'] ?? '';
+    final originalAddress = _userDocData?['addressDetails'] ?? '';
+
+    final changed =
+        _nameController.text != originalName ||
+        _phoneController.text != originalPhone ||
+        _cityController.text != originalCity ||
+        _addressController.text != originalAddress;
+
+    if (changed != _isEdited) {
+      setState(() => _isEdited = changed);
+    }
   }
 
   Future<void> _updateProfile() async {
     setState(() => _isLoading = true);
 
     try {
+      final user = fb_auth.FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('المستخدم غير مسجل');
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+            'displayName': _nameController.text.trim(),
+            'phoneNumber': _phoneController.text.trim().isEmpty
+                ? null
+                : _phoneController.text.trim(),
+            'city': _cityController.text.trim().isEmpty
+                ? null
+                : _cityController.text.trim(),
+            'addressDetails': _addressController.text.trim(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+
       await ref
           .read(authNotifierProvider.notifier)
           .updateProfile(
@@ -122,7 +203,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ],
       ),
-
       body: Builder(
         builder: (context) {
           if (authState.isLoading) {
@@ -167,15 +247,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               children: [
                 _buildProfileHeader(user, isDark),
                 const SizedBox(height: 30),
-
                 _buildProfileField(
                   label: "الاسم الكامل",
                   controller: _nameController,
+                  focusNode: _nameFocus,
                   icon: Icons.person_outline,
                 ),
                 _buildProfileField(
                   label: "رقم الهاتف",
                   controller: _phoneController,
+                  focusNode: _phoneFocus,
                   icon: Icons.phone_android,
                   keyboardType: TextInputType.phone,
                 ),
@@ -184,31 +265,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   controller: _emailController,
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
-                  readOnly: true, // Email cannot be changed
+                  readOnly: true,
                 ),
                 _buildProfileField(
                   label: "المدينة",
                   controller: _cityController,
+                  focusNode: _cityFocus,
                   icon: Icons.location_city_outlined,
                 ),
                 _buildProfileField(
                   label: "العنوان التفصيلي",
                   controller: _addressController,
+                  focusNode: _addressFocus,
                   icon: Icons.location_on_outlined,
                   maxLines: 2,
                 ),
-
                 const SizedBox(height: 30),
-
                 if (_isEdited)
                   CustomButton(
                     text: _isLoading ? "جاري التحديث..." : "حفظ التغييرات",
                     onPressed: _isLoading ? null : _updateProfile,
                   ),
-
                 const SizedBox(height: 20),
-
-                // Additional info section
                 _buildInfoSection(user, isDark),
               ],
             ),
@@ -219,6 +297,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildProfileHeader(user, bool isDark) {
+    final photoUrl = (_userDocData?['photoUrl'] ?? '') as String;
+    final displayPhoto = photoUrl.isNotEmpty
+        ? photoUrl
+        : fb_auth.FirebaseAuth.instance.currentUser?.photoURL ?? '';
+
     return Column(
       children: [
         Stack(
@@ -229,11 +312,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               backgroundColor: isDark
                   ? Colors.white10
                   : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              child: Icon(
-                Icons.person,
-                size: 60,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              backgroundImage: displayPhoto.isNotEmpty
+                  ? NetworkImage(displayPhoto)
+                  : null,
+              child: displayPhoto.isEmpty
+                  ? Icon(
+                      Icons.person,
+                      size: 60,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  : null,
             ),
             CircleAvatar(
               radius: 18,
@@ -248,11 +336,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         const SizedBox(height: 15),
         Text(
-          user.displayName ?? 'مستخدم',
+          _userDocData?['displayName'] ??
+              _userDocData?['name'] ??
+              user.displayName ??
+              'مستخدم',
           style: Theme.of(
             context,
           ).textTheme.displayLarge?.copyWith(fontSize: 20),
         ),
+        const SizedBox(height: 8),
+        Text(
+          _userDocData?['email'] ?? user.email ?? '',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -272,11 +369,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
         ),
-        if (user.city != null && user.city!.isNotEmpty)
+        if ((_userDocData?['city'] ?? user.city ?? '').toString().isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              user.city!,
+              _userDocData?['city'] ?? user.city ?? '',
               style: TextStyle(
                 color: isDark ? Colors.white70 : Colors.grey.shade600,
                 fontSize: 14,
@@ -290,6 +387,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget _buildProfileField({
     required String label,
     required TextEditingController controller,
+    FocusNode? focusNode,
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
@@ -312,6 +410,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(height: 8),
           TextField(
             controller: controller,
+            focusNode: focusNode,
             keyboardType: keyboardType,
             maxLines: maxLines,
             readOnly: readOnly,
@@ -349,8 +448,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-          _buildInfoRow("تاريخ الإنشاء", "غير محدد"), // TODO: Add creation date
-          _buildInfoRow("آخر تسجيل دخول", "غير محدد"), // TODO: Add last login
+          _buildInfoRow("تاريخ الإنشاء", "غير محدد"),
+          _buildInfoRow("آخر تسجيل دخول", "غير محدد"),
           _buildInfoRow("معرف المستخدم", user.id.substring(0, 8) + "..."),
           if (user.emailVerified)
             _buildInfoRow("حالة التحقق", "موثق", isVerified: true)
@@ -363,16 +462,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildInfoRow(String label, String value, {bool? isVerified}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white70
-                  : Colors.grey.shade700,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           Row(
@@ -383,7 +480,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   color: isVerified ? Colors.green : Colors.orange,
                   size: 16,
                 ),
-              const SizedBox(width: 5),
+              if (isVerified != null) const SizedBox(width: 5),
               Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
             ],
           ),
@@ -418,11 +515,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   void dispose() {
+    _userDocSub?.cancel();
+    _nameController.removeListener(_checkChanges);
+    _phoneController.removeListener(_checkChanges);
+    _emailController.removeListener(_checkChanges);
+    _addressController.removeListener(_checkChanges);
+    _cityController.removeListener(_checkChanges);
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
     _cityController.dispose();
+    _nameFocus.dispose();
+    _phoneFocus.dispose();
+    _addressFocus.dispose();
+    _cityFocus.dispose();
     super.dispose();
   }
 }
