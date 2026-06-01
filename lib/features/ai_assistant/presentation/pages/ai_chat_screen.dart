@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:yemen_store/features/ai_assistant/domain/models/chat_message.dart';
+import 'package:yemen_stor/features/ai_assistant/domain/models/chat_message.dart';
 
 import '../widgets/chat_input.dart';
 import '../widgets/message_list.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class ShopInfoWidget extends StatelessWidget {
   final Map<String, dynamic> shop;
@@ -8,6 +7,9 @@ class ShopInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final shopName = shop['name'] ?? '';
     final rating = shop['rating'] ?? 0.0;
     final location = shop['location'] ?? '';
@@ -17,25 +19,26 @@ class ShopInfoWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 15),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
+        border: isDark ? Border.all(color: theme.dividerColor.withOpacity(0.05)) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "معلومات المحل",
-            style: TextStyle(
+            style: theme.textTheme.titleMedium?.copyWith(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
-              fontSize: 18,
             ),
           ),
           const SizedBox(height: 15),
@@ -47,8 +50,8 @@ class ShopInfoWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primary,
-                      AppColors.primary.withOpacity(0.7),
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withOpacity(0.7),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -57,7 +60,7 @@ class ShopInfoWidget extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    shopName[0],
+                    shopName.isNotEmpty ? shopName[0] : 'S',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -73,10 +76,9 @@ class ShopInfoWidget extends StatelessWidget {
                   children: [
                     Text(
                       shopName,
-                      style: const TextStyle(
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -86,23 +88,25 @@ class ShopInfoWidget extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           "$rating",
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Icon(
+                        Icon(
                           Icons.location_on,
-                          color: Colors.grey,
+                          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
                           size: 16,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          location,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
+                        Expanded(
+                          child: Text(
+                            location,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                            ),
                           ),
                         ),
                       ],

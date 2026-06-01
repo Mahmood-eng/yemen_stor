@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../data/models/product_model.dart';
 
 class ProductCard extends StatelessWidget {
@@ -16,19 +15,25 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
         ],
+        border: isDark ? Border.all(color: theme.dividerColor.withOpacity(0.05)) : null,
       ),
       child: InkWell(
+        borderRadius: BorderRadius.circular(20),
         onTap: () {
           context.push(
             AppRoutes.productDetails,
@@ -46,16 +51,38 @@ class ProductCard extends StatelessWidget {
                     width: double.infinity,
                     margin: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF3F5F7),
+                      color: isDark ? theme.colorScheme.surface : const Color(0xFFF3F5F7),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Center(
-                      child: Icon(
-                        _getIconForMarketType(marketType),
-                        size: 50,
-                        color: Colors.grey[400],
-                      ),
-                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: product.images.isNotEmpty
+                        ? Image.network(
+                            product.images.first,
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.primary.withOpacity(0.5),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) => Center(
+                              child: Icon(
+                                _getIconForMarketType(marketType),
+                                size: 40,
+                                color: theme.colorScheme.primary.withOpacity(0.5),
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Icon(
+                              _getIconForMarketType(marketType),
+                              size: 40,
+                              color: theme.colorScheme.primary.withOpacity(0.5),
+                            ),
+                          ),
                   ),
                 ),
                 // تفاصيل المنتج
@@ -66,21 +93,20 @@ class ProductCard extends StatelessWidget {
                     children: [
                       Text(
                         product.name,
-                        style: const TextStyle(
-                          fontFamily: 'Cairo',
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 13,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           Text(
-                            "\$${product.price}",
+                            "${product.price.toInt()} ريال",
                             style: TextStyle(
-                              color: AppColors.primary,
+                              color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
@@ -88,37 +114,39 @@ class ProductCard extends StatelessWidget {
                           const SizedBox(width: 6),
                           if (product.hasDiscount)
                             Text(
-                              "\$${product.originalPrice!.toInt()}",
-                              style: const TextStyle(
-                                color: Colors.grey,
+                              "${product.originalPrice!.toInt()} ريال",
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
                                 fontSize: 10,
                                 decoration: TextDecoration.lineThrough,
                               ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       // زر شراء الآن
-                      ElevatedButton(
+                      ElevatedButton.icon(
                         onPressed: () {
                           // منطق الشراء
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size(double.infinity, 38),
-                          elevation: 0,
-                        ),
-                        child: const Text(
+                        icon: const Icon(Icons.bolt, size: 16),
+                        label: const Text(
                           "شراء الآن",
                           style: TextStyle(
                             fontFamily: 'Cairo',
-                            fontSize: 11,
-                            color: Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size(double.infinity, 36),
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
                         ),
                       ),
                     ],
@@ -138,19 +166,20 @@ class ProductCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                      ),
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                        ),
                     ],
                   ),
                   child: Icon(
                     Icons.add_shopping_cart,
-                    size: 18,
-                    color: AppColors.primary,
+                    size: 16,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ),
@@ -167,12 +196,14 @@ class ProductCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.accent,
+                    gradient: LinearGradient(
+                      colors: [theme.colorScheme.secondary, theme.colorScheme.secondary.withOpacity(0.8)],
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     "خصم ${product.discountPercentage.toInt()}%",
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
@@ -184,28 +215,29 @@ class ProductCard extends StatelessWidget {
 
             // أيقونة القلب
             Positioned(
-              top: product.hasDiscount ? 48 : 15,
+              top: product.hasDiscount ? 44 : 15,
               left: 15,
               child: GestureDetector(
                 onTap: () {
                   // إضافة للمفضلة
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                      ),
+                      if (!isDark)
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 5,
+                        ),
                     ],
                   ),
                   child: Icon(
                     Icons.favorite_border,
-                    size: 18,
-                    color: AppColors.accent,
+                    size: 16,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
               ),

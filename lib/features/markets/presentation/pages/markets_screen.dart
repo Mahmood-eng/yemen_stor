@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/features/markets/data/models/market_model.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/features/markets/data/models/market_model.dart';
 import '../widgets/market_expansion_card.dart';
 
 class MarketsScreen extends StatelessWidget {
@@ -60,7 +60,27 @@ class MarketsScreen extends StatelessWidget {
                   );
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('لا توجد أسواق حالياً'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.storefront_outlined,
+                          size: 60,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('لا توجد أسواق حالياً في هذا القسم'),
+                        Text(
+                          'المسار: app_data/main_config/markets',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
 
                 final marketDocs = snapshot.data!.docs;
@@ -73,32 +93,12 @@ class MarketsScreen extends StatelessWidget {
                         marketDocs[index].data() as Map<String, dynamic>;
                     final marketId = marketDocs[index].id;
 
-                    return StreamBuilder<QuerySnapshot>(
-                      stream: marketDocs[index].reference
-                          .collection('categories')
-                          .snapshots(),
-                      builder: (context, catSnapshot) {
-                        final categories = (catSnapshot.data?.docs ?? []).map((
-                          doc,
-                        ) {
-                          return CategoryModel.fromFirestore(
-                            doc.data() as Map<String, dynamic>,
-                            doc.id,
-                          );
-                        }).toList();
-
-                        final market = MarketModel.fromFirestore(
-                          marketData,
-                          marketId,
-                          categories: categories,
-                        );
-
-                        return MarketExpansionCard(
-                          market: market,
-                          isDark: isDark,
-                        );
-                      },
+                    final market = MarketModel.fromFirestore(
+                      marketData,
+                      marketId,
                     );
+
+                    return MarketExpansionCard(market: market, isDark: isDark);
                   },
                 );
               },

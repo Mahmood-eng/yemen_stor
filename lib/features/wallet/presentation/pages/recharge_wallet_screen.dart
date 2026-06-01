@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
 import '../widgets/bank_card.dart';
 import '../widgets/activation_sheet.dart';
 import '../widgets/amount_input_field.dart';

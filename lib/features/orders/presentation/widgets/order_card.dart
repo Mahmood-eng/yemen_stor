@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_status.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
 
 class OrderCard extends StatelessWidget {
   final OrderModel order;

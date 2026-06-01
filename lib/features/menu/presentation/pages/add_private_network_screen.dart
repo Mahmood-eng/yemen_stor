@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/features/menu/presentation/widgets/menu_section_card.dart';
-import 'package:yemen_store/features/menu/presentation/widgets/menu_text_form_field.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/features/menu/presentation/widgets/menu_section_card.dart';
+import 'package:yemen_stor/features/menu/presentation/widgets/menu_text_form_field.dart';
 
 class AddPrivateNetworkScreen extends StatefulWidget {
   const AddPrivateNetworkScreen({super.key});

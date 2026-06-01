@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_providers.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/widgets/custom_button.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_providers.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -54,7 +54,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(authNotifierProvider, (previous, next) {
-      if (next.user != null && !next.isLoading) {
+      if (next?.user != null && next?.isLoading == false) {
         context.go(AppRoutes.home);
       }
     });

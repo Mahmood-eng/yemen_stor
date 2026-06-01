@@ -23,6 +23,9 @@ class AppTheme {
       colorScheme: colorScheme,
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.bgLight,
+      cardColor: Colors.white,
+      dialogBackgroundColor: Colors.white,
+      dividerColor: Colors.grey.withOpacity(0.2),
       fontFamily: 'Cairo',
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.bgLight,
@@ -106,6 +109,9 @@ class AppTheme {
       colorScheme: colorScheme,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.bgDark,
+      cardColor: AppColors.cardDark,
+      dialogBackgroundColor: AppColors.cardDark,
+      dividerColor: Colors.white.withOpacity(0.12),
       fontFamily: 'Cairo',
 
       appBarTheme: AppBarTheme(

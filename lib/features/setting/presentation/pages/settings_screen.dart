@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/providers/theme_provider.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/core/providers/theme_provider.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

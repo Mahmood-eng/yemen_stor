@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yemen_store/features/auth/domain/entities/user.dart';
-import 'package:yemen_store/features/auth/domain/usecases/get_current_user_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/sign_in_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/sign_out_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/sign_up_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/update_profile_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/sign_in_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/sign_up_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/update_profile_usecase.dart';
 
 class AuthState {
   final User? user;

@@ -2,15 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:yemen_store/core/theme/app_theme.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/firebase_options.dart';
-import 'package:yemen_store/core/providers/theme_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:yemen_stor/core/theme/app_theme.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/firebase_options.dart';
+import 'package:yemen_stor/core/providers/theme_provider.dart';
+import 'package:yemen_stor/features/menu/presentation/cubit/menu_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const ProviderScope(child: YemenStoreApp()));
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<MenuCubit>(
+          create: (context) => MenuCubit(),
+        ),
+      ],
+      child: const ProviderScope(child: YemenStoreApp()),
+    ),
+  );
 }
 
 class YemenStoreApp extends ConsumerWidget {

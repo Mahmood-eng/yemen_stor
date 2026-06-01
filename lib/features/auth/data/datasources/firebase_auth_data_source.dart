@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:yemen_store/features/auth/data/datasources/auth_data_source.dart';
-import 'package:yemen_store/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/data/datasources/auth_data_source.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user.dart';
 
 class FirebaseAuthDataSource implements AuthDataSource {
   final firebase_auth.FirebaseAuth _firebaseAuth;
@@ -57,17 +57,26 @@ class FirebaseAuthDataSource implements AuthDataSource {
 
       // حفظ البيانات الإضافية في Firestore
       if (result.user != null) {
-        // determine next account number starting from 1000
-        final usersSnapshot = await _firestore.collection('users').get();
-        int maxAcc = 0;
-        for (final doc in usersSnapshot.docs) {
-          final acc = doc.data()['accountNumber'];
-          if (acc != null) {
-            final num = int.tryParse(acc.toString()) ?? 0;
-            if (num > maxAcc) maxAcc = num;
+        // تحسين: استخدام وثيقة عداد مركزية لضمان السرعة والكفاءة وتوفير التكاليف
+        final counterRef = _firestore.collection('app_data').doc('main_config');
+
+        final nextAcc = await _firestore.runTransaction((transaction) async {
+          final snapshot = await transaction.get(counterRef);
+          int currentMax = 999;
+          if (snapshot.exists &&
+              snapshot.data()!.containsKey('lastAccountNumber')) {
+            currentMax =
+                int.tryParse(
+                  snapshot.data()!['lastAccountNumber'].toString(),
+                ) ??
+                999;
           }
-        }
-        final nextAcc = (maxAcc >= 1000) ? (maxAcc + 1) : 1000;
+          int next = currentMax + 1;
+          transaction.set(counterRef, {
+            'lastAccountNumber': next,
+          }, SetOptions(merge: true));
+          return next;
+        });
 
         await _firestore.collection('users').doc(result.user!.uid).set({
           'id': result.user!.uid,
@@ -132,8 +141,8 @@ class FirebaseAuthDataSource implements AuthDataSource {
       // تحديث البيانات في Firestore
       await _firestore.collection('users').doc(user.uid).update({
         'displayName': displayName,
-        if (phoneNumber != null) 'phoneNumber': phoneNumber,
-        if (city != null) 'city': city,
+        'phoneNumber': phoneNumber,
+        'city': city,
         'updatedAt': FieldValue.serverTimestamp(),
       });
     }

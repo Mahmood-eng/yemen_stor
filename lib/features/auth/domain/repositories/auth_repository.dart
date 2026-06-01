@@ -1,4 +1,4 @@
-import 'package:yemen_store/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
   Future<User?> signInWithEmailAndPassword(String email, String password);

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_provider.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_providers.dart';
-import 'package:yemen_store/features/auth/presentation/utils/auth_validation.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/auth_text_field.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/social_divider.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/social_icons_row.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/widgets/custom_button.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_provider.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_providers.dart';
+import 'package:yemen_stor/features/auth/presentation/utils/auth_validation.dart';
+import 'package:yemen_stor/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:yemen_stor/features/auth/presentation/widgets/social_divider.dart';
+import 'package:yemen_stor/features/auth/presentation/widgets/social_icons_row.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -171,7 +171,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         // حقل اختيار المدينة
                         DropdownButtonFormField<String>(
-                          value: _selectedCity,
+                          initialValue: _selectedCity,
                           alignment: Alignment.centerRight,
                           hint: const Text(
                             "اختر المدينة",

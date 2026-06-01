@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
 
 class ServicesSearchField extends StatelessWidget {
   const ServicesSearchField({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
 
 class ArtaAddSheet extends StatelessWidget {
   final Color accentColor;

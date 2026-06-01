@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../data/models/product_model.dart';
 
 class ProductInfoWidget extends StatelessWidget {
@@ -9,49 +8,53 @@ class ProductInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
+        border: isDark ? Border.all(color: theme.dividerColor.withOpacity(0.05)) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             product.name,
-            style: const TextStyle(
+            style: theme.textTheme.titleLarge?.copyWith(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
-              fontSize: 20,
             ),
           ),
           const SizedBox(height: 10),
           Row(
             children: [
               Text(
-                "\$${product.price}",
+                "${product.price.toInt()} ريال",
                 style: TextStyle(
-                  color: AppColors.primary,
+                  color: theme.colorScheme.primary,
                   fontWeight: FontWeight.bold,
-                  fontSize: 24,
+                  fontSize: 22,
                 ),
               ),
               const SizedBox(width: 10),
               if (product.hasDiscount)
                 Text(
-                  "\$${product.originalPrice!.toInt()}",
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
+                  "${product.originalPrice!.toInt()} ريال",
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                    fontSize: 14,
                     decoration: TextDecoration.lineThrough,
                   ),
                 ),
@@ -63,7 +66,7 @@ class ProductInfoWidget extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.accent,
+                    color: theme.colorScheme.secondary,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -80,10 +83,10 @@ class ProductInfoWidget extends StatelessWidget {
           const SizedBox(height: 15),
           Text(
             product.description,
-            style: const TextStyle(
+            style: theme.textTheme.bodyMedium?.copyWith(
               fontFamily: 'Cairo',
               fontSize: 14,
-              color: Colors.grey,
+              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.9),
               height: 1.5,
             ),
           ),

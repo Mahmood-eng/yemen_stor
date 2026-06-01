@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yemen_store/features/auth/data/datasources/firebase_auth_data_source.dart';
-import 'package:yemen_store/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:yemen_store/features/auth/domain/repositories/auth_repository.dart';
-import 'package:yemen_store/features/auth/domain/usecases/get_current_user_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/sign_in_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/sign_out_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/sign_up_usecase.dart';
-import 'package:yemen_store/features/auth/domain/usecases/update_profile_usecase.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_provider.dart';
+import 'package:yemen_stor/features/auth/data/datasources/firebase_auth_data_source.dart';
+import 'package:yemen_stor/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/sign_in_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/sign_up_usecase.dart';
+import 'package:yemen_stor/features/auth/domain/usecases/update_profile_usecase.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_provider.dart';
 
 // Data Source
 final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {

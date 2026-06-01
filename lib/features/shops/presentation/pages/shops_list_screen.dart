@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/yemen_store_app_bar.dart';
 import '../../data/models/shop_model.dart';
 
 class ShopsListScreen extends StatelessWidget {
@@ -16,32 +17,28 @@ class ShopsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     final marketName = market['name'] ?? '';
+    final marketId = market['id'] ?? '';
     final subcategoryName = subcategory['title'] ?? '';
-    final subcategoryIcon = subcategory['icon'];
-
-    // الحصول على المحلات المناسبة لنوع السوق
-    final shops = mockShopsByMarket[marketName] ?? [];
+    final categoryId = subcategory['id'] ?? '';
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFD),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
+        appBar: YemenStoreAppBar(
           title: Text(
             subcategoryName,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontFamily: 'Cairo',
+            style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
-          centerTitle: true,
           leading: IconButton(
             icon: Icon(
-              Icons.arrow_back_ios,
-              color: Theme.of(context).colorScheme.primary,
+              Icons.arrow_back_ios_new,
+              color: theme.appBarTheme.iconTheme?.color,
               size: 20,
             ),
             onPressed: () => context.pop(),
@@ -50,7 +47,7 @@ class ShopsListScreen extends StatelessWidget {
             IconButton(
               icon: Icon(
                 Icons.shopping_cart_outlined,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.appBarTheme.iconTheme?.color,
               ),
               onPressed: () => context.push(AppRoutes.cart),
             ),
@@ -59,22 +56,63 @@ class ShopsListScreen extends StatelessWidget {
         body: Column(
           children: [
             // شريط البحث في المحلات
-            _buildSearchField(),
+            _buildSearchField(theme, isDark),
 
             // قائمة المحلات
             Expanded(
-              child: shops.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      itemCount: shops.length,
-                      itemBuilder: (context, index) {
-                        return _buildShopCard(context, shops[index]);
-                      },
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('shops')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(color: theme.colorScheme.primary),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return _buildEmptyState(theme);
+                  }
+
+                  final shops = snapshot.data!.docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    if (data['id'] == null || data['id'] == '') {
+                      data['id'] = doc.id;
+                    }
+                    return ShopModel.fromJson(data);
+                  }).where((shop) {
+                    // Match market: by ID or name
+                    final String shopMarketName = shop.toJson()['marketName'] ?? '';
+                    final bool matchesMarket = (marketId.isNotEmpty && shop.marketId == marketId) ||
+                        (marketName.isNotEmpty && shopMarketName == marketName) ||
+                        (marketId.isEmpty && marketName.isEmpty);
+
+                    // Match category: by ID or name
+                    final String shopCategoryName = shop.toJson()['categoryName'] ?? shop.marketType;
+                    final bool matchesCategory = (categoryId.isNotEmpty && shop.categoryId == categoryId) ||
+                        (subcategoryName.isNotEmpty && (shopCategoryName == subcategoryName || shop.marketType == subcategoryName)) ||
+                        (categoryId.isEmpty && subcategoryName.isEmpty);
+
+                    return matchesMarket && matchesCategory;
+                  }).toList();
+
+                  if (shops.isEmpty) {
+                    return _buildEmptyState(theme);
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
+                    itemCount: shops.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      return _buildShopCard(context, shops[index], theme, isDark);
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -82,39 +120,53 @@ class ShopsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchField() {
+  Widget _buildSearchField(ThemeData theme, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(15),
-      child: TextField(
-        textAlign: TextAlign.right,
-        decoration: InputDecoration(
-          hintText: "بحث عن محل في مدينة تعز...",
-          hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 13),
-          prefixIcon: Icon(Icons.search, color: AppColors.primary),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none,
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            if (!isDark)
+              BoxShadow(
+                color: theme.shadowColor.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+          ],
+        ),
+        child: TextField(
+          textAlign: TextAlign.right,
+          decoration: InputDecoration(
+            hintText: "ابحث عن محل...",
+            prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
+            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            filled: true,
+            fillColor: theme.inputDecorationTheme.fillColor ?? theme.colorScheme.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.store_outlined, size: 80, color: Colors.grey[400]),
+          Icon(Icons.storefront_outlined, size: 80, color: theme.colorScheme.onSurface.withOpacity(0.2)),
           const SizedBox(height: 16),
           Text(
             "لا توجد محلات متاحة حالياً",
-            style: TextStyle(
-              fontFamily: 'Cairo',
-              fontSize: 16,
-              color: Colors.grey[600],
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
         ],
@@ -122,95 +174,161 @@ class ShopsListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShopCard(BuildContext context, ShopModel shop) {
+  Widget _buildShopCard(BuildContext context, ShopModel shop, ThemeData theme, bool isDark) {
+    final isOpen = shop.status == "مفتوح الآن";
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: theme.shadowColor.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
         ],
+        border: isDark ? Border.all(color: theme.dividerColor.withOpacity(0.05)) : null,
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 55,
-          height: 55,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.primary.withOpacity(0.7)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Center(
-            child: Text(
-              shop.name[0],
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        title: Text(
-          shop.name,
-          style: const TextStyle(
-            fontFamily: 'Cairo',
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            context.push(AppRoutes.shopDetails, extra: {'shop': shop.toJson()});
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
               children: [
-                const Icon(Icons.star, color: Colors.amber, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  "${shop.rating} • ",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                 // صورة المحل أو الحرف الأول
+                 Container(
+                   width: 64,
+                   height: 64,
+                   decoration: BoxDecoration(
+                     color: theme.colorScheme.surface,
+                     borderRadius: BorderRadius.circular(16),
+                     border: Border.all(color: theme.dividerColor.withOpacity(0.08)),
+                   ),
+                   clipBehavior: Clip.antiAlias,
+                   child: shop.logoUrl.isNotEmpty
+                       ? Image.network(
+                           shop.logoUrl,
+                           fit: BoxFit.cover,
+                           loadingBuilder: (context, child, loadingProgress) {
+                             if (loadingProgress == null) return child;
+                             return const Center(
+                               child: CircularProgressIndicator(strokeWidth: 2),
+                             );
+                           },
+                           errorBuilder: (context, error, stackTrace) => Container(
+                             decoration: BoxDecoration(
+                               gradient: LinearGradient(
+                                 colors: [theme.colorScheme.primary, theme.colorScheme.primary.withOpacity(0.7)],
+                               ),
+                             ),
+                             child: Center(
+                               child: Text(
+                                 shop.name.isNotEmpty ? shop.name[0] : 'S',
+                                 style: const TextStyle(
+                                   color: Colors.white,
+                                   fontSize: 24,
+                                   fontWeight: FontWeight.bold,
+                                 ),
+                               ),
+                             ),
+                           ),
+                         )
+                       : Container(
+                           decoration: BoxDecoration(
+                             gradient: LinearGradient(
+                               colors: [theme.colorScheme.primary, theme.colorScheme.primary.withOpacity(0.7)],
+                             ),
+                           ),
+                           child: Center(
+                             child: Text(
+                               shop.name.isNotEmpty ? shop.name[0] : 'S',
+                               style: const TextStyle(
+                                 color: Colors.white,
+                                 fontSize: 24,
+                                 fontWeight: FontWeight.bold,
+                               ),
+                             ),
+                           ),
+                         ),
+                 ),
+                const SizedBox(width: 16),
+                
+                // تفاصيل المحل
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        shop.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(Icons.star_rounded, color: Colors.amber.shade400, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            shop.rating.toString(),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: isOpen ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              shop.status,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: isOpen ? Colors.green.shade600 : Colors.red.shade600,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (shop.description.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          shop.description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                Text(
-                  shop.status,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: shop.status == "مفتوح الآن"
-                        ? Colors.green
-                        : Colors.red,
-                  ),
+                
+                // سهم الانتقال
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: theme.colorScheme.onSurface.withOpacity(0.3),
                 ),
               ],
             ),
-            const SizedBox(height: 2),
-            Text(
-              shop.description,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-          ],
+          ),
         ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: AppColors.primary.withOpacity(0.5),
-        ),
-        onTap: () {
-          context.push(AppRoutes.shopDetails, extra: {'shop': shop.toJson()});
-        },
       ),
     );
   }

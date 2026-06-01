@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/widgets/yemen_store_app_bar.dart';
-import 'package:yemen_store/features/menu/presentation/pages/app_drawer.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/features/menu/presentation/pages/app_drawer.dart';
 import '../widgets/category_tabs.dart';
 import '../widgets/recommendation_product_card.dart';
 

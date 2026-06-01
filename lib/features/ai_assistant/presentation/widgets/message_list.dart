@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/features/ai_assistant/domain/models/chat_message.dart';
+import 'package:yemen_stor/features/ai_assistant/domain/models/chat_message.dart';
 
 import 'chat_bubble.dart';
 import 'product_suggestion_card.dart';

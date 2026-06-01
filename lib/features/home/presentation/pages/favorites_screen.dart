@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
 
 class FavoritesScreen extends StatelessWidget {
   static const String id = 'favorites_screen';

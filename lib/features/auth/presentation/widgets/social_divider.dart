@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/core/theme/app_colors.dart'; 
 
 class SocialDivider extends StatelessWidget {
   const SocialDivider({super.key});

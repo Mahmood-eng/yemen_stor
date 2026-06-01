@@ -1,5 +1,5 @@
-import 'package:yemen_store/features/auth/domain/entities/user.dart';
-import 'package:yemen_store/features/auth/domain/repositories/auth_repository.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
 
 class GetCurrentUserUseCase {
   final AuthRepository repository;

@@ -15,6 +15,7 @@ class SubcategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final marketName = market['name'] ?? '';
     final subcategoryName = subcategory['title'] ?? '';
     final subcategoryIcon = subcategory['icon'];
@@ -22,14 +23,13 @@ class SubcategoriesScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFD),
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
           elevation: 0,
           title: Text(
             subcategoryName,
             style: TextStyle(
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -37,7 +37,7 @@ class SubcategoriesScreen extends StatelessWidget {
           ),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: AppColors.primary),
+            icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.primary),
             onPressed: () => context.pop(),
           ),
         ),

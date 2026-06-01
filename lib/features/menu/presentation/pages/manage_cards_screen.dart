@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yemen_store/features/menu/presentation/widgets/menu_card_panel.dart';
+import 'package:yemen_stor/features/menu/presentation/widgets/menu_card_panel.dart';
 
 class ManageCardsScreen extends StatefulWidget {
   const ManageCardsScreen({super.key});

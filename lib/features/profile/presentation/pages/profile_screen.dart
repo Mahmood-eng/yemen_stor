@@ -5,10 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
 
-import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_providers.dart';
+import 'package:yemen_stor/core/widgets/custom_button.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_providers.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   static const String id = 'profile_screen';
@@ -167,6 +167,80 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  Future<void> _updatePhotoUrl(String newUrl) async {
+    setState(() => _isLoading = true);
+    try {
+      final user = fb_auth.FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('المستخدم غير مسجل');
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'photoUrl': newUrl});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم تحديث الصورة بنجاح')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل في تحديث الصورة: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showEditProfilePictureDialog(BuildContext context) {
+    final TextEditingController urlController = TextEditingController(text: (_userDocData?['photoUrl'] ?? '') as String);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text('تغيير صورة الملف الشخصي', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('الرجاء إدخال رابط (URL) للصورة الجديدة:'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: urlController,
+              decoration: InputDecoration(
+                hintText: 'https://example.com/image.jpg',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                prefixIcon: const Icon(Icons.link),
+                filled: true,
+              ),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await _updatePhotoUrl(urlController.text.trim());
+            },
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text('حفظ الصورة'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _signOut() async {
     try {
       await ref.read(authNotifierProvider.notifier).signOut();
@@ -304,35 +378,57 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Column(
       children: [
-        Stack(
-          alignment: Alignment.bottomRight,
-          children: [
-            CircleAvatar(
-              radius: 55,
-              backgroundColor: isDark
-                  ? Colors.white10
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              backgroundImage: displayPhoto.isNotEmpty
-                  ? NetworkImage(displayPhoto)
-                  : null,
-              child: displayPhoto.isEmpty
-                  ? Icon(
-                      Icons.person,
-                      size: 60,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  : null,
-            ),
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(
-                Icons.camera_alt,
-                size: 18,
-                color: Colors.white,
+        GestureDetector(
+          onTap: () => _showEditProfilePictureDialog(context),
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 55,
+                  backgroundColor: isDark
+                      ? Colors.white10
+                      : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  backgroundImage: displayPhoto.isNotEmpty
+                      ? NetworkImage(displayPhoto)
+                      : null,
+                  child: displayPhoto.isEmpty
+                      ? Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                ),
               ),
-            ),
-          ],
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    width: 3,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.edit,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 15),
         Text(

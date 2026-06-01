@@ -16,15 +16,28 @@ class CategoryModel {
   factory CategoryModel.fromFirestore(Map<String, dynamic> json, String id) {
     return CategoryModel(
       id: id,
-      name: json['categoryName'] ?? '',
-      iconName: json['iconName'] ?? '',
+      name: json['categoryName'] ?? json['name'] ?? '',
+      iconName: json['iconName'] ?? json['icon'] ?? 'category',
       marketId: json['marketId'] ?? '',
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'categoryId': id,
+      'name': name,
+      'iconName': iconName,
+      'marketId': marketId,
+    };
+  }
+
   // تحويل البيانات لشكل الخريطة القديم لضمان عمل الودجات الحالية
   Map<String, dynamic> toLegacyMap() {
-    return {'title': name, 'icon': MarketModel.getIconData(iconName)};
+    return {
+      'id': id,
+      'title': name,
+      'icon': MarketModel.getIconData(iconName),
+    };
   }
 }
 
@@ -48,10 +61,19 @@ class MarketModel {
   }) {
     return MarketModel(
       id: id,
-      name: json['marketName'] ?? '',
-      iconName: json['iconName'] ?? '',
+      name: json['marketName'] ?? json['name'] ?? '',
+      iconName: json['iconName'] ?? json['icon'] ?? 'category',
       categories: categories,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'iconName': iconName,
+      'categories': categories.map((c) => c.toJson()).toList(),
+    };
   }
 
   IconData get icon => getIconData(iconName);

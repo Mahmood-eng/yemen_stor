@@ -1,6 +1,6 @@
-import 'package:yemen_store/features/auth/data/datasources/auth_data_source.dart';
-import 'package:yemen_store/features/auth/domain/entities/user.dart';
-import 'package:yemen_store/features/auth/domain/repositories/auth_repository.dart';
+import 'package:yemen_stor/features/auth/data/datasources/auth_data_source.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthDataSource dataSource;

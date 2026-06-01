@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
 
-import 'package:yemen_store/features/digitalservices/presentation/widgets/service_category_card.dart';
-import 'package:yemen_store/features/digitalservices/presentation/widgets/services_banner.dart';
-import 'package:yemen_store/features/digitalservices/presentation/widgets/services_search.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/features/digitalservices/presentation/widgets/section_title.dart';
-import 'package:yemen_store/features/digitalservices/presentation/widgets/services_grid.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/widgets/service_category_card.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/widgets/services_banner.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/widgets/services_search.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/widgets/section_title.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/widgets/services_grid.dart';
 
 import '../../../menu/presentation/pages/app_drawer.dart';
 
