@@ -83,7 +83,7 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
 
   Future<void> _submitWithConfirmation() async {
     if (!_isFormValid) return;
-    
+
     HapticFeedback.mediumImpact();
 
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
@@ -99,12 +99,21 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("تأكيد العملية", style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
-          content: Text("هل أنت متأكد من رغبتك بشحن مبلغ $amount $_selectedCurrency إلى محفظتك؟", style: const TextStyle(fontFamily: 'Cairo')),
+          title: const Text(
+            "تأكيد العملية",
+            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            "هل أنت متأكد من رغبتك بشحن مبلغ $amount $_selectedCurrency إلى محفظتك؟",
+            style: const TextStyle(fontFamily: 'Cairo'),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("إلغاء", style: TextStyle(color: Colors.redAccent, fontFamily: 'Cairo')),
+              child: const Text(
+                "إلغاء",
+                style: TextStyle(color: Colors.redAccent, fontFamily: 'Cairo'),
+              ),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -112,7 +121,13 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text("نعم، اشحن رصيدي", style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+              child: const Text(
+                "نعم، اشحن رصيدي",
+                style: TextStyle(
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -146,7 +161,10 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
           const SnackBar(
             content: Text(
               'تم إضافة الرصيد إلى محفظتك بنجاح!',
-              style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.bold,
+              ),
             ),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
@@ -173,7 +191,7 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
           title: const Text("تغذية رصيدي"),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () => context.push(AppRoutes.home),
+            onPressed: () => context.go(AppRoutes.home),
           ),
         ),
         body: SingleChildScrollView(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
 import 'package:yemen_stor/core/theme/app_colors.dart';
 
 class RentPaymentScreen extends ConsumerStatefulWidget {
@@ -196,7 +197,7 @@ class _RentPaymentScreenState extends ConsumerState<RentPaymentScreen> {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () => context.pop(),
+            onPressed: () => context.go(AppRoutes.home),
             icon: const Icon(Icons.arrow_back_ios),
           ),
           title: const Text(

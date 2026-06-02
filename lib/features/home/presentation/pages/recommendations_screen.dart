@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
 import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/core/widgets/notification_badge_icon.dart';
 import 'package:yemen_stor/features/menu/presentation/pages/app_drawer.dart';
 import 'package:yemen_stor/features/shops/data/models/product_model.dart';
 import '../widgets/category_tabs.dart';
@@ -47,14 +48,8 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications_none_rounded,
-              color: theme.appBarTheme.iconTheme?.color,
-            ),
-            onPressed: () {
-              context.push(AppRoutes.notifications);
-            },
+          NotificationBadgeIcon(
+            color: theme.appBarTheme.iconTheme?.color,
           ),
           IconButton(
             icon: Icon(

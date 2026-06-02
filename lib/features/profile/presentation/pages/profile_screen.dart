@@ -174,21 +174,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       final user = fb_auth.FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('المستخدم غير مسجل');
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({'photoUrl': newUrl});
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+        {'photoUrl': newUrl},
+      );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تحديث الصورة بنجاح')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('تم تحديث الصورة بنجاح')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل في تحديث الصورة: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('فشل في تحديث الصورة: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -196,12 +195,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _showEditProfilePictureDialog(BuildContext context) {
-    final TextEditingController urlController = TextEditingController(text: (_userDocData?['photoUrl'] ?? '') as String);
+    final TextEditingController urlController = TextEditingController(
+      text: (_userDocData?['photoUrl'] ?? '') as String,
+    );
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text('تغيير صورة الملف الشخصي', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'تغيير صورة الملف الشخصي',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +216,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               controller: urlController,
               decoration: InputDecoration(
                 hintText: 'https://example.com/image.jpg',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 prefixIcon: const Icon(Icons.link),
                 filled: true,
               ),
@@ -220,7 +226,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
         ),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        actionsPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -232,7 +241,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               await _updatePhotoUrl(urlController.text.trim());
             },
             style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: const Text('حفظ الصورة'),
@@ -316,101 +327,116 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             );
           }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-              child: Column(
-                children: [
-                  _buildProfileHeader(user, isDark),
-                  const SizedBox(height: 30),
-                  
-                  // أزرار الإجراءات السريعة
-                  _buildQuickActions(context, isDark),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // نموذج تعديل البيانات
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: isDark ? Theme.of(context).cardColor : Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+            child: Column(
+              children: [
+                _buildProfileHeader(user, isDark),
+                const SizedBox(height: 30),
+
+                // أزرار الإجراءات السريعة
+                _buildQuickActions(context, isDark),
+
+                const SizedBox(height: 30),
+
+                // نموذج تعديل البيانات
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isDark ? Theme.of(context).cardColor : Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.3 : 0.05,
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "المعلومات الشخصية",
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Cairo',
-                              ),
-                        ),
-                        const SizedBox(height: 20),
-                        _buildProfileField(
-                  label: "الاسم الكامل",
-                  controller: _nameController,
-                  focusNode: _nameFocus,
-                  icon: Icons.person_outline,
-                ),
-                _buildProfileField(
-                  label: "رقم الهاتف",
-                  controller: _phoneController,
-                  focusNode: _phoneFocus,
-                  icon: Icons.phone_android,
-                  keyboardType: TextInputType.phone,
-                ),
-                _buildProfileField(
-                  label: "البريد الإلكتروني",
-                  controller: _emailController,
-                  icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  readOnly: true,
-                ),
-                _buildProfileField(
-                  label: "المدينة",
-                  controller: _cityController,
-                  focusNode: _cityFocus,
-                  icon: Icons.location_city_outlined,
-                ),
-                _buildProfileField(
-                  label: "العنوان التفصيلي",
-                  controller: _addressController,
-                  focusNode: _addressFocus,
-                  icon: Icons.location_on_outlined,
-                  maxLines: 2,
-                ),
-                        const SizedBox(height: 20),
-                        if (_isEdited)
-                          SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: ElevatedButton(
-                              onPressed: _isLoading ? null : _updateProfile,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                              ),
-                              child: _isLoading
-                                  ? const CircularProgressIndicator(color: Colors.white)
-                                  : const Text("حفظ التغييرات", style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.bold)),
-                            ),
-                          ),
-                      ],
-                    ),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  _buildInfoSection(user, isDark),
-                ],
-              ),
-            );
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "المعلومات الشخصية",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Cairo',
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildProfileField(
+                        label: "الاسم الكامل",
+                        controller: _nameController,
+                        focusNode: _nameFocus,
+                        icon: Icons.person_outline,
+                      ),
+                      _buildProfileField(
+                        label: "رقم الهاتف",
+                        controller: _phoneController,
+                        focusNode: _phoneFocus,
+                        icon: Icons.phone_android,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      _buildProfileField(
+                        label: "البريد الإلكتروني",
+                        controller: _emailController,
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        readOnly: true,
+                      ),
+                      _buildProfileField(
+                        label: "المدينة",
+                        controller: _cityController,
+                        focusNode: _cityFocus,
+                        icon: Icons.location_city_outlined,
+                      ),
+                      _buildProfileField(
+                        label: "العنوان التفصيلي",
+                        controller: _addressController,
+                        focusNode: _addressFocus,
+                        icon: Icons.location_on_outlined,
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: 20),
+                      if (_isEdited)
+                        SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _updateProfile,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : const Text(
+                                    "حفظ التغييرات",
+                                    style: TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildInfoSection(user, isDark),
+              ],
+            ),
+          );
         },
       ),
     );
@@ -434,7 +460,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.2),
                       blurRadius: 15,
                       spreadRadius: 2,
                     ),
@@ -444,7 +472,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   radius: 55,
                   backgroundColor: isDark
                       ? Colors.white10
-                      : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                   backgroundImage: displayPhoto.isNotEmpty
                       ? NetworkImage(displayPhoto)
                       : null,
@@ -467,11 +497,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     width: 3,
                   ),
                 ),
-                child: const Icon(
-                  Icons.edit,
-                  size: 18,
-                  color: Colors.white,
-                ),
+                child: const Icon(Icons.edit, size: 18, color: Colors.white),
               ),
             ],
           ),
@@ -556,7 +582,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildQuickActionBtn(BuildContext context, {required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+  Widget _buildQuickActionBtn(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
@@ -568,13 +600,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? color.withValues(alpha: 0.15) : color.withValues(alpha: 0.1),
+              color: isDark
+                  ? color.withValues(alpha: 0.15)
+                  : color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 28),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
         ],
       ),
     );
@@ -612,17 +653,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             readOnly: readOnly,
             style: const TextStyle(fontFamily: 'Cairo'),
             decoration: InputDecoration(
-              prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)),
+              prefixIcon: Icon(
+                icon,
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.7),
+              ),
               suffixIcon: readOnly ? null : const Icon(Icons.edit, size: 16),
               filled: true,
-              fillColor: isDark ? Theme.of(context).colorScheme.surfaceContainerHighest : Colors.grey.shade50,
+              fillColor: isDark
+                  ? Theme.of(context).colorScheme.surfaceContainerHighest
+                  : Colors.grey.shade50,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 1.5,
+                ),
               ),
             ),
           ),

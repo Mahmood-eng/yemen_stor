@@ -106,6 +106,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         .signUp(email, password, displayName, city);
   }
 
+  void _handleBiometricAuth() {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('تنبيه', style: TextStyle(fontFamily: 'Cairo')),
+          content: const Text(
+            'لا يمكن استخدام البصمة لإنشاء حساب جديد. يرجى ملء البيانات المطلوبة أولاً، وبعد الدخول يمكنك تفعيل البصمة من الإعدادات لتسهيل دخولك مستقبلاً.',
+            style: TextStyle(fontFamily: 'Cairo', height: 1.5),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('حسناً', style: TextStyle(fontFamily: 'Cairo')),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
@@ -344,7 +365,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         const SocialDivider(),
                         const SizedBox(height: 20),
 
-                        const SocialIconsRow(),
+                        SocialIconsRow(
+                          onFingerprintTap: _handleBiometricAuth,
+                        ),
 
                         const SizedBox(height: 25),
 

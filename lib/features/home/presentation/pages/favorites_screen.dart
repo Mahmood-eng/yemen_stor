@@ -38,7 +38,7 @@ class FavoritesScreen extends ConsumerWidget {
               Icons.arrow_back_ios_new,
               color: theme.colorScheme.primary,
             ),
-            onPressed: () => context.push(AppRoutes.home),
+            onPressed: () => context.go(AppRoutes.home),
           ),
         ),
         body: favoritesAsync.when(
@@ -256,7 +256,7 @@ class FavoritesScreen extends ConsumerWidget {
                               Icon(
                                 Icons.add_shopping_cart,
                                 size: 16,
-                                color: theme.colorScheme.primary,
+                                color: theme.colorScheme.onPrimary,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -265,7 +265,7 @@ class FavoritesScreen extends ConsumerWidget {
                                   fontSize: 12,
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
+                                  color: theme.colorScheme.onPrimary,
                                 ),
                               ),
                             ],

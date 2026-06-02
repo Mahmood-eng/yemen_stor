@@ -449,10 +449,17 @@ class AppDrawer extends StatelessWidget {
                   ),
                   _buildDrawerItem(
                     context,
-                    Icons.info_outline,
-                    'حول التطبيق',
-                    () {},
+                    Icons.help_outline_rounded,
+                    'مركز المساعدة',
+                    () => context.go(AppRoutes.help),
                   ),
+                  _buildDrawerItem(
+                    context,
+                    Icons.info_outline_rounded,
+                    'حول التطبيق',
+                    () => context.go(AppRoutes.about),
+                  ),
+
                 ],
               ),
             ),
@@ -655,11 +662,30 @@ class AppDrawer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: InkWell(
-        onTap: () async {
-          await fb_auth.FirebaseAuth.instance.signOut();
-          if (context.mounted) {
-            context.go(AppRoutes.login);
-          }
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('تسجيل الخروج', style: TextStyle(fontFamily: 'Cairo')),
+              content: const Text('هل أنت متأكد من أنك تريد تسجيل الخروج؟', style: TextStyle(fontFamily: 'Cairo')),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo')),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    await fb_auth.FirebaseAuth.instance.signOut();
+                    if (context.mounted) {
+                      context.go(AppRoutes.login);
+                    }
+                  },
+                  child: const Text('خروج', style: TextStyle(color: Colors.red, fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
         },
         child: Row(
           children: [

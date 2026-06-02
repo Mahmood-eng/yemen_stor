@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
 import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
 import 'package:yemen_stor/core/widgets/smart_search_delegate.dart';
+import 'package:yemen_stor/core/widgets/notification_badge_icon.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../menu/presentation/pages/app_drawer.dart';
@@ -45,14 +46,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: 40,
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications_none_rounded,
-              color: theme.appBarTheme.iconTheme?.color,
-            ),
-            onPressed: () {
-              context.push(AppRoutes.notifications);
-            },
+          NotificationBadgeIcon(
+            color: theme.appBarTheme.iconTheme?.color,
           ),
           IconButton(
             icon: Icon(

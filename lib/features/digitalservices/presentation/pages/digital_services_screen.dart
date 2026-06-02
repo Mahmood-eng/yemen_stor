@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/core/widgets/notification_badge_icon.dart';
 
 import 'package:yemen_stor/features/digitalservices/presentation/widgets/service_category_card.dart';
 import 'package:yemen_stor/features/digitalservices/presentation/widgets/services_banner.dart';
@@ -31,14 +32,8 @@ class DigitalServicesScreen extends StatelessWidget {
             ),
           ),
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications_none_rounded,
-                color: theme.appBarTheme.iconTheme?.color,
-              ),
-              onPressed: () {
-                context.push(AppRoutes.notifications);
-              },
+            NotificationBadgeIcon(
+              color: theme.appBarTheme.iconTheme?.color,
             ),
             IconButton(
               icon: Icon(

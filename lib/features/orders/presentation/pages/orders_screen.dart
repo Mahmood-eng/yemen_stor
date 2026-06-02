@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/core/widgets/notification_badge_icon.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../providers/order_providers.dart';
 import '../widgets/order_card.dart';
@@ -23,12 +24,8 @@ class OrdersScreen extends ConsumerWidget {
           title: const Text('سجل طلباتي'),
           leading: const SizedBox.shrink(),
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications_none_rounded,
-                color: theme.appBarTheme.iconTheme?.color,
-              ),
-              onPressed: () => context.push(AppRoutes.notifications),
+            NotificationBadgeIcon(
+              color: theme.appBarTheme.iconTheme?.color,
             ),
             IconButton(
               icon: Icon(

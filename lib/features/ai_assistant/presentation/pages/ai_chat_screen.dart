@@ -83,8 +83,21 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(theme, isDark),
-      body: Column(
-        children: [
+      body: Container(
+        decoration: isDark
+            ? null
+            : BoxDecoration(
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/chat_bg.png'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    theme.scaffoldBackgroundColor.withOpacity(0.95),
+                    BlendMode.lighten,
+                  ),
+                ),
+              ),
+        child: Column(
+          children: [
           Expanded(
             child: MessageList(
               messages: _messages,
@@ -104,13 +117,14 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
+      ),
     );
   }
 
   PreferredSizeWidget _buildAppBar(ThemeData theme, bool isDark) {
     return AppBar(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios),
+        icon: const Icon(Icons.arrow_back_ios_new),
         onPressed: () => Navigator.pop(context),
       ),
       elevation: 0,
@@ -123,36 +137,98 @@ class _ChatPageState extends State<ChatPage> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.12),
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary,
+                  theme.colorScheme.secondary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            child: Icon(
-              Icons.smart_toy_rounded,
-              color: theme.colorScheme.primary,
-              size: 24,
+            child: const Center(
+              child: Icon(
+                Icons.auto_awesome,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'نور',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'صراط',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Cairo',
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Text(
+                      'AI',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 2),
-              Text(
-                'متصل الآن',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.72),
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.greenAccent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'متصل الآن',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                      fontFamily: 'Cairo',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.more_vert_rounded),
+          onPressed: () {},
+        ),
+      ],
     );
   }
 }

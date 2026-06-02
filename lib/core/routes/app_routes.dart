@@ -5,6 +5,8 @@ import 'package:yemen_stor/features/home/presentation/pages/favorites_screen.dar
 import 'package:yemen_stor/features/home/presentation/widgets/home_bottom_nav.dart';
 import 'package:yemen_stor/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:yemen_stor/features/setting/presentation/pages/settings_screen.dart';
+import 'package:yemen_stor/features/setting/presentation/pages/help_screen.dart';
+import 'package:yemen_stor/features/setting/presentation/pages/about_app_screen.dart';
 import 'package:yemen_stor/features/auth/presentation/pages/login_screen.dart';
 import 'package:yemen_stor/features/auth/presentation/pages/signup_screen.dart';
 import 'package:yemen_stor/features/auth/presentation/pages/forgot_password_screen.dart';
@@ -60,6 +62,8 @@ class AppRoutes {
   static const String services = '/services';
   static const String profile = '/profile';
   static const String settings = '/settings';
+  static const String help = '/help';
+  static const String about = '/about';
   static const String wallet = '/wallet';
   static const String favorites = '/favorites';
   static const String orderTrackingWithId = '/orders/tracking/:orderId';
@@ -281,6 +285,14 @@ class AppRoutes {
           final orderId = extra['orderId'] as String? ?? '';
           return OrderTrackingScreen(orderId: orderId);
         },
+      ),
+      GoRoute(
+        path: help,
+        builder: (context, state) => const HelpScreen(),
+      ),
+      GoRoute(
+        path: about,
+        builder: (context, state) => const AboutAppScreen(),
       ),
 
       // 2. هيكل التطبيق الرئيسي مع الشريط السفلي

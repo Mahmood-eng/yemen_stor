@@ -10,6 +10,8 @@ import 'package:yemen_stor/features/auth/presentation/utils/auth_validation.dart
 import 'package:yemen_stor/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:yemen_stor/features/auth/presentation/widgets/social_divider.dart';
 import 'package:yemen_stor/features/auth/presentation/widgets/social_icons_row.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:local_auth/local_auth.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -56,6 +58,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = _passwordController.text;
 
     ref.read(authNotifierProvider.notifier).signIn(email, password);
+  }
+
+  Future<void> _handleBiometricAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isEnabled = prefs.getBool('use_biometrics') ?? false;
+
+    if (!isEnabled) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('تنبيه', style: TextStyle(fontFamily: 'Cairo')),
+            content: const Text(
+              'تسجيل الدخول بالبصمة غير مفعل لحسابك. يرجى تسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور أولاً، ثم تفعيل البصمة من قائمة الإعدادات.',
+              style: TextStyle(fontFamily: 'Cairo', height: 1.5),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('حسناً', style: TextStyle(fontFamily: 'Cairo')),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
+    final LocalAuthentication auth = LocalAuthentication();
+    try {
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+      if (canAuthenticate) {
+        final bool didAuthenticate = await auth.authenticate(
+          localizedReason: 'الرجاء التحقق من هويتك لتسجيل الدخول',
+          biometricOnly: true,
+        );
+
+        if (didAuthenticate) {
+          // If biometric succeeds, we can't easily fetch their password directly 
+          // without having cached it securely previously. However, for a fully working 
+          // demo without deep encryption, we might just bypass auth and go to home
+          // Note: In a real production app, we would use flutter_secure_storage 
+          // to store the token or password.
+          // For now, if they pass biometric and it was enabled, we assume they are the owner.
+          // Let's do a mock bypass or a message.
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('تم التحقق بنجاح!')),
+            );
+            // In a real app we would login silently here.
+            // context.go(AppRoutes.home);
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('جهازك لا يدعم البصمة أو غير مفعلة')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('حدث خطأ أثناء المصادقة بالبصمة')),
+        );
+      }
+    }
   }
 
   @override
@@ -211,7 +282,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SocialDivider(),
                         const SizedBox(height: 20),
 
-                        const SocialIconsRow(),
+                        SocialIconsRow(
+                          onFingerprintTap: _handleBiometricAuth,
+                        ),
 
                         const SizedBox(height: 25),
 
