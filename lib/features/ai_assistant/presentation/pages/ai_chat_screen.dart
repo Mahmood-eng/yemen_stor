@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:yemen_stor/features/ai_assistant/domain/models/chat_message.dart';
+import 'package:yemen_stor/features/ai_assistant/domain/services/ai_assistant_service.dart';
 
 import '../widgets/chat_input.dart';
 import '../widgets/message_list.dart';
@@ -16,9 +17,11 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final AiAssistantService _aiService = AiAssistantService();
+  
   final List<ChatMessage> _messages = [
     ChatMessage(
-      text: 'مرحباً بك! انا صراط مساعدك الذكي كيف أستطيع مساعدتك اليوم؟',
+      text: 'مرحباً بك! أنا "صراط" مساعدك الذكي في المتجر. كيف أستطيع مساعدتك اليوم؟',
       isUser: false,
       hasProduct: false,
     ),
@@ -44,7 +47,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -57,22 +60,17 @@ class _ChatPageState extends State<ChatPage> {
 
     _scrollToEnd();
 
-    Timer(const Duration(milliseconds: 900), () {
-      setState(() {
-        _isBotTyping = false;
-        _messages.add(
-          ChatMessage(
-            text: 'إليك هذا الاختيار من المتجر، جاهز للمراجعة؟',
-            isUser: false,
-            hasProduct: true,
-            productName: 'سماعات بلوتوث لاسلكية',
-            productPrice: '299 ريال',
-            productDetails: 'تصميم مريح وجودة صوت عالية',
-          ),
-        );
-      });
-      _scrollToEnd();
+    // Call the AI Service
+    final responses = await _aiService.processUserInput(text);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isBotTyping = false;
+      _messages.addAll(responses);
     });
+    
+    _scrollToEnd();
   }
 
   @override
