@@ -6,7 +6,7 @@ import '../models/order_status.dart';
 class OrderRemoteDataSource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Stream of all orders belonging to the current user
+  /// Stream of all orders belonging to the current user (legacy - used for tracking)
   Stream<List<OrderModel>> getUserOrders() {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return Stream.value([]);
@@ -14,6 +14,54 @@ class OrderRemoteDataSource {
     return _firestore
         .collection('orders')
         .where('userId', isEqualTo: user.uid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => OrderModel.fromJson(doc.data(), doc.id))
+            .toList());
+  }
+
+  /// تبويب النشطة: processing + onWay
+  Stream<List<OrderModel>> getActiveOrders() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return Stream.value([]);
+
+    return _firestore
+        .collection('orders')
+        .where('userId', isEqualTo: user.uid)
+        .where('status', whereIn: ['processing', 'onWay'])
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => OrderModel.fromJson(doc.data(), doc.id))
+            .toList());
+  }
+
+  /// تبويب المكتملة
+  Stream<List<OrderModel>> getCompletedOrders() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return Stream.value([]);
+
+    return _firestore
+        .collection('orders')
+        .where('userId', isEqualTo: user.uid)
+        .where('status', isEqualTo: 'completed')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => OrderModel.fromJson(doc.data(), doc.id))
+            .toList());
+  }
+
+  /// تبويب الملغاة
+  Stream<List<OrderModel>> getCanceledOrders() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return Stream.value([]);
+
+    return _firestore
+        .collection('orders')
+        .where('userId', isEqualTo: user.uid)
+        .where('status', isEqualTo: 'canceled')
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs

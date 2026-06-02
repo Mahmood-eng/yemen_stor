@@ -1,4 +1,4 @@
-import 'package:yemen_stor/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user_entity.dart';
 import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
 
 class GetCurrentUserUseCase {
@@ -6,7 +6,7 @@ class GetCurrentUserUseCase {
 
   GetCurrentUserUseCase(this.repository);
 
-  Future<User?> call() {
+  Future<UserEntity?> call() {
     return repository.getCurrentUser();
   }
 }

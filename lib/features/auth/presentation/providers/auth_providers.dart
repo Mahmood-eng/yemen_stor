@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yemen_stor/features/auth/data/datasources/firebase_auth_data_source.dart';
 import 'package:yemen_stor/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
-import 'package:yemen_stor/features/auth/domain/entities/user.dart' as app_user;
+import 'package:yemen_stor/features/auth/domain/entities/user_entity.dart' as app_user;
+import 'package:yemen_stor/features/auth/data/models/user_model.dart';
 import 'package:yemen_stor/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:yemen_stor/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:yemen_stor/features/auth/domain/usecases/sign_out_usecase.dart';
@@ -74,7 +75,7 @@ final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
 });
 
 // User document live stream provider
-final userDocumentStreamProvider = StreamProvider<app_user.User?>((ref) {
+final userDocumentStreamProvider = StreamProvider<app_user.UserEntity?>((ref) {
   final authUser = ref.watch(firebaseAuthProvider).currentUser;
   if (authUser == null) {
     return Stream.value(null);
@@ -85,6 +86,6 @@ final userDocumentStreamProvider = StreamProvider<app_user.User?>((ref) {
       .snapshots()
       .map((snapshot) {
         if (!snapshot.exists) return null;
-        return app_user.User.fromJson(snapshot.data()!);
+        return UserModel.fromJson(snapshot.data()!);
       });
 });

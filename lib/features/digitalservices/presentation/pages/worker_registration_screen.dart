@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/professional_constants.dart';
 import '../../domain/entities/worker_entity.dart';
 import '../providers/workers_providers.dart';
 
@@ -19,41 +20,39 @@ class _WorkerRegistrationScreenState
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  final _cityCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _bioCtrl = TextEditingController();
   final _imageUrlCtrl = TextEditingController();
   final _expCtrl = TextEditingController();
+  final _cvUrlCtrl = TextEditingController();
 
-  String _selectedProfession = 'سباك';
-  String _selectedStatus = 'متاح';
+  final List<TextEditingController> _portfolioControllers = [];
+  final List<TextEditingController> _projectControllers = [];
+  final List<TextEditingController> _certificateControllers = [];
 
-  final List<String> _professions = [
-    'سباك',
-    'كهربائي',
-    'نجار',
-    'حداد',
-    'بناء',
-    'دهان',
-    'مبرمج',
-    'مصمم جرافيك',
-    'محاسب',
-    'مدرس',
-    'طبيب',
-    'مهندس',
-    'محامي',
-    'مستشار مالي',
-  ];
+  bool get _isScientific =>
+      ProfessionalConstants.isScientificOrConsultant(_selectedCategory);
+
+  bool get _isCraftsman =>
+      ProfessionalConstants.isCraftsman(_selectedCategory);
+
+  // ── الحقول الثابتة بقوائم الاختيار ──
+  String _selectedCity = ProfessionalConstants.yemeniCities.first;
+  String _selectedCategory = ProfessionalConstants.defaultCategory;
+  String _selectedProfession = ProfessionalConstants.defaultProfession;
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _phoneCtrl.dispose();
-    _cityCtrl.dispose();
     _addressCtrl.dispose();
     _bioCtrl.dispose();
     _imageUrlCtrl.dispose();
     _expCtrl.dispose();
+    _cvUrlCtrl.dispose();
+    for (final c in _portfolioControllers) { c.dispose(); }
+    for (final c in _projectControllers) { c.dispose(); }
+    for (final c in _certificateControllers) { c.dispose(); }
     super.dispose();
   }
 
@@ -70,13 +69,19 @@ class _WorkerRegistrationScreenState
       id: '',
       name: _nameCtrl.text.trim(),
       profession: _selectedProfession,
+      category: _selectedCategory,
       experienceYears: int.tryParse(_expCtrl.text.trim()) ?? 0,
       phone: _phoneCtrl.text.trim(),
-      city: _cityCtrl.text.trim(),
+      city: _selectedCity,
       address: _addressCtrl.text.trim(),
       bio: _bioCtrl.text.trim(),
       imageUrl: _imageUrlCtrl.text.trim(),
-      status: _selectedStatus,
+      status: 'متاح',
+      isAvailable: true,
+      portfolioLinks: _portfolioControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList(),
+      projectLinks: _isScientific ? _projectControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList() : const [],
+      cvUrl: _isScientific ? _cvUrlCtrl.text.trim() : null,
+      certificates: _isScientific ? _certificateControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList() : const [],
       userId: userId,
       createdAt: FieldValue.serverTimestamp(),
     );
@@ -100,8 +105,10 @@ class _WorkerRegistrationScreenState
 
     ref.listen(workerRegisterProvider, (prev, next) {
       if (next.status == WorkerRegisterStatus.success) {
-        _showSnack('تم التسجيل بنجاح!');
+        _showSnack('تم التسجيل بنجاح! 🎉');
         ref.read(workerRegisterProvider.notifier).reset();
+        // تحديث بيانات المهني الحالي
+        ref.invalidate(currentWorkerProfileProvider);
         context.pop();
       } else if (next.status == WorkerRegisterStatus.error) {
         _showSnack(next.errorMessage ?? 'حدث خطأ', isError: true);
@@ -120,7 +127,7 @@ class _WorkerRegistrationScreenState
           backgroundColor: theme.appBarTheme.backgroundColor,
           elevation: 0,
           title: Text(
-            'التسجيل كعامل',
+            'التسجيل كمهني',
             style: TextStyle(
               fontFamily: 'Cairo',
               fontWeight: FontWeight.bold,
@@ -128,7 +135,8 @@ class _WorkerRegistrationScreenState
             ),
           ),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, color: theme.appBarTheme.foregroundColor),
+            icon: Icon(Icons.arrow_back_ios_new,
+                color: theme.appBarTheme.foregroundColor),
             onPressed: () => context.pop(),
           ),
         ),
@@ -139,7 +147,7 @@ class _WorkerRegistrationScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Card
+                // ── Header Card ──
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -147,12 +155,12 @@ class _WorkerRegistrationScreenState
                     gradient: LinearGradient(
                       colors: [
                         theme.colorScheme.primary,
-                        theme.colorScheme.primary.withOpacity(0.7),
+                        theme.colorScheme.primary.withValues(alpha: 0.7),
                       ],
                       begin: Alignment.topRight,
                       end: Alignment.bottomLeft,
                     ),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(18),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +182,7 @@ class _WorkerRegistrationScreenState
                         style: TextStyle(
                           fontFamily: 'Cairo',
                           fontSize: 13,
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                         ),
                       ),
                     ],
@@ -182,7 +190,9 @@ class _WorkerRegistrationScreenState
                 ),
                 const SizedBox(height: 24),
 
-                _SectionHeader(title: 'البيانات الشخصية', icon: Icons.person_outline),
+                // ── البيانات الشخصية ──
+                _SectionHeader(
+                    title: 'البيانات الشخصية', icon: Icons.person_outline),
                 const SizedBox(height: 12),
 
                 _buildField(
@@ -197,27 +207,31 @@ class _WorkerRegistrationScreenState
                   label: 'رقم الهاتف',
                   icon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
-                  validator: (v) => v!.trim().isEmpty ? 'رقم الهاتف مطلوب' : null,
+                  validator: (v) =>
+                      v!.trim().isEmpty ? 'رقم الهاتف مطلوب' : null,
                 ),
                 const SizedBox(height: 12),
+
+                // ── Dropdown المدينة ──
+                _buildDropdownField(
+                  label: 'المدينة',
+                  icon: Icons.location_city_outlined,
+                  value: _selectedCity,
+                  items: ProfessionalConstants.yemeniCities,
+                  onChanged: (v) => setState(() => _selectedCity = v!),
+                ),
+                const SizedBox(height: 12),
+
                 Row(
                   children: [
-                    Expanded(
-                      child: _buildField(
-                        controller: _cityCtrl,
-                        label: 'المدينة',
-                        icon: Icons.location_city_outlined,
-                        validator: (v) => v!.trim().isEmpty ? 'المدينة مطلوبة' : null,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
                     Expanded(
                       child: _buildField(
                         controller: _expCtrl,
                         label: 'سنوات الخبرة',
                         icon: Icons.timeline,
                         keyboardType: TextInputType.number,
-                        validator: (v) => v!.trim().isEmpty ? 'مطلوب' : null,
+                        validator: (v) =>
+                            v!.trim().isEmpty ? 'مطلوب' : null,
                       ),
                     ),
                   ],
@@ -227,30 +241,44 @@ class _WorkerRegistrationScreenState
                   controller: _addressCtrl,
                   label: 'العنوان التفصيلي',
                   icon: Icons.map_outlined,
-                  validator: (v) => v!.trim().isEmpty ? 'العنوان مطلوب' : null,
+                  validator: (v) =>
+                      v!.trim().isEmpty ? 'العنوان مطلوب' : null,
                 ),
 
                 const SizedBox(height: 24),
-                _SectionHeader(title: 'بيانات المهنة', icon: Icons.work_outline),
+
+                // ── بيانات المهنة ──
+                _SectionHeader(
+                    title: 'بيانات المهنة', icon: Icons.work_outline),
                 const SizedBox(height: 12),
 
-                // Profession Dropdown
+                // ── Dropdown الأول: القسم الرئيسي ──
                 _buildDropdownField(
-                  label: 'التخصص المهني',
-                  icon: Icons.engineering_outlined,
-                  value: _selectedProfession,
-                  items: _professions,
-                  onChanged: (v) => setState(() => _selectedProfession = v!),
+                  label: 'القسم الرئيسي',
+                  icon: Icons.category_outlined,
+                  value: _selectedCategory,
+                  items: ProfessionalConstants.mainCategories,
+                  onChanged: (v) {
+                    setState(() {
+                      _selectedCategory = v!;
+                      // إعادة تعيين التخصص لأول عنصر في القسم الجديد
+                      _selectedProfession = ProfessionalConstants
+                          .getProfessionsByCategory(v)
+                          .first;
+                    });
+                  },
                 ),
                 const SizedBox(height: 12),
 
-                // Status Dropdown
+                // ── Dropdown الثاني: التخصص الدقيق (يتحدث ديناميكياً) ──
                 _buildDropdownField(
-                  label: 'الحالة',
-                  icon: Icons.toggle_on_outlined,
-                  value: _selectedStatus,
-                  items: const ['متاح', 'مشغول'],
-                  onChanged: (v) => setState(() => _selectedStatus = v!),
+                  label: 'التخصص الدقيق',
+                  icon: Icons.engineering_outlined,
+                  value: _selectedProfession,
+                  items: ProfessionalConstants.getProfessionsByCategory(
+                      _selectedCategory),
+                  onChanged: (v) =>
+                      setState(() => _selectedProfession = v!),
                 ),
                 const SizedBox(height: 12),
 
@@ -259,7 +287,8 @@ class _WorkerRegistrationScreenState
                   label: 'نبذة عنك',
                   icon: Icons.description_outlined,
                   maxLines: 3,
-                  validator: (v) => v!.trim().isEmpty ? 'النبذة مطلوبة' : null,
+                  validator: (v) =>
+                      v!.trim().isEmpty ? 'النبذة مطلوبة' : null,
                 ),
                 const SizedBox(height: 12),
 
@@ -270,7 +299,87 @@ class _WorkerRegistrationScreenState
                 ),
                 const SizedBox(height: 32),
 
-                // Submit Button
+                // ── الروابط الإضافية (تتغير حسب القسم) ──
+                if (_isCraftsman) ...[
+                  _SectionHeader(title: 'معرض الأعمال (صور / روابط)', icon: Icons.collections_outlined),
+                  const SizedBox(height: 12),
+                  ..._portfolioControllers.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    return _buildRemovableField(
+                      theme,
+                      'رابط الصورة ${i + 1}',
+                      entry.value,
+                      Icons.image_outlined,
+                      () => setState(() {
+                        _portfolioControllers[i].dispose();
+                        _portfolioControllers.removeAt(i);
+                      }),
+                    );
+                  }),
+                  _buildAddButton(
+                    theme,
+                    'إضافة صورة أو رابط لمعرض الأعمال',
+                    () => setState(() => _portfolioControllers.add(TextEditingController())),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
+                if (_isScientific) ...[
+                  _SectionHeader(title: 'روابط المشاريع السابقة', icon: Icons.code_rounded),
+                  const SizedBox(height: 12),
+                  ..._projectControllers.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    return _buildRemovableField(
+                      theme,
+                      'رابط مشروع (GitHub/Behance...)',
+                      entry.value,
+                      Icons.link_rounded,
+                      () => setState(() {
+                        _projectControllers[i].dispose();
+                        _projectControllers.removeAt(i);
+                      }),
+                    );
+                  }),
+                  _buildAddButton(
+                    theme,
+                    'إضافة رابط مشروع',
+                    () => setState(() => _projectControllers.add(TextEditingController())),
+                  ),
+                  const SizedBox(height: 24),
+
+                  _SectionHeader(title: 'الشهادات الأكاديمية', icon: Icons.workspace_premium_outlined),
+                  const SizedBox(height: 12),
+                  ..._certificateControllers.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    return _buildRemovableField(
+                      theme,
+                      'الشهادة ${i + 1}',
+                      entry.value,
+                      Icons.school_outlined,
+                      () => setState(() {
+                        _certificateControllers[i].dispose();
+                        _certificateControllers.removeAt(i);
+                      }),
+                    );
+                  }),
+                  _buildAddButton(
+                    theme,
+                    'إضافة شهادة',
+                    () => setState(() => _certificateControllers.add(TextEditingController())),
+                  ),
+                  const SizedBox(height: 24),
+
+                  _SectionHeader(title: 'السيرة الذاتية (CV)', icon: Icons.description_outlined),
+                  const SizedBox(height: 12),
+                  _buildField(
+                    controller: _cvUrlCtrl,
+                    label: 'رابط ملف CV',
+                    icon: Icons.insert_drive_file_outlined,
+                  ),
+                  const SizedBox(height: 32),
+                ],
+
+                // ── زر التسجيل ──
                 SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -332,7 +441,7 @@ class _WorkerRegistrationScreenState
         prefixIcon: Icon(icon, color: theme.colorScheme.primary),
         labelStyle: TextStyle(
           fontFamily: 'Cairo',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         filled: true,
         fillColor: theme.colorScheme.surface,
@@ -342,7 +451,8 @@ class _WorkerRegistrationScreenState
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.8),
+          borderSide:
+              BorderSide(color: theme.colorScheme.primary, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -350,7 +460,8 @@ class _WorkerRegistrationScreenState
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.error, width: 1.8),
+          borderSide:
+              BorderSide(color: theme.colorScheme.error, width: 1.8),
         ),
       ),
     );
@@ -367,13 +478,15 @@ class _WorkerRegistrationScreenState
     return DropdownButtonFormField<String>(
       value: value,
       onChanged: onChanged,
-      style: TextStyle(fontFamily: 'Cairo', color: theme.colorScheme.onSurface),
+      isExpanded: true,
+      style:
+          TextStyle(fontFamily: 'Cairo', color: theme.colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: theme.colorScheme.primary),
         labelStyle: TextStyle(
           fontFamily: 'Cairo',
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         filled: true,
         fillColor: theme.colorScheme.surface,
@@ -383,7 +496,8 @@ class _WorkerRegistrationScreenState
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.8),
+          borderSide:
+              BorderSide(color: theme.colorScheme.primary, width: 1.8),
         ),
       ),
       dropdownColor: theme.cardColor,
@@ -391,13 +505,74 @@ class _WorkerRegistrationScreenState
       items: items.map((item) {
         return DropdownMenuItem(
           value: item,
-          child: Text(item, style: const TextStyle(fontFamily: 'Cairo')),
+          child: Text(
+            item,
+            style: const TextStyle(fontFamily: 'Cairo', fontSize: 13),
+            overflow: TextOverflow.ellipsis,
+          ),
         );
       }).toList(),
     );
   }
+
+  Widget _buildRemovableField(
+    ThemeData theme,
+    String label,
+    TextEditingController controller,
+    IconData icon,
+    VoidCallback onRemove,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: label,
+                hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 12),
+                prefixIcon: Icon(icon, color: theme.colorScheme.primary, size: 17),
+                filled: true,
+                fillColor: theme.colorScheme.surfaceContainerHighest,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: 12),
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: onRemove,
+            icon: const Icon(Icons.remove_circle_outline, color: Colors.red, size: 22),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddButton(ThemeData theme, String label, VoidCallback onPressed) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(Icons.add_circle_outline_rounded, color: theme.colorScheme.primary, size: 20),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontFamily: 'Cairo',
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Section Header Widget
+// ─────────────────────────────────────────────────────────────
 class _SectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -412,7 +587,7 @@ class _SectionHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, size: 18, color: theme.colorScheme.primary),

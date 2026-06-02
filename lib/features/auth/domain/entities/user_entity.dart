@@ -1,4 +1,4 @@
-class User {
+class UserEntity {
   final String id;
   final String email;
   final String? displayName;
@@ -16,7 +16,7 @@ class User {
   final double balanceSAR;
   final double balanceUSD;
 
-  User({
+  UserEntity({
     required this.id,
     required this.email,
     this.displayName,
@@ -35,49 +35,7 @@ class User {
     this.balanceUSD = 0.0,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      displayName: json['displayName'] as String?,
-      phoneNumber: json['phoneNumber'] as String?,
-      city: json['city'] as String?,
-      emailVerified: json['emailVerified'] as bool? ?? false,
-      addressDetails: json['addressDetails'] as String?,
-      accountNumber: json['accountNumber'] as String?,
-      balance: json['balance'] as String?,
-      role: json['role'] as String?,
-      imageUrl: json['imageUrl'] as String?,
-      password: json['password'] as String?,
-      confirmPassword: json['confirmPassword'] as String?,
-      balanceYER: (json['balanceYER'] as num?)?.toDouble() ?? 0.0,
-      balanceSAR: (json['balanceSAR'] as num?)?.toDouble() ?? 0.0,
-      balanceUSD: (json['balanceUSD'] as num?)?.toDouble() ?? 0.0,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'displayName': displayName,
-      'phoneNumber': phoneNumber,
-      'city': city,
-      'emailVerified': emailVerified,
-      'addressDetails': addressDetails,
-      'accountNumber': accountNumber,
-      'balance': balance,
-      'role': role,
-      'imageUrl': imageUrl,
-      'password': password,
-      'confirmPassword': confirmPassword,
-      'balanceYER': balanceYER,
-      'balanceSAR': balanceSAR,
-      'balanceUSD': balanceUSD,
-    };
-  }
-
-  User copyWith({
+  UserEntity copyWith({
     String? id,
     String? email,
     String? displayName,
@@ -95,7 +53,7 @@ class User {
     double? balanceSAR,
     double? balanceUSD,
   }) {
-    return User(
+    return UserEntity(
       id: id ?? this.id,
       email: email ?? this.email,
       displayName: displayName ?? this.displayName,

@@ -36,7 +36,8 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
 
   void _validateForm() {
     setState(() {
-      _isFormValid = _titleController.text.trim().isNotEmpty &&
+      _isFormValid =
+          _titleController.text.trim().isNotEmpty &&
           _priceController.text.trim().isNotEmpty &&
           _sellerController.text.trim().isNotEmpty &&
           _phoneController.text.trim().isNotEmpty &&
@@ -53,7 +54,7 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
     _phoneController.removeListener(_validateForm);
     _locationController.removeListener(_validateForm);
     _descriptionController.removeListener(_validateForm);
-    
+
     _titleController.dispose();
     _priceController.dispose();
     _sellerController.dispose();
@@ -81,7 +82,7 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
       );
 
       await ref.read(artaMarketNotifierProvider.notifier).addProduct(product);
-      
+
       final state = ref.read(artaMarketNotifierProvider);
       if (state.isSuccess && mounted) {
         Navigator.pop(context);
@@ -135,29 +136,61 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              _buildTextField("اسم المنتج", _titleController, icon: Icons.shopping_bag),
+              _buildTextField(
+                "اسم المنتج",
+                _titleController,
+                icon: Icons.shopping_bag,
+              ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextField("السعر (ر.ي)", _priceController, icon: Icons.money, isNumber: true),
+                    child: _buildTextField(
+                      "السعر (ر.ي)",
+                      _priceController,
+                      icon: Icons.money,
+                      isNumber: true,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextField("الموقع", _locationController, icon: Icons.location_on),
+                    child: _buildTextField(
+                      "الموقع",
+                      _locationController,
+                      icon: Icons.location_on,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
-              _buildTextField("اسم البائع", _sellerController, icon: Icons.person),
+              _buildTextField(
+                "اسم البائع",
+                _sellerController,
+                icon: Icons.person,
+              ),
               const SizedBox(height: 10),
-              _buildTextField("رقم الجوال", _phoneController, icon: Icons.phone, isNumber: true),
+              _buildTextField(
+                "رقم الجوال",
+                _phoneController,
+                icon: Icons.phone,
+                isNumber: true,
+              ),
               const SizedBox(height: 10),
-              _buildTextField("الوصف", _descriptionController, icon: Icons.description, maxLines: 3),
+              _buildTextField(
+                "الوصف",
+                _descriptionController,
+                icon: Icons.description,
+                maxLines: 3,
+              ),
               const SizedBox(height: 10),
-              _buildTextField("رابط الصورة (اختياري)", _imageController, icon: Icons.image, isRequired: false),
+              _buildTextField(
+                "رابط الصورة ",
+                _imageController,
+                icon: Icons.image,
+                isRequired: false,
+              ),
               const SizedBox(height: 20),
-              
+
               state.isLoading
                   ? const CustomLoadingIndicator()
                   : ElevatedButton(
@@ -170,7 +203,13 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("نشر العرطة", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        "نشر العرطة",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
               const SizedBox(height: 20),
             ],
@@ -180,7 +219,14 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {required IconData icon, bool isNumber = false, int maxLines = 1, bool isRequired = true}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller, {
+    required IconData icon,
+    bool isNumber = false,
+    int maxLines = 1,
+    bool isRequired = true,
+  }) {
     return TextFormField(
       controller: controller,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
@@ -189,7 +235,10 @@ class _ArtaAddSheetState extends ConsumerState<ArtaAddSheet> {
         labelText: label,
         prefixIcon: Icon(icon, size: 20),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
       ),
       validator: (value) {
         if (isRequired && (value == null || value.trim().isEmpty)) {

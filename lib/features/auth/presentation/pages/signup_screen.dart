@@ -42,10 +42,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   void _validateForm() {
     setState(() {
-      _isFormValid = _emailController.text.trim().isNotEmpty &&
-          _passwordController.text.isNotEmpty &&
-          _confirmPasswordController.text.isNotEmpty &&
-          _displayNameController.text.trim().isNotEmpty &&
+      _isFormValid = AuthValidation.validateDisplayName(_displayNameController.text).isEmpty &&
+          AuthValidation.validateEmail(_emailController.text).isEmpty &&
+          AuthValidation.validatePassword(_passwordController.text).isEmpty &&
+          _confirmPasswordController.text == _passwordController.text &&
           _selectedCity != null &&
           _agreeToTerms;
     });

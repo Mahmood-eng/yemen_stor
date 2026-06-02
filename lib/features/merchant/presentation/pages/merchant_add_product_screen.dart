@@ -653,7 +653,7 @@ class _MerchantAddProductScreenState
                                 children: [
                                   Expanded(
                                     child: _buildTextField(
-                                      label: 'السعر (ريال يمني) *',
+                                      label: 'السعر  *',
                                       controller: _priceController,
                                       keyboardType:
                                           const TextInputType.numberWithOptions(

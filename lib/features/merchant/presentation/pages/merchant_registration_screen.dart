@@ -17,7 +17,8 @@ class MerchantRegistrationScreen extends ConsumerStatefulWidget {
       _MerchantRegistrationScreenState();
 }
 
-class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistrationScreen> {
+class _MerchantRegistrationScreenState
+    extends ConsumerState<MerchantRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _storeNameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -92,7 +93,10 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
     if (!_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('يرجى الموافقة على الشروط والأحكام.', style: TextStyle(fontFamily: 'Cairo')),
+          content: Text(
+            'يرجى الموافقة على الشروط والأحكام.',
+            style: TextStyle(fontFamily: 'Cairo'),
+          ),
         ),
       );
       return;
@@ -100,7 +104,10 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
     if (_selectedMarketObj == null || _selectedCategoryObj == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('يرجى اختيار السوق والقسم.', style: TextStyle(fontFamily: 'Cairo')),
+          content: Text(
+            'يرجى اختيار السوق والقسم.',
+            style: TextStyle(fontFamily: 'Cairo'),
+          ),
         ),
       );
       return;
@@ -157,7 +164,10 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('فشل في إرسال الطلب: $e', style: const TextStyle(fontFamily: 'Cairo')),
+            content: Text(
+              'فشل في إرسال الطلب: $e',
+              style: const TextStyle(fontFamily: 'Cairo'),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -179,7 +189,11 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: YemenStoreAppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new, size: 20, color: theme.appBarTheme.iconTheme?.color),
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              size: 20,
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
             onPressed: () => context.go(AppRoutes.home),
           ),
           title: Text(
@@ -227,7 +241,7 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
                           },
                         ),
                         const SizedBox(height: 12),
-                        
+
                         // --- اختيار السوق والفئة ---
                         if (_isMarketsLoading)
                           const Padding(
@@ -252,7 +266,7 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
                           ),
                         const SizedBox(height: 12),
                         _buildTextField(
-                          label: 'رابط شعار المتجر (URL) (اختياري)',
+                          label: 'رابط شعار المتجر (URL)',
                           controller: _logoUrlController,
                           hint: 'https://example.com/logo.jpg',
                           prefixIcon: Icons.image_outlined,
@@ -348,7 +362,9 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
                           },
                           title: Text(
                             'أوافق على جميع شروط وأحكام التجار وسياسة الخصوصية الخاصة بيمن ستور',
-                            style: textTheme.bodySmall?.copyWith(fontFamily: 'Cairo'),
+                            style: textTheme.bodySmall?.copyWith(
+                              fontFamily: 'Cairo',
+                            ),
                           ),
                           activeColor: colorScheme.primary,
                           controlAffinity: ListTileControlAffinity.leading,
@@ -368,7 +384,8 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
-                        disabledBackgroundColor: colorScheme.primary.withOpacity(0.5),
+                        disabledBackgroundColor: colorScheme.primary
+                            .withOpacity(0.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -388,7 +405,10 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
                                 const SizedBox(width: 12),
                                 const Text(
                                   'جاري إرسال الطلب وحفظ البيانات...',
-                                  style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             )
@@ -434,9 +454,9 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
           Text(
             title,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.bold,
-                ),
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const Divider(height: 24),
           child,
@@ -458,18 +478,34 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
         DropdownButtonFormField<MarketModel>(
           value: _selectedMarketObj,
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.store_outlined, color: theme.colorScheme.primary.withOpacity(0.7)),
+            prefixIcon: Icon(
+              Icons.store_outlined,
+              color: theme.colorScheme.primary.withOpacity(0.7),
+            ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
           items: _fetchedMarkets
-              .map((m) => DropdownMenuItem(value: m, child: Text(m.name, style: const TextStyle(fontFamily: 'Cairo'))))
+              .map(
+                (m) => DropdownMenuItem(
+                  value: m,
+                  child: Text(
+                    m.name,
+                    style: const TextStyle(fontFamily: 'Cairo'),
+                  ),
+                ),
+              )
               .toList(),
           onChanged: (value) {
             if (value != null) {
               setState(() {
                 _selectedMarketObj = value;
-                _selectedCategoryObj = value.categories.isNotEmpty ? value.categories.first : null;
+                _selectedCategoryObj = value.categories.isNotEmpty
+                    ? value.categories.first
+                    : null;
               });
             }
           },
@@ -494,12 +530,26 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
         DropdownButtonFormField<CategoryModel>(
           value: _selectedCategoryObj,
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.category_outlined, color: theme.colorScheme.primary.withOpacity(0.7)),
+            prefixIcon: Icon(
+              Icons.category_outlined,
+              color: theme.colorScheme.primary.withOpacity(0.7),
+            ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
           ),
           items: categories
-              .map((c) => DropdownMenuItem(value: c, child: Text(c.name, style: const TextStyle(fontFamily: 'Cairo'))))
+              .map(
+                (c) => DropdownMenuItem(
+                  value: c,
+                  child: Text(
+                    c.name,
+                    style: const TextStyle(fontFamily: 'Cairo'),
+                  ),
+                ),
+              )
               .toList(),
           onChanged: (value) {
             if (value != null) {
@@ -530,7 +580,10 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(prefixIcon, color: theme.colorScheme.primary.withOpacity(0.7)),
+        prefixIcon: Icon(
+          prefixIcon,
+          color: theme.colorScheme.primary.withOpacity(0.7),
+        ),
         labelStyle: theme.textTheme.bodyLarge?.copyWith(
           color: theme.colorScheme.onSurface.withOpacity(0.75),
           fontFamily: 'Cairo',
@@ -540,7 +593,10 @@ class _MerchantRegistrationScreenState extends ConsumerState<MerchantRegistratio
           fontFamily: 'Cairo',
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
     );
   }

@@ -41,6 +41,9 @@ import 'package:yemen_stor/features/notification/presentation/pages/notification
 import 'package:yemen_stor/features/digitalservices/presentation/pages/workers_list_screen.dart';
 import 'package:yemen_stor/features/digitalservices/presentation/pages/worker_registration_screen.dart';
 import 'package:yemen_stor/features/digitalservices/presentation/pages/wifi_network_details_screen.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/pages/worker_profile_screen.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/pages/worker_edit_profile_screen.dart';
+import 'package:yemen_stor/features/digitalservices/domain/entities/worker_entity.dart';
 
 class AppRoutes {
   static const String onboarding = '/onboarding';
@@ -85,6 +88,8 @@ class AppRoutes {
   static const String productDetails = '/markets/product-details';
   static const String workersList = '/digital-services/workers';
   static const String workerRegistration = '/digital-services/workers/register';
+  static const String workerProfile = '/digital-services/workers/profile';
+  static const String workerEditProfile = '/digital-services/workers/edit-profile';
   static const String wifiNetworkDetails = '/digital-services/wifi-networks/details';
 
   static final router = GoRouter(
@@ -247,6 +252,20 @@ class AppRoutes {
       GoRoute(
         path: workerRegistration,
         builder: (context, state) => const WorkerRegistrationScreen(),
+      ),
+      GoRoute(
+        path: workerProfile,
+        builder: (context, state) {
+          final worker = state.extra as WorkerEntity;
+          return WorkerProfileScreen(worker: worker);
+        },
+      ),
+      GoRoute(
+        path: workerEditProfile,
+        builder: (context, state) {
+          final worker = state.extra as WorkerEntity;
+          return WorkerEditProfileScreen(worker: worker);
+        },
       ),
       GoRoute(
         path: orderTracking,

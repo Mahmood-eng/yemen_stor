@@ -32,23 +32,23 @@ class DigitalServicesScreen extends StatelessWidget {
           ),
           actions: [
             IconButton(
-            icon: Icon(
-              Icons.notifications_none_rounded,
-              color: theme.appBarTheme.iconTheme?.color,
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                color: theme.appBarTheme.iconTheme?.color,
+              ),
+              onPressed: () {
+                context.push(AppRoutes.notifications);
+              },
             ),
-            onPressed: () {
-              context.push(AppRoutes.notifications);
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.shopping_cart_outlined,
-              color: theme.appBarTheme.iconTheme?.color,
+            IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: theme.appBarTheme.iconTheme?.color,
+              ),
+              onPressed: () {
+                context.push(AppRoutes.cart);
+              },
             ),
-            onPressed: () {
-              context.push(AppRoutes.cart);
-            },
-          ),
           ],
         ),
 
@@ -107,25 +107,28 @@ class DigitalServicesScreen extends StatelessWidget {
                     title: "عمالة مهنية",
                     icon: Icons.handyman_outlined,
                     iconColor: AppColors.iconBrown,
-                    onTap: () => context.push(AppRoutes.workersList, extra: 'عمالة مهنية'),
+                    onTap: () => context.push(
+                      AppRoutes.workersList,
+                      extra: 'عمالة مهنية',
+                    ),
                   ),
                   ServiceCategoryCard(
                     title: "كوادر علمية",
                     icon: Icons.school_outlined,
                     iconColor: AppColors.iconTeal,
-                    onTap: () => context.push(AppRoutes.workersList, extra: 'كوادر علمية'),
-                  ),
-                  ServiceCategoryCard(
-                    title: "مستشارين",
-                    icon: Icons.support_agent_outlined,
-                    iconColor: AppColors.iconCyan,
-                    onTap: () => context.push(AppRoutes.workersList, extra: 'مستشارين'),
+                    onTap: () => context.push(
+                      AppRoutes.workersList,
+                      extra: 'كوادر علمية',
+                    ),
                   ),
                   ServiceCategoryCard(
                     title: "استشارات مهنية",
                     icon: Icons.support_agent_outlined,
                     iconColor: AppColors.iconCyan,
-                    onTap: () => context.push(AppRoutes.workersList, extra: 'استشارات مهنية'),
+                    onTap: () => context.push(
+                      AppRoutes.workersList,
+                      extra: 'استشارات مهنية',
+                    ),
                   ),
                 ],
               ),

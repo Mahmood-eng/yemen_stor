@@ -663,12 +663,12 @@ class AppDrawer extends StatelessWidget {
         },
         child: Row(
           children: [
-            Icon(Icons.logout_rounded, color: theme.colorScheme.error),
+            Icon(Icons.logout_rounded, color: Colors.red),
             const SizedBox(width: 10),
             Text(
               'تسجيل الخروج',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.error,
+                color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),
             ),

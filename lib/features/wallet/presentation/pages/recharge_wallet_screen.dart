@@ -12,7 +12,8 @@ class RechargeWalletScreen extends ConsumerStatefulWidget {
   const RechargeWalletScreen({super.key});
 
   @override
-  ConsumerState<RechargeWalletScreen> createState() => _RechargeWalletScreenState();
+  ConsumerState<RechargeWalletScreen> createState() =>
+      _RechargeWalletScreenState();
 }
 
 class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
@@ -63,7 +64,8 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
 
   void _validateForm() {
     setState(() {
-      _isFormValid = _amountController.text.trim().isNotEmpty &&
+      _isFormValid =
+          _amountController.text.trim().isNotEmpty &&
           _uniqueCodeController.text.trim().isNotEmpty &&
           _selectedBank != null;
     });
@@ -80,7 +82,7 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
 
   void _submit() {
     if (!_isFormValid) return;
-    
+
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,12 +95,14 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
     if (_selectedCurrency == "ر.س") currencyCode = "SAR";
     if (_selectedCurrency == "\$") currencyCode = "USD";
 
-    ref.read(depositNotifierProvider.notifier).submitDeposit(
-      amount: amount,
-      currency: currencyCode,
-      bankId: _selectedBank!,
-      uniqueCode: _uniqueCodeController.text.trim(),
-    );
+    ref
+        .read(depositNotifierProvider.notifier)
+        .submitDeposit(
+          amount: amount,
+          currency: currencyCode,
+          bankId: _selectedBank!,
+          uniqueCode: _uniqueCodeController.text.trim(),
+        );
   }
 
   @override
@@ -109,7 +113,9 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
       if (next.isSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم إرسال طلب التغذية بنجاح. سيتم مراجعة الطلب قريباً.'),
+            content: Text(
+              'تم إرسال طلب التغذية بنجاح. سيتم مراجعة الطلب قريباً.',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -117,10 +123,7 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
         ref.read(depositNotifierProvider.notifier).reset();
       } else if (next.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
         );
       }
     });
@@ -156,7 +159,7 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
 
               const SizedBox(height: 15),
 
-              const Text("الرمز التعريفي / الفريد (Unique ID)"),
+              const Text("الرمز التعريفي / الفريد"),
               const SizedBox(height: 8),
               TextField(
                 controller: _uniqueCodeController,
@@ -198,7 +201,10 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
                       ),
                       child: const Text(
                         "تأكيد العملية والاستمرار",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
             ],

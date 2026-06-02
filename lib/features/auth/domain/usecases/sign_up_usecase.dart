@@ -1,4 +1,4 @@
-import 'package:yemen_stor/features/auth/domain/entities/user.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user_entity.dart';
 import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
 
 class SignUpUseCase {
@@ -6,7 +6,7 @@ class SignUpUseCase {
 
   SignUpUseCase(this.repository);
 
-  Future<User?> call(
+  Future<UserEntity?> call(
     String email,
     String password,
     String displayName,

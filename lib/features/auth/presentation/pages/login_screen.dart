@@ -35,8 +35,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _validateForm() {
     setState(() {
-      _isFormValid = _emailController.text.trim().isNotEmpty &&
-          _passwordController.text.isNotEmpty;
+      _isFormValid = AuthValidation.validateEmail(_emailController.text).isEmpty &&
+          AuthValidation.validatePassword(_passwordController.text).isEmpty;
     });
   }
 

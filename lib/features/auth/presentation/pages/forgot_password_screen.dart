@@ -27,7 +27,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   void _validateForm() {
     setState(() {
-      _isFormValid = _emailController.text.trim().isNotEmpty;
+      _isFormValid = AuthValidation.validateEmail(_emailController.text).isEmpty;
     });
   }
 

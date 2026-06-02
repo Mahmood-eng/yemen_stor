@@ -56,7 +56,9 @@ class ArtaMarketScreen extends ConsumerWidget {
             ),
             IconButton(
               icon: Icon(Icons.favorite_rounded, color: primaryColor),
-              onPressed: () => context.push(AppRoutes.artaFavorites), // We will add this route
+              onPressed: () => context.push(
+                AppRoutes.artaFavorites,
+              ), // We will add this route
             ),
           ],
         ),
@@ -78,16 +80,23 @@ class ArtaMarketScreen extends ConsumerWidget {
           children: [
             // Strict Warning Banner
             Container(
-              width: double.infinity,
-              color: Colors.red.shade900,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              width: MediaQuery.of(context).size.width * 0.94,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 245, 136, 11),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: const Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.white, size: 28),
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'تنبيه صارم: التطبيق غير مسؤول عن عمليات البيع المباشر والشراء بين المستخدمين هنا. يرجى أخذ الحيطة والحذر عند التعامل.',
+                      'تنبيه : التطبيق غير مسؤول عن عمليات البيع المباشر والشراء بين المستخدمين هنا. يرجى أخذ الحيطة والحذر عند التعامل.',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -98,7 +107,7 @@ class ArtaMarketScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            
+
             // Products List
             Expanded(
               child: productsAsync.when(
