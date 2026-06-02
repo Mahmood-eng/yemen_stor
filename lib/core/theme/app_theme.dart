@@ -24,7 +24,9 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.bgLight,
       cardColor: Colors.white,
-      dialogBackgroundColor: Colors.white,
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white.withOpacity(0.9),
+      ),
       dividerColor: Colors.grey.withOpacity(0.2),
       fontFamily: 'Cairo',
       appBarTheme: AppBarTheme(
@@ -99,7 +101,7 @@ class AppTheme {
       primary: AppColors.primaryDark, // أزرق فاتح ليظهر بوضوح
       secondary: AppColors.accent,
       surface: AppColors.bgDark,
-      onPrimary: Colors.black,
+      onPrimary: Colors.white,
       onSurface: AppColors.textPrimaryDark, // أبيض خالص للعناوين
       onSurfaceVariant: AppColors.textSecondaryDark, // رمادي فاتح للفرعي
     );
@@ -110,8 +112,9 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.bgDark,
       cardColor: AppColors.cardDark,
-      dialogBackgroundColor: AppColors.cardDark,
-      dividerColor: Colors.white.withOpacity(0.12),
+      dialogTheme: DialogThemeData(
+        backgroundColor: const Color(0xFF2C2C2C).withOpacity(0.9),
+      ),
       fontFamily: 'Cairo',
 
       appBarTheme: AppBarTheme(

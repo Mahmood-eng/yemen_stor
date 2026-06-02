@@ -5,6 +5,7 @@ abstract class MerchantRemoteDataSource {
   Future<void> registerShop(MerchantShopModel shop);
   Stream<MerchantShopModel?> getMerchantShop(String ownerId);
   Future<void> updateShopStatus(String shopId, String status);
+  Future<void> updateShop(MerchantShopModel shop);
 }
 
 class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
@@ -35,5 +36,10 @@ class MerchantRemoteDataSourceImpl implements MerchantRemoteDataSource {
   @override
   Future<void> updateShopStatus(String shopId, String status) async {
     await _firestore.collection('shops').doc(shopId).update({'status': status});
+  }
+
+  @override
+  Future<void> updateShop(MerchantShopModel shop) async {
+    await _firestore.collection('shops').doc(shop.id).update(shop.toJson());
   }
 }

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../providers/order_providers.dart';
 import '../widgets/tracking_map_widget.dart';
 import '../widgets/driver_info_widget.dart';
 import '../widgets/order_timeline_widget.dart';
+import '../../../../core/widgets/custom_loading_indicator.dart';
 
-class OrderTrackingScreen extends StatefulWidget {
+class OrderTrackingScreen extends ConsumerWidget {
   final String orderId;
   const OrderTrackingScreen({super.key, required this.orderId});
 
   @override
-  State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
-}
-
-class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final orderAsync = ref.watch(singleOrderStreamProvider(orderId));
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -24,19 +23,20 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         body: Stack(
           children: [
             const TrackingMapWidget(),
-            _buildBackButton(theme),
-            _buildDraggableSheet(theme, isDark),
+            _buildBackButton(context, theme),
+            _buildDraggableSheet(context, theme, isDark, orderAsync),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBackButton(ThemeData theme) {
+  Widget _buildBackButton(BuildContext context, ThemeData theme) {
     return Positioned(
       top: 50,
       right: 20,
       child: FloatingActionButton.small(
+        heroTag: 'back_btn',
         backgroundColor: theme.colorScheme.surface,
         child: Icon(
           Icons.arrow_back_ios_new,
@@ -48,19 +48,22 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildDraggableSheet(ThemeData theme, bool isDark) {
+  Widget _buildDraggableSheet(
+      BuildContext context, ThemeData theme, bool isDark, orderAsync) {
     return DraggableScrollableSheet(
       initialChildSize: 0.4,
       minChildSize: 0.35,
-      maxChildSize: 0.8,
+      maxChildSize: 0.85,
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(30)),
             boxShadow: [
               BoxShadow(
-                color: theme.shadowColor.withOpacity(isDark ? 0.6 : 0.2),
+                color: theme.shadowColor
+                    .withOpacity(isDark ? 0.6 : 0.2),
                 blurRadius: 10,
               ),
             ],
@@ -69,6 +72,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             controller: scrollController,
             padding: const EdgeInsets.all(25),
             children: [
+              // مقبض السحب
               Center(
                 child: Container(
                   width: 40,
@@ -80,11 +84,31 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const DriverInfoWidget(name: "أحمد سعيد المقطري"),
+              const DriverInfoWidget(name: 'السائق قادم...'),
               const Divider(height: 40),
-              const OrderTimelineWidget(),
-              const SizedBox(height: 30),
-              _buildOrderSummary(theme),
+              orderAsync.when(
+                loading: () => const Center(child: CustomLoadingIndicator()),
+                error: (err, _) => Text(
+                  'خطأ في تحميل الطلب: $err',
+                  style: const TextStyle(fontFamily: 'Cairo'),
+                ),
+                data: (order) {
+                  if (order == null) {
+                    return const Text(
+                      'لم يتم العثور على الطلب',
+                      style: TextStyle(fontFamily: 'Cairo'),
+                    );
+                  }
+                  return Column(
+                    children: [
+                      // Timeline يعتمد على حالة الطلب الحقيقية
+                      OrderTimelineWidget(status: order.status),
+                      const SizedBox(height: 30),
+                      _buildOrderSummary(context, theme, isDark, order),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
         );
@@ -92,16 +116,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildOrderSummary(ThemeData theme) {
-    final isDark = theme.brightness == Brightness.dark;
-    // تعريف بيانات الطلب التجريبية لحل مشكلة المتغير غير المعرف
-    final orderData = {
-      'id': widget.orderId,
-      'image': 'assets/images/perfume.jpg',
-      'items': 'عطر ساواج ديور الرجالي - 100 مل',
-      'shop': 'متجر النخبة للعطور',
-    };
-
+  Widget _buildOrderSummary(
+      BuildContext context, ThemeData theme, bool isDark, order) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -113,14 +129,30 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       ),
       child: Row(
         children: [
+          // صورة الطلب
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              orderData['image']!,
-              width: 65,
-              height: 65,
-              fit: BoxFit.cover,
-            ),
+            child: order.imageUrl.isNotEmpty
+                ? Image.network(
+                    order.imageUrl,
+                    width: 65,
+                    height: 65,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      width: 65,
+                      height: 65,
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.shopping_bag_outlined,
+                          color: Colors.grey),
+                    ),
+                  )
+                : Container(
+                    width: 65,
+                    height: 65,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.shopping_bag_outlined,
+                        color: Colors.grey),
+                  ),
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -128,7 +160,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "طلب رقم: #${orderData['id']}",
+                  'طلب رقم: #${order.id.substring(0, 6).toUpperCase()}',
                   style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.bold,
@@ -136,10 +168,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   ),
                 ),
                 Text(
-                  orderData['items']!,
+                  order.title,
                   style: const TextStyle(
                     fontFamily: 'Cairo',
-                    fontSize: 10,
+                    fontSize: 11,
                     color: Colors.grey,
                   ),
                   maxLines: 1,
@@ -147,7 +179,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  orderData['shop']!,
+                  order.storeName.isNotEmpty ? order.storeName : 'المتجر',
                   style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 11,
@@ -155,21 +187,33 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                Text(
+                  order.formattedPrice,
+                  style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 13,
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
-          // زر عرض الفاتورة / التفاصيل
-          TextButton(
-            onPressed: () {
-              // هنا يمكنك إضافة منطق عرض الفاتورة
-            },
-            child: const Text(
-              "عرض التفاصيل ",
+          // حالة الطلب
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: order.status.color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              order.status.label,
               style: TextStyle(
-                fontFamily: 'Cairo',
-                fontSize: 12,
-                color: Colors.blue,
+                color: order.status.color,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Cairo',
               ),
             ),
           ),

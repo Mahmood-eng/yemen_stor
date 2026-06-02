@@ -376,6 +376,7 @@ class _MerchantProductsScreenState extends ConsumerState<MerchantProductsScreen>
               },
             ),
             floatingActionButton: FloatingActionButton(
+              heroTag: 'merchant_add_product',
               onPressed: () {
                 context.push(AppRoutes.merchantAddProduct);
               },

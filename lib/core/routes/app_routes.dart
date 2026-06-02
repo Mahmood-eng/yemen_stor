@@ -7,6 +7,7 @@ import 'package:yemen_stor/features/onboarding/presentation/onboarding_screen.da
 import 'package:yemen_stor/features/setting/presentation/pages/settings_screen.dart';
 import 'package:yemen_stor/features/auth/presentation/pages/login_screen.dart';
 import 'package:yemen_stor/features/auth/presentation/pages/signup_screen.dart';
+import 'package:yemen_stor/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:yemen_stor/features/home/presentation/pages/home_screen.dart';
 import 'package:yemen_stor/features/home/presentation/pages/recommendations_screen.dart';
 import 'package:yemen_stor/features/orders/presentation/pages/orders_screen.dart';
@@ -25,9 +26,11 @@ import 'package:yemen_stor/features/merchant/presentation/pages/merchant_dashboa
 import 'package:yemen_stor/features/merchant/presentation/pages/merchant_orders_screen.dart';
 import 'package:yemen_stor/features/merchant/presentation/pages/merchant_products_screen.dart';
 import 'package:yemen_stor/features/merchant/presentation/pages/merchant_registration_screen.dart';
+import 'package:yemen_stor/features/merchant/presentation/pages/merchant_edit_shop_screen.dart';
 import 'package:yemen_stor/features/menu/presentation/pages/add_private_network_screen.dart';
 import 'package:yemen_stor/features/menu/presentation/pages/manage_cards_screen.dart';
-import 'package:yemen_stor/features/markets/presentation/pages/arta_market_screen.dart';
+import 'package:yemen_stor/features/arta_market/presentation/pages/arta_market_screen.dart';
+import 'package:yemen_stor/features/arta_market/presentation/pages/arta_favorites_screen.dart';
 import 'package:yemen_stor/features/markets/presentation/pages/markets_screen.dart';
 import 'package:yemen_stor/features/markets/presentation/pages/subcategories_screen.dart';
 import 'package:yemen_stor/features/shops/presentation/pages/shops_list_screen.dart';
@@ -35,11 +38,15 @@ import 'package:yemen_stor/features/shops/presentation/pages/shop_details_screen
 import 'package:yemen_stor/features/shops/presentation/pages/product_details_screen.dart';
 import 'package:yemen_stor/features/ai_assistant/presentation/pages/ai_chat_screen.dart';
 import 'package:yemen_stor/features/notification/presentation/pages/notifications_screen.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/pages/workers_list_screen.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/pages/worker_registration_screen.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/pages/wifi_network_details_screen.dart';
 
 class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String signup = '/signup';
+  static const String forgotPassword = '/forgot-password';
   static const String home = '/home';
   static const String recommendations = '/recommendations';
   static const String cart = '/cart';
@@ -62,6 +69,7 @@ class AppRoutes {
   static const String merchantProducts = '/merchant/products';
   static const String merchantOrders = '/merchant/orders';
   static const String merchantAddProduct = '/merchant/add-product';
+  static const String merchantEditShop = '/merchant/edit-shop';
   static const String addPrivateNetwork =
       '/manage-networks/add-private-network';
   static const String manageCards = '/manage-networks/manage-cards';
@@ -70,10 +78,14 @@ class AppRoutes {
   static const String aiChat = '/ai-chat';
   static const String markets = '/markets';
   static const String marketsArta = '/markets/arta';
+  static const String artaFavorites = '/markets/arta/favorites';
   static const String subcategories = '/markets/subcategories';
   static const String shopsList = '/markets/shops';
   static const String shopDetails = '/markets/shop-details';
   static const String productDetails = '/markets/product-details';
+  static const String workersList = '/digital-services/workers';
+  static const String workerRegistration = '/digital-services/workers/register';
+  static const String wifiNetworkDetails = '/digital-services/wifi-networks/details';
 
   static final router = GoRouter(
     initialLocation: FirebaseAuth.instance.currentUser != null
@@ -90,6 +102,10 @@ class AppRoutes {
       GoRoute(
         path: signup,
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: profile,
@@ -126,37 +142,47 @@ class AppRoutes {
         builder: (context, state) => const ArtaMarketScreen(),
       ),
       GoRoute(
+        path: artaFavorites,
+        builder: (context, state) => const ArtaFavoritesScreen(),
+      ),
+      GoRoute(
         path: subcategories,
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          final market = extra['market'] as Map<String, dynamic>;
-          final subcategory = extra['subcategory'] as Map<String, dynamic>;
-          return SubcategoriesScreen(market: market, subcategory: subcategory);
+          final extra = state.extra as Map? ?? {};
+          final market = extra['market'] as Map? ?? {};
+          final subcategory = extra['subcategory'] as Map? ?? {};
+          return SubcategoriesScreen(
+            market: Map<String, dynamic>.from(market), 
+            subcategory: Map<String, dynamic>.from(subcategory),
+          );
         },
       ),
       GoRoute(
         path: shopsList,
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          final market = extra['market'] as Map<String, dynamic>;
-          final subcategory = extra['subcategory'] as Map<String, dynamic>;
-          return ShopsListScreen(market: market, subcategory: subcategory);
+          final extra = state.extra as Map? ?? {};
+          final market = extra['market'] as Map? ?? {};
+          final subcategory = extra['subcategory'] as Map? ?? {};
+          return ShopsListScreen(
+            market: Map<String, dynamic>.from(market), 
+            subcategory: Map<String, dynamic>.from(subcategory),
+          );
         },
       ),
       GoRoute(
         path: shopDetails,
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          final shop = extra['shop'] as Map<String, dynamic>;
-          return ShopDetailsScreen(shop: shop);
+          final extra = state.extra as Map? ?? {};
+          final shop = extra['shop'] as Map? ?? {};
+          return ShopDetailsScreen(shop: Map<String, dynamic>.from(shop));
         },
       ),
       GoRoute(
         path: productDetails,
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
-          final product = extra['product'] as Map<String, dynamic>;
-          return ProductDetailsScreen(product: product);
+          final extra = state.extra as Map? ?? {};
+          final product = extra['product'] as Map? ?? {};
+          return ProductDetailsScreen(product: Map<String, dynamic>.from(product));
         },
       ),
       GoRoute(
@@ -167,6 +193,13 @@ class AppRoutes {
       GoRoute(
         path: wifiNetworks,
         builder: (context, state) => const WifiNetworksScreen(),
+      ),
+      GoRoute(
+        path: wifiNetworkDetails,
+        builder: (context, state) {
+          final network = state.extra as Map? ?? {};
+          return WifiNetworkDetailsScreen(network: Map<String, dynamic>.from(network));
+        },
       ),
       GoRoute(
         path: merchantRegistration,
@@ -189,6 +222,10 @@ class AppRoutes {
         builder: (context, state) => const MerchantAddProductScreen(),
       ),
       GoRoute(
+        path: merchantEditShop,
+        builder: (context, state) => const MerchantEditShopScreen(),
+      ),
+      GoRoute(
         path: addPrivateNetwork,
         builder: (context, state) => const AddPrivateNetworkScreen(),
       ),
@@ -199,6 +236,25 @@ class AppRoutes {
       GoRoute(
         path: transactionHistory,
         builder: (context, state) => const TransactionHistoryScreen(),
+      ),
+      GoRoute(
+        path: workersList,
+        builder: (context, state) {
+          final category = state.extra as String? ?? 'الكل';
+          return WorkersListScreen(category: category);
+        },
+      ),
+      GoRoute(
+        path: workerRegistration,
+        builder: (context, state) => const WorkerRegistrationScreen(),
+      ),
+      GoRoute(
+        path: orderTracking,
+        builder: (context, state) {
+          final extra = state.extra as Map? ?? {};
+          final orderId = extra['orderId'] as String? ?? '';
+          return OrderTrackingScreen(orderId: orderId);
+        },
       ),
 
       // 2. هيكل التطبيق الرئيسي مع الشريط السفلي

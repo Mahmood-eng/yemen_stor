@@ -22,6 +22,7 @@ dependencies:
   cloud_firestore: any
   firebase_auth: any
   shared_preferences: ^2.1.1
+  local_auth: ^3.0.1
 
 dev_dependencies:
   flutter_test:

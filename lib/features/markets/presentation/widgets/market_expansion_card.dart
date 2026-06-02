@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
 import 'package:yemen_stor/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/widgets/custom_loading_indicator.dart';
 import 'package:yemen_stor/features/markets/data/models/market_model.dart';
 
 class MarketExpansionCard extends StatelessWidget {
@@ -30,8 +31,8 @@ class MarketExpansionCard extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         leading: CircleAvatar(
           backgroundColor: isArta
-              ? Colors.orange.withOpacity(0.1)
-              : AppColors.primary.withOpacity(0.1),
+              ? Colors.orange.withValues(alpha: 0.1)
+              : AppColors.primary.withValues(alpha: 0.1),
           child: Icon(
             market.icon,
             color: isArta ? Colors.orange : AppColors.primary,
@@ -90,7 +91,7 @@ class MarketExpansionCard extends StatelessWidget {
               child: Row(
                 children: [
                   CircleAvatar(
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                     child: Icon(market.icon, color: AppColors.primary),
                   ),
                   const SizedBox(width: 15),
@@ -123,7 +124,7 @@ class MarketExpansionCard extends StatelessWidget {
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CustomLoadingIndicator());
                   }
 
                   if (snapshot.hasError) {
@@ -175,7 +176,7 @@ class MarketExpansionCard extends StatelessWidget {
                             Navigator.pop(context); // Close bottom sheet
                             // الانتقال إلى شاشة الأقسام الفرعية أولاً
                             context.push(
-                              '/subcategories', // تأكد أن هذا هو المسار الصحيح في AppRoutes
+                              AppRoutes.subcategories,
                               extra: {
                                 'market': market.toJson(),
                                 'subcategory': legacySub,

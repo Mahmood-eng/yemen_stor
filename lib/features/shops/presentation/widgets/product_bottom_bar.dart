@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
 import '../../data/models/product_model.dart';
+import '../../../orders/presentation/providers/cart_providers.dart';
 
-class ProductBottomBar extends StatelessWidget {
+class ProductBottomBar extends ConsumerWidget {
   final ProductModel product;
 
   const ProductBottomBar({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -33,7 +37,20 @@ class ProductBottomBar extends StatelessWidget {
           children: [
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  // Buy now: Add to cart and navigate to CartScreen
+                  await ref.read(cartActionsProvider).addToCart(
+                    productId: product.id,
+                    productName: product.name,
+                    price: product.price,
+                    imageUrl: product.images.isNotEmpty ? product.images.first : '',
+                    shopId: product.shopId,
+                    shopName: product.shopName,
+                  );
+                  if (context.mounted) {
+                    context.push(AppRoutes.cart);
+                  }
+                },
                 icon: Icon(Icons.bolt, color: theme.colorScheme.onPrimary),
                 label: Text(
                   "إشتري الآن",
@@ -62,7 +79,29 @@ class ProductBottomBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: IconButton(
-                onPressed: () {},
+                onPressed: () async {
+                  // Add to cart and show nice snackbar
+                  await ref.read(cartActionsProvider).addToCart(
+                    productId: product.id,
+                    productName: product.name,
+                    price: product.price,
+                    imageUrl: product.images.isNotEmpty ? product.images.first : '',
+                    shopId: product.shopId,
+                    shopName: product.shopName,
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "تم إضافة المنتج إلى السلة ✓",
+                          style: TextStyle(fontFamily: 'Cairo'),
+                        ),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  }
+                },
                 icon: Icon(Icons.add_shopping_cart, color: theme.colorScheme.secondary),
               ),
             ),

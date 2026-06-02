@@ -655,7 +655,12 @@ class AppDrawer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: InkWell(
-        onTap: () {},
+        onTap: () async {
+          await fb_auth.FirebaseAuth.instance.signOut();
+          if (context.mounted) {
+            context.go(AppRoutes.login);
+          }
+        },
         child: Row(
           children: [
             Icon(Icons.logout_rounded, color: theme.colorScheme.error),

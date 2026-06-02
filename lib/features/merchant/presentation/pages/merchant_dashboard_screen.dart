@@ -146,12 +146,22 @@ class _MerchantDashboardScreenState extends ConsumerState<MerchantDashboardScree
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'أهلاً بك مجدداً، متجر $storeName',
-                            style: textTheme.titleMedium?.copyWith(
-                              fontFamily: 'Cairo',
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'أهلاً بك مجدداً، متجر $storeName',
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => context.push(AppRoutes.merchantEditShop),
+                                icon: Icon(Icons.edit_note, color: colorScheme.primary, size: 28),
+                                tooltip: 'تعديل بيانات المتجر',
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 6),
                           Text(

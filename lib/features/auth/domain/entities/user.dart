@@ -12,7 +12,9 @@ class User {
   final String? imageUrl;
   final String? password;
   final String? confirmPassword;
-
+  final double balanceYER;
+  final double balanceSAR;
+  final double balanceUSD;
 
   User({
     required this.id,
@@ -28,6 +30,9 @@ class User {
     this.imageUrl,
     this.password,
     this.confirmPassword,
+    this.balanceYER = 0.0,
+    this.balanceSAR = 0.0,
+    this.balanceUSD = 0.0,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -45,6 +50,9 @@ class User {
       imageUrl: json['imageUrl'] as String?,
       password: json['password'] as String?,
       confirmPassword: json['confirmPassword'] as String?,
+      balanceYER: (json['balanceYER'] as num?)?.toDouble() ?? 0.0,
+      balanceSAR: (json['balanceSAR'] as num?)?.toDouble() ?? 0.0,
+      balanceUSD: (json['balanceUSD'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -63,6 +71,9 @@ class User {
       'imageUrl': imageUrl,
       'password': password,
       'confirmPassword': confirmPassword,
+      'balanceYER': balanceYER,
+      'balanceSAR': balanceSAR,
+      'balanceUSD': balanceUSD,
     };
   }
 
@@ -80,7 +91,9 @@ class User {
     String? accountNumber,
     String? balance,
     String? role,
-
+    double? balanceYER,
+    double? balanceSAR,
+    double? balanceUSD,
   }) {
     return User(
       id: id ?? this.id,
@@ -96,6 +109,9 @@ class User {
       imageUrl: imageUrl ?? this.imageUrl,
       password: password ?? this.password,
       confirmPassword: confirmPassword ?? this.confirmPassword,
+      balanceYER: balanceYER ?? this.balanceYER,
+      balanceSAR: balanceSAR ?? this.balanceSAR,
+      balanceUSD: balanceUSD ?? this.balanceUSD,
     );
   }
 }

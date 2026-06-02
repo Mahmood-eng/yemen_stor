@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import '../../data/models/product_model.dart';
 import '../../../../core/widgets/yemen_store_app_bar.dart';
+import '../../../orders/presentation/providers/favorites_providers.dart';
 import '../widgets/product_info_widget.dart';
 import '../widgets/product_specifications_widget.dart';
 import '../widgets/shop_info_widget.dart';
 import '../widgets/product_bottom_bar.dart';
+import '../../../../core/widgets/custom_favorite_button.dart';
 
-class ProductDetailsScreen extends StatefulWidget {
+class ProductDetailsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
-  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+  ConsumerState<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   double _productRatingInput = 5.0;
   late final TextEditingController _productCommentController;
   bool _isSubmittingProductReview = false;
@@ -94,6 +97,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final initialProductModel = ProductModel.fromJson(widget.product);
     final productId = initialProductModel.id;
 
+    final favoritesList = ref.watch(favoritesStreamProvider).value ?? [];
+    final isFav = favoritesList.any((item) => item.productId == productId);
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: StreamBuilder<DocumentSnapshot>(
@@ -125,12 +131,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   icon: Icon(Icons.share_outlined, color: theme.appBarTheme.iconTheme?.color),
                   onPressed: () {},
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.favorite_border,
-                    color: theme.colorScheme.secondary,
-                  ),
-                  onPressed: () {},
+                CustomFavoriteButton(
+                  isFavorite: isFav,
+                  onTap: () {
+                    ref.read(favoritesActionsProvider).toggleFavorite(
+                      productId: productModel.id,
+                      productName: productModel.name,
+                      price: productModel.hasDiscount ? productModel.price : productModel.originalPrice ?? productModel.price,
+                      imageUrl: productModel.images.isNotEmpty ? productModel.images.first : '',
+                      description: productModel.description,
+                    );
+                  },
                 ),
               ],
             ),

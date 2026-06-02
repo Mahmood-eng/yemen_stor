@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
 import 'package:yemen_stor/features/markets/data/models/market_model.dart';
 import '../widgets/market_expansion_card.dart';
+import 'package:yemen_stor/core/widgets/custom_loading_indicator.dart';
 
 class MarketsScreen extends StatelessWidget {
   static const String id = 'markets_screen';
@@ -52,7 +53,7 @@ class MarketsScreen extends StatelessWidget {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CustomLoadingIndicator());
                 }
                 if (snapshot.hasError) {
                   return Center(

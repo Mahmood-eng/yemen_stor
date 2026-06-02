@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:yemen_stor/core/providers/theme_provider.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
 import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
@@ -19,6 +20,10 @@ class SettingsScreen extends ConsumerWidget {
         .snapshots()
         .map((snapshot) => snapshot.data());
   }
+
+  // Local state providers
+  static final notificationsProvider = StateProvider<bool>((ref) => true);
+  static final biometricsProvider = StateProvider<bool>((ref) => false);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -135,31 +140,132 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 16),
 
             Text(
-              'الدعم',
+              'الخصوصية والأمان',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Card(
-              child: ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: const Text('مركز المساعدة'),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                onTap: () {},
+              child: Column(
+                children: [
+                  SwitchListTile(
+                    title: const Text('الإشعارات'),
+                    subtitle: const Text('تلقي تنبيهات بالطلبات والعروض'),
+                    value: ref.watch(notificationsProvider),
+                    onChanged: (val) => ref.read(notificationsProvider.notifier).state = val,
+                    activeColor: theme.colorScheme.primary,
+                  ),
+                  const Divider(height: 1),
+                  SwitchListTile(
+                    title: const Text('قفل التطبيق (بصمة الوجه / الأصبع)'),
+                    subtitle: const Text('حماية التطبيق باستخدام المقاييس الحيوية'),
+                    value: ref.watch(biometricsProvider),
+                    onChanged: (val) async {
+                      if (val) {
+                        final LocalAuthentication auth = LocalAuthentication();
+                        try {
+                          final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+                          final bool canAuthenticate = canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+                          
+                          if (canAuthenticate) {
+                            final bool didAuthenticate = await auth.authenticate(
+                              localizedReason: 'الرجاء التحقق من هويتك لتفعيل قفل التطبيق',
+                              biometricOnly: true,
+                            );
+                            
+                            if (didAuthenticate) {
+                              ref.read(biometricsProvider.notifier).state = true;
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('تم تفعيل قفل البصمة بنجاح')),
+                                );
+                              }
+                            }
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('جهازك لا يدعم البصمة أو غير مفعلة')),
+                              );
+                            }
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('حدث خطأ أثناء تفعيل البصمة')),
+                            );
+                          }
+                        }
+                      } else {
+                        ref.read(biometricsProvider.notifier).state = false;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('تم إلغاء قفل البصمة')),
+                        );
+                      }
+                    },
+                    activeColor: theme.colorScheme.primary,
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 16),
 
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: const Text('حول التطبيق'),
-                subtitle: const Text('إصدار 1.0.0'),
-                onTap: () {},
+            Text(
+              'الدعم الفني',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.help_outline),
+                    title: const Text('مركز المساعدة'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                    onTap: () {},
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.feedback_outlined),
+                    title: const Text('إرسال ملاحظات (Feedback)'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('سيتم توفير نافذة إرسال الملاحظات قريباً')),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text('حول التطبيق'),
+                    subtitle: const Text('إصدار 1.0.0'),
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            ElevatedButton.icon(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (context.mounted) {
+                  context.go(AppRoutes.login);
+                }
+              },
+              icon: const Icon(Icons.logout, color: Colors.white),
+              label: const Text('تسجيل الخروج', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade800,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 30),
           ],
         ),
       ),

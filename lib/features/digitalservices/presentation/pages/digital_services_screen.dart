@@ -65,7 +65,7 @@ class DigitalServicesScreen extends StatelessWidget {
               const ServicesBanner(),
               const SizedBox(height: 22),
 
-              const SectionTitle(title: "اتصالات"),
+              const SectionTitle(title: "اتصالات وشبكات"),
               const SizedBox(height: 15),
               ServicesGrid(
                 children: [
@@ -80,16 +80,6 @@ class DigitalServicesScreen extends StatelessWidget {
                     icon: Icons.wifi,
                     iconColor: AppColors.iconBlue,
                     onTap: () => context.push(AppRoutes.wifiNetworks),
-                  ),
-                  const ServiceCategoryCard(
-                    title: "باقات",
-                    icon: Icons.cloud_upload,
-                    iconColor: AppColors.iconLightBlue,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "خدمات أخرى",
-                    icon: Icons.settings_outlined,
-                    iconColor: AppColors.iconGrey,
                   ),
                 ],
               ),
@@ -106,31 +96,6 @@ class DigitalServicesScreen extends StatelessWidget {
                     iconColor: AppColors.iconPurple,
                     onTap: () => context.push(AppRoutes.aiSubscription),
                   ),
-                  const ServiceCategoryCard(
-                    title: "برامج تصميم",
-                    icon: Icons.dashboard_customize,
-                    iconColor: AppColors.iconPink,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "برامج إنتاجية",
-                    icon: Icons.work_outline,
-                    iconColor: AppColors.iconGreen,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "منصات تعليمية",
-                    icon: Icons.school_outlined,
-                    iconColor: AppColors.iconTeal,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "منصات ترفيهية",
-                    icon: Icons.movie_outlined,
-                    iconColor: AppColors.iconRedAccent,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "محتوى مرئي",
-                    icon: Icons.play_circle_fill,
-                    iconColor: AppColors.iconRed,
-                  ),
                 ],
               ),
               const SizedBox(height: 25),
@@ -138,71 +103,37 @@ class DigitalServicesScreen extends StatelessWidget {
               const SizedBox(height: 15),
               ServicesGrid(
                 children: [
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "عمالة مهنية",
                     icon: Icons.handyman_outlined,
                     iconColor: AppColors.iconBrown,
+                    onTap: () => context.push(AppRoutes.workersList, extra: 'عمالة مهنية'),
                   ),
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "كوادر علمية",
                     icon: Icons.school_outlined,
                     iconColor: AppColors.iconTeal,
+                    onTap: () => context.push(AppRoutes.workersList, extra: 'كوادر علمية'),
                   ),
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "مستشارين",
                     icon: Icons.support_agent_outlined,
                     iconColor: AppColors.iconCyan,
+                    onTap: () => context.push(AppRoutes.workersList, extra: 'مستشارين'),
                   ),
-                  const ServiceCategoryCard(
+                  ServiceCategoryCard(
                     title: "استشارات مهنية",
                     icon: Icons.support_agent_outlined,
                     iconColor: AppColors.iconCyan,
+                    onTap: () => context.push(AppRoutes.workersList, extra: 'استشارات مهنية'),
                   ),
                 ],
               ),
               const SizedBox(height: 25),
-              const SectionTitle(title: "ألعاب إلكترونية"),
+              const SectionTitle(title: "سجلات وتقارير"),
               const SizedBox(height: 15),
               ServicesGrid(
                 children: [
-                  const ServiceCategoryCard(
-                    title: "شحن العاب",
-                    icon: Icons.videogame_asset,
-                    iconColor: AppColors.iconGreen,
-                  ),
-
-                  const ServiceCategoryCard(
-                    title: "بطاقات هدايا",
-                    icon: Icons.card_giftcard,
-                    iconColor: AppColors.iconRedAccent,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "اشتراكات ألعاب",
-                    icon: Icons.gamepad_outlined,
-                    iconColor: AppColors.iconDeepPurple,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              const SectionTitle(title: "مالية "),
-              const SizedBox(height: 15),
-              ServicesGrid(
-                children: [
-                  const ServiceCategoryCard(
-                    title: "تحويلات مالية",
-                    icon: Icons.account_balance_wallet_outlined,
-                    iconColor: AppColors.iconIndigo,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "دفع فواتير",
-                    icon: Icons.receipt_long_outlined,
-                    iconColor: AppColors.iconOrangeAccent,
-                  ),
-                  const ServiceCategoryCard(
-                    title: "خدمات بنكية",
-                    icon: Icons.account_balance_outlined,
-                    iconColor: AppColors.iconBlueGrey,
-                  ),
                   ServiceCategoryCard(
                     title: "سجل العمليات",
                     icon: Icons.history,
@@ -219,25 +150,17 @@ class DigitalServicesScreen extends StatelessWidget {
         floatingActionButton: Builder(
           builder: (context) {
             final theme = Theme.of(context);
-            return FloatingActionButton.extended(
+            return FloatingActionButton(
+              heroTag: 'digital_services_fab',
               onPressed: () => context.push(AppRoutes.transactionHistory),
               backgroundColor: theme.colorScheme.primary,
-              icon: Icon(
-                Icons.history,
-                color: theme.colorScheme.onPrimary,
-                size: 20,
-              ),
-              label: Text(
-                "آخر العمليات",
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 12,
-                  color: theme.colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                Icons.history,
+                color: theme.colorScheme.onPrimary,
+                size: 24,
               ),
             );
           },

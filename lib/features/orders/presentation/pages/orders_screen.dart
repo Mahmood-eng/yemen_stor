@@ -1,58 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../providers/order_providers.dart';
 import '../widgets/order_card.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_status.dart';
 
-class OrdersScreen extends StatefulWidget {
+class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
 
   @override
-  State<OrdersScreen> createState() => _OrdersScreenState();
-}
-
-class _OrdersScreenState extends State<OrdersScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final ordersAsync = ref.watch(userOrdersStreamProvider);
 
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: YemenStoreAppBar(
-          title: const Text("سجل طلباتي"),
-           leading: IconButton(
-          icon: Icon(
-            Icons.menu_rounded,
-            color: theme.appBarTheme.iconTheme?.color,
-          ),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
-        
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications_none_rounded,
-              color: theme.appBarTheme.iconTheme?.color,
+          title: const Text('سجل طلباتي'),
+          leading: const SizedBox.shrink(),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                color: theme.appBarTheme.iconTheme?.color,
+              ),
+              onPressed: () => context.push(AppRoutes.notifications),
             ),
-            onPressed: () {
-              context.push(AppRoutes.notifications);
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.shopping_cart_outlined,
-              color: theme.appBarTheme.iconTheme?.color,
+            IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: theme.appBarTheme.iconTheme?.color,
+              ),
+              onPressed: () => context.push(AppRoutes.cart),
             ),
-            onPressed: () {
-              context.push(AppRoutes.cart);
-            },
-          ),
-        ],
+          ],
           bottom: TabBar(
             indicatorColor: theme.colorScheme.primary,
             labelColor: theme.colorScheme.primary,
@@ -64,21 +49,40 @@ class _OrdersScreenState extends State<OrdersScreen> {
               fontSize: 13,
             ),
             tabs: const [
-              Tab(text: "النشطة"),
-              Tab(text: "المكتملة"),
-              Tab(text: "الملغاة"),
+              Tab(text: 'النشطة'),
+              Tab(text: 'المكتملة'),
+              Tab(text: 'الملغاة'),
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildOrdersList(context, [
-              OrderStatus.onWay,
-              OrderStatus.processing,
-            ]),
-            _buildOrdersList(context, [OrderStatus.completed]),
-            _buildOrdersList(context, [OrderStatus.canceled]),
-          ],
+        body: ordersAsync.when(
+          loading: () =>
+              const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(
+            child: Text(
+              'حدث خطأ: $err',
+              style: const TextStyle(fontFamily: 'Cairo'),
+            ),
+          ),
+          data: (orders) => TabBarView(
+            children: [
+              _buildOrdersList(
+                context,
+                orders,
+                [OrderStatus.onWay, OrderStatus.processing],
+              ),
+              _buildOrdersList(
+                context,
+                orders,
+                [OrderStatus.completed],
+              ),
+              _buildOrdersList(
+                context,
+                orders,
+                [OrderStatus.canceled],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -86,47 +90,23 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   Widget _buildOrdersList(
     BuildContext context,
+    List<OrderModel> allOrders,
     List<OrderStatus> filterStatus,
   ) {
-    final mockOrders = [
-      OrderModel(
-        id: "1",
-        title: "عطر ساواج ديور الرجالي - 100 مل",
-        price: "45,000",
-        status: OrderStatus.onWay,
-        imageset: Image.asset(
-          "assets/images/perfume.jpg",
-          width: 85,
-          height: 85,
-          fit: BoxFit.cover,
-        ),
-        storeName: "متجر النخبة للعطور",
-        storeAddress: "شارع جمال",
-        marketName: "سوق الجمال",
-        categoryName: "عطور",
-        time: "اليوم، 10:30 ص",
-      ),
-      // ... بقية البيانات
-    ];
+    final filtered =
+        allOrders.where((o) => filterStatus.contains(o.status)).toList();
 
-    final filteredOrders = mockOrders
-        .where((o) => filterStatus.contains(o.status))
-        .toList();
-
-    if (filteredOrders.isEmpty) return _buildEmptyState(context);
+    if (filtered.isEmpty) return _buildEmptyState(context);
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      itemCount: filteredOrders.length,
+      itemCount: filtered.length,
       itemBuilder: (context, index) {
-        final order = filteredOrders[index];
+        final order = filtered[index];
         return OrderCard(
           order: order,
           onTrackTap: () {
-            context.pushNamed(
-              AppRoutes.orderTracking,
-              pathParameters: {'orderId': order.id},
-            );
+            context.push('${AppRoutes.orders}/tracking/${order.id}');
           },
         );
       },
@@ -146,7 +126,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
           const SizedBox(height: 15),
           Text(
-            "لا توجد طلبات هنا بعد",
+            'لا توجد طلبات هنا بعد',
             style: TextStyle(
               color: isDark ? Colors.white38 : Colors.grey,
               fontFamily: 'Cairo',

@@ -22,11 +22,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
-  bool _rememberMe = false;
+  bool _rememberMe = true;
+  bool _isFormValid = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateForm);
+    _passwordController.addListener(_validateForm);
+  }
+
+  void _validateForm() {
+    setState(() {
+      _isFormValid = _emailController.text.trim().isNotEmpty &&
+          _passwordController.text.isNotEmpty;
+    });
+  }
+
+  @override
   void dispose() {
+    _emailController.removeListener(_validateForm);
+    _passwordController.removeListener(_validateForm);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -149,7 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // TODO: Implement forgot password
+                                context.push(AppRoutes.forgotPassword);
                               },
                               child: const Text(
                                 "نسيت كلمة المرور؟",
@@ -165,9 +182,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        CustomButton(
-                          text: authState.isLoading ? "جاري التحميل..." : "تسجيل الدخول",
-                          onPressed: authState.isLoading ? null : _signIn,
+                        ElevatedButton(
+                          onPressed: (!_isFormValid || authState.isLoading) ? null : _signIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            minimumSize: const Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: authState.isLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  "تسجيل الدخول",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                         const SizedBox(height: 20),
 

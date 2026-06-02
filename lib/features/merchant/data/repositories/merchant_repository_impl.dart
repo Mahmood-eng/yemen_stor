@@ -43,4 +43,30 @@ class MerchantRepositoryImpl implements MerchantRepository {
   Future<void> updateShopStatus(String shopId, String status) async {
     await remoteDataSource.updateShopStatus(shopId, status);
   }
+
+  @override
+  Future<void> updateShop(MerchantShopEntity shop) async {
+    final model = MerchantShopModel(
+      id: shop.id,
+      name: shop.name,
+      description: shop.description,
+      marketId: shop.marketId,
+      marketName: shop.marketName,
+      categoryId: shop.categoryId,
+      categoryName: shop.categoryName,
+      marketType: shop.marketType,
+      logoUrl: shop.logoUrl,
+      images: shop.images,
+      phone: shop.phone,
+      address: shop.address,
+      ownerName: shop.ownerName,
+      documentNumber: shop.documentNumber,
+      documentUrl: shop.documentUrl,
+      ownerId: shop.ownerId,
+      status: shop.status,
+      rating: shop.rating,
+      createdAt: shop.createdAt,
+    );
+    await remoteDataSource.updateShop(model);
+  }
 }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/widgets/custom_favorite_button.dart';
+import '../../../orders/presentation/providers/favorites_providers.dart';
+import '../../../orders/presentation/providers/cart_providers.dart';
 import '../../data/models/product_model.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends ConsumerWidget {
   final ProductModel product;
   final String marketType;
 
@@ -14,7 +18,7 @@ class ProductCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -126,8 +130,19 @@ class ProductCard extends StatelessWidget {
                       const SizedBox(height: 10),
                       // زر شراء الآن
                       ElevatedButton.icon(
-                        onPressed: () {
-                          // منطق الشراء
+                        onPressed: () async {
+                          // إضافة المنتج للسلة ثم الانتقال إليها
+                          await ref.read(cartActionsProvider).addToCart(
+                            productId: product.id,
+                            productName: product.name,
+                            price: product.hasDiscount ? product.price : product.originalPrice ?? product.price,
+                            imageUrl: product.images.isNotEmpty ? product.images.first : '',
+                            shopId: product.shopId,
+                            shopName: product.shopName,
+                          );
+                          if (context.mounted) {
+                            context.push(AppRoutes.cart);
+                          }
                         },
                         icon: const Icon(Icons.bolt, size: 16),
                         label: const Text(
@@ -160,8 +175,25 @@ class ProductCard extends StatelessWidget {
               top: 15,
               right: 15,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   // إضافة للسلة
+                  await ref.read(cartActionsProvider).addToCart(
+                    productId: product.id,
+                    productName: product.name,
+                    price: product.hasDiscount ? product.price : product.originalPrice ?? product.price,
+                    imageUrl: product.images.isNotEmpty ? product.images.first : '',
+                    shopId: product.shopId,
+                    shopName: product.shopName,
+                  );
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('تمت الإضافة إلى السلة بنجاح', style: const TextStyle(fontFamily: 'Cairo')),
+                        backgroundColor: Colors.green,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(8),
@@ -217,29 +249,27 @@ class ProductCard extends StatelessWidget {
             Positioned(
               top: product.hasDiscount ? 44 : 15,
               left: 15,
-              child: GestureDetector(
-                onTap: () {
-                  // إضافة للمفضلة
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final favoritesAsync = ref.watch(favoritesStreamProvider);
+                  final isFavorite = favoritesAsync.maybeWhen(
+                    data: (favList) => favList.any((item) => item.productId == product.id),
+                    orElse: () => false,
+                  );
+
+                  return CustomFavoriteButton(
+                    isFavorite: isFavorite,
+                    onTap: () {
+                      ref.read(favoritesActionsProvider).toggleFavorite(
+                        productId: product.id,
+                        productName: product.name,
+                        price: product.hasDiscount ? product.price : product.originalPrice ?? product.price,
+                        imageUrl: product.images.isNotEmpty ? product.images.first : '',
+                        description: product.description,
+                      );
+                    },
+                  );
                 },
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      if (!isDark)
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 5,
-                        ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.favorite_border,
-                    size: 16,
-                    color: theme.colorScheme.secondary,
-                  ),
-                ),
               ),
             ),
           ],

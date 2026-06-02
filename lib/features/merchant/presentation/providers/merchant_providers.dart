@@ -6,6 +6,8 @@ import '../../domain/repositories/merchant_repository.dart';
 import '../../domain/usecases/register_shop_usecase.dart';
 import '../../domain/usecases/get_merchant_shop_usecase.dart';
 import '../../domain/usecases/update_shop_status_usecase.dart';
+import '../../domain/usecases/update_shop_usecase.dart';
+
 
 final merchantRemoteDataSourceProvider = Provider<MerchantRemoteDataSource>((ref) {
   return MerchantRemoteDataSourceImpl();
@@ -29,6 +31,11 @@ final getMerchantShopUseCaseProvider = Provider<GetMerchantShopUseCase>((ref) {
 final updateShopStatusUseCaseProvider = Provider<UpdateShopStatusUseCase>((ref) {
   final repository = ref.watch(merchantRepositoryProvider);
   return UpdateShopStatusUseCase(repository);
+});
+
+final updateShopUseCaseProvider = Provider<UpdateShopUseCase>((ref) {
+  final repository = ref.watch(merchantRepositoryProvider);
+  return UpdateShopUseCase(repository);
 });
 
 // A stream provider to load the merchant's registered shop

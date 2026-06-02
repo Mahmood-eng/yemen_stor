@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: Transform.translate(
         offset: const Offset(0, -10), // رفع الزر لأعلى بمقدار 10 بكسل
         child: FloatingActionButton(
+          heroTag: 'home_fab',
           onPressed: () {
             context.push(AppRoutes.aiChat);
           },

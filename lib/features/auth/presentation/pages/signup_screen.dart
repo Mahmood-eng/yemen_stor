@@ -27,8 +27,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscureText = true;
   bool _obscureConfirmText = true;
   bool _agreeToTerms = false;
-  String? _selectedCity;
+  String? _selectedCity = "تعز";
+  bool _isFormValid = false;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateForm);
+    _passwordController.addListener(_validateForm);
+    _confirmPasswordController.addListener(_validateForm);
+    _displayNameController.addListener(_validateForm);
+  }
+
+  void _validateForm() {
+    setState(() {
+      _isFormValid = _emailController.text.trim().isNotEmpty &&
+          _passwordController.text.isNotEmpty &&
+          _confirmPasswordController.text.isNotEmpty &&
+          _displayNameController.text.trim().isNotEmpty &&
+          _selectedCity != null &&
+          _agreeToTerms;
+    });
+  }
 
   final List<String> _yemeniCities = [
     "صنعاء",
@@ -54,6 +75,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _emailController.removeListener(_validateForm);
+    _passwordController.removeListener(_validateForm);
+    _confirmPasswordController.removeListener(_validateForm);
+    _displayNameController.removeListener(_validateForm);
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -186,8 +211,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (value) =>
-                              setState(() => _selectedCity = value),
+                          onChanged: (value) {
+                            setState(() => _selectedCity = value);
+                            _validateForm();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'يجب اختيار المدينة';
@@ -267,8 +294,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             Checkbox(
                               value: _agreeToTerms,
                               activeColor: AppColors.primary,
-                              onChanged: (value) =>
-                                  setState(() => _agreeToTerms = value!),
+                              onChanged: (value) {
+                                setState(() => _agreeToTerms = value!);
+                                _validateForm();
+                              },
                             ),
                             Expanded(
                               child: Text(
@@ -286,11 +315,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        CustomButton(
-                          text: authState.isLoading
-                              ? "جاري الإنشاء..."
-                              : "إنشاء حساب",
-                          onPressed: authState.isLoading ? null : _signUp,
+                        ElevatedButton(
+                          onPressed: (!_isFormValid || authState.isLoading) ? null : _signUp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            minimumSize: const Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: authState.isLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  "إنشاء حساب",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                         const SizedBox(height: 20),
 

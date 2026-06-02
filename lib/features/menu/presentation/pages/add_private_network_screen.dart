@@ -32,8 +32,43 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
     'نقطة اتصال متعددة المستخدمين',
   ];
 
+  bool _isFormValid = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _networkNameController.addListener(_validateForm);
+    _cityController.addListener(_validateForm);
+    _areaController.addListener(_validateForm);
+    _ownerNameController.addListener(_validateForm);
+    _whatsappController.addListener(_validateForm);
+    _idNumberController.addListener(_validateForm);
+    _documentUrlController.addListener(_validateForm);
+  }
+
+  void _validateForm() {
+    setState(() {
+      _isFormValid = _networkNameController.text.isNotEmpty &&
+          _cityController.text.isNotEmpty &&
+          _areaController.text.isNotEmpty &&
+          _ownerNameController.text.isNotEmpty &&
+          _whatsappController.text.isNotEmpty &&
+          _idNumberController.text.isNotEmpty &&
+          _documentUrlController.text.isNotEmpty;
+    });
+  }
+
   @override
   void dispose() {
+    _networkNameController.removeListener(_validateForm);
+    _cityController.removeListener(_validateForm);
+    _areaController.removeListener(_validateForm);
+    _ownerNameController.removeListener(_validateForm);
+    _whatsappController.removeListener(_validateForm);
+    _idNumberController.removeListener(_validateForm);
+    _documentUrlController.removeListener(_validateForm);
+    
     _networkNameController.dispose();
     _descriptionController.dispose();
     _cityController.dispose();
@@ -227,53 +262,57 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () async {
-                    if (!(_formKey.currentState?.validate() ?? false)) return;
+                  onPressed: (!_isFormValid || _isLoading)
+                      ? null
+                      : () async {
+                          if (!(_formKey.currentState?.validate() ?? false)) return;
 
-                    try {
-                      final uid = FirebaseAuth.instance.currentUser?.uid;
-                      if (uid == null) throw Exception('المستخدم غير مسجل');
+                          setState(() => _isLoading = true);
+                          try {
+                            final uid = FirebaseAuth.instance.currentUser?.uid;
+                            if (uid == null) throw Exception('المستخدم غير مسجل');
 
-                      final data = {
-                        'name': _networkNameController.text.trim(),
-                        'description': _descriptionController.text.trim(),
-                        'type': _networkType,
-                        'city': _cityController.text.trim(),
-                        'area': _areaController.text.trim(),
-                        'ownerName': _ownerNameController.text.trim(),
-                        'whatsapp': _whatsappController.text.trim(),
-                        'idNumber': _idNumberController.text.trim(),
-                        'documentUrl': _documentUrlController.text.trim(),
-                        'ownerId': uid,
-                        'status': 'pending',
-                        'createdAt': FieldValue.serverTimestamp(),
-                      };
+                            final data = {
+                              'name': _networkNameController.text.trim(),
+                              'description': _descriptionController.text.trim(),
+                              'type': _networkType,
+                              'city': _cityController.text.trim(),
+                              'area': _areaController.text.trim(),
+                              'ownerName': _ownerNameController.text.trim(),
+                              'whatsapp': _whatsappController.text.trim(),
+                              'idNumber': _idNumberController.text.trim(),
+                              'documentUrl': _documentUrlController.text.trim(),
+                              'ownerId': uid,
+                              'status': 'pending',
+                              'createdAt': FieldValue.serverTimestamp(),
+                            };
 
-                      final ref = await FirebaseFirestore.instance
-                          .collection('networks')
-                          .add(data);
+                            final ref = await FirebaseFirestore.instance
+                                .collection('networks')
+                                .add(data);
 
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(uid)
-                          .update({
-                            'role': 'network_owner',
-                            'networkId': ref.id,
-                          });
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(uid)
+                                .update({
+                                  'role': 'network_owner',
+                                  'networkId': ref.id,
+                                });
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('تم إضافة شبكتك ${data['name']} بنجاح'),
-                        ),
-                      );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('تم إضافة شبكتك ${data['name']} بنجاح'),
+                              ),
+                            );
 
-                      context.push(AppRoutes.manageCards);
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('فشل في الإضافة: $e')),
-                      );
-                    }
-                  },
+                            context.go(AppRoutes.manageCards);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('فشل في الإضافة: $e')),
+                            );
+                            setState(() => _isLoading = false);
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     minimumSize: const Size.fromHeight(52),
@@ -281,13 +320,19 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: Text(
-                    'تقديم طلب الإضافة',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          'تقديم طلب الإضافة',
+                          style: textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 24),
               ],

@@ -7,6 +7,7 @@ import '../../data/models/product_model.dart';
 import '../../../../core/widgets/yemen_store_app_bar.dart';
 import '../widgets/product_card.dart';
 import '../providers/product_providers.dart';
+import '../../../../core/widgets/custom_loading_indicator.dart';
 
 class ShopDetailsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> shop;
@@ -264,7 +265,7 @@ class _ShopDetailsScreenState extends ConsumerState<ShopDetailsScreen> {
                                           ? const SizedBox(
                                               width: 20,
                                               height: 20,
-                                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                              child: CustomLoadingIndicator(size: 20, color: Colors.white),
                                             )
                                           : const Text(
                                               "إرسال التقييم",
@@ -457,7 +458,7 @@ class _ShopDetailsScreenState extends ConsumerState<ShopDetailsScreen> {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CustomLoadingIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
@@ -590,7 +591,7 @@ class _ShopDetailsScreenState extends ConsumerState<ShopDetailsScreen> {
           ],
         ),
         body: productsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const Center(child: CustomLoadingIndicator()),
           error: (error, stack) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
