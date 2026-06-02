@@ -519,10 +519,28 @@ class _MerchantOrdersScreenState extends ConsumerState<MerchantOrdersScreen> {
         if (rejectReason != null) 'rejectReason': rejectReason,
       };
 
+      // First, get the order to know the userId
+      final orderDoc = await FirebaseFirestore.instance.collection('orders').doc(orderId).get();
+      final userId = orderDoc.data()?['userId'] as String?;
+
       await FirebaseFirestore.instance
           .collection('orders')
           .doc(orderId)
           .update(data);
+
+      // Send notification to the user
+      if (userId != null && userId.isNotEmpty) {
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'userId': userId,
+          'title': 'تحديث حالة الطلب',
+          'body': rejectReason != null 
+              ? 'تم رفض طلبك. السبب: $rejectReason' 
+              : 'تم تحديث حالة طلبك إلى: $newStatus',
+          'createdAt': FieldValue.serverTimestamp(),
+          'isRead': false,
+          'type': 'order_status_update',
+        });
+      }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

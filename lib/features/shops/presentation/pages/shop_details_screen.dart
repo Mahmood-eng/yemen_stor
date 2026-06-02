@@ -316,7 +316,9 @@ class _ShopDetailsScreenState extends ConsumerState<ShopDetailsScreen> {
     String status,
   ) {
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('shops').doc(shopId).snapshots(),
+      stream: shopId.isNotEmpty 
+          ? FirebaseFirestore.instance.collection('shops').doc(shopId).snapshots()
+          : const Stream.empty(),
       builder: (context, snapshot) {
         double currentRating = 0.0;
         String currentStatus = status;

@@ -178,8 +178,11 @@ class MarketExpansionCard extends StatelessWidget {
                             context.push(
                               AppRoutes.subcategories,
                               extra: {
-                                'market': market.toJson(),
-                                'subcategory': legacySub,
+                                'marketId': market.id,
+                                'marketName': market.name,
+                                'categoryId': category.id,
+                                'subcategoryName': category.name,
+                                'iconName': category.iconName,
                               },
                             );
                           },

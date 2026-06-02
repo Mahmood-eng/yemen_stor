@@ -84,15 +84,22 @@ class OrderRemoteDataSource {
     required double deliveryFee,
     required String imageUrl,
     required String storeName,
+    required String shopId,
     required String storeAddress,
     required String marketName,
     required String categoryName,
+    required String merchantId,
+    required String marketId,
+    required String categoryId,
     required List<Map<String, dynamic>> items,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('يجب تسجيل الدخول أولاً');
 
-    final docRef = await _firestore.collection('orders').add({
+    final batch = _firestore.batch();
+    final docRef = _firestore.collection('orders').doc();
+
+    batch.set(docRef, {
       'userId': user.uid,
       'title': title,
       'totalPrice': totalPrice,
@@ -102,10 +109,41 @@ class OrderRemoteDataSource {
       'storeAddress': storeAddress,
       'marketName': marketName,
       'categoryName': categoryName,
+      'merchantId': merchantId,
+      'marketId': marketId,
+      'categoryId': categoryId,
       'status': OrderStatus.processing.name,
       'createdAt': FieldValue.serverTimestamp(),
       'items': items,
     });
+
+    // إشعار للمستخدم
+    final userNotifRef = _firestore.collection('notifications').doc();
+    batch.set(userNotifRef, {
+      'userId': user.uid,
+      'title': 'تم استلام طلبك',
+      'body': 'طلبك من $storeName قيد التجهيز الآن.',
+      'createdAt': FieldValue.serverTimestamp(),
+      'isRead': false,
+      'type': 'order_placed',
+    });
+
+    // إشعار للتاجر (صاحب المحل) إذا كان لدينا merchantId
+    if (merchantId.isNotEmpty) {
+      final merchantNotifRef = _firestore.collection('notifications').doc();
+      batch.set(merchantNotifRef, {
+        'merchantId': merchantId,
+        'shopId': shopId,
+        'title': 'طلب جديد!',
+        'body': 'لديك طلب جديد بقيمة $totalPrice ر.ي. يرجى تجهيزه.',
+        'createdAt': FieldValue.serverTimestamp(),
+        'isRead': false,
+        'type': 'new_order',
+      });
+    }
+
+    await batch.commit();
+
     return docRef.id;
   }
 

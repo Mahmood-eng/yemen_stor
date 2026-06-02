@@ -10,6 +10,9 @@ class FavoriteItem {
   final String imageUrl;
   final String description;
   final String userId;
+  final String merchantId;
+  final String marketId;
+  final String categoryId;
 
   FavoriteItem({
     required this.id,
@@ -19,6 +22,9 @@ class FavoriteItem {
     required this.imageUrl,
     required this.description,
     required this.userId,
+    required this.merchantId,
+    required this.marketId,
+    required this.categoryId,
   });
 
   factory FavoriteItem.fromJson(Map<String, dynamic> json, String id) {
@@ -30,6 +36,9 @@ class FavoriteItem {
       imageUrl: json['imageUrl'] ?? json['image'] ?? '',
       description: json['description'] ?? '',
       userId: json['userId'] ?? '',
+      merchantId: json['merchantId'] ?? '',
+      marketId: json['marketId'] ?? '',
+      categoryId: json['categoryId'] ?? '',
     );
   }
 
@@ -41,6 +50,9 @@ class FavoriteItem {
       'imageUrl': imageUrl,
       'description': description,
       'userId': userId,
+      'merchantId': merchantId,
+      'marketId': marketId,
+      'categoryId': categoryId,
     };
   }
 }
@@ -69,6 +81,9 @@ class FavoritesNotifier {
     required double price,
     required String imageUrl,
     required String description,
+    required String merchantId,
+    required String marketId,
+    required String categoryId,
   }) async {
     final user = fb_auth.FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -90,6 +105,9 @@ class FavoritesNotifier {
         'price': price,
         'imageUrl': imageUrl,
         'description': description,
+        'merchantId': merchantId,
+        'marketId': marketId,
+        'categoryId': categoryId,
       });
     }
   }

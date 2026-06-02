@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:yemen_stor/core/theme/app_colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -10,41 +14,40 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  // بيانات تجريبية للإشعارات
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      "title": "تم شحن الرصيد بنجاح",
-      "body":
-          "تم إضافة 10,000 ر.ي إلى محفظتك عبر بنك الكريمي. رقم العملية: #88210",
-      "time": "منذ 5 دقائق",
-      "isRead": false,
-      "type": "success", // success, alert, promo
-    },
-    {
-      "title": "فشل سداد فاتورة الكهرباء",
-      "body":
-          "نعتذر، تعذر إتمام عملية سداد فاتورة الكهرباء لعدم توفر خدمة المزود حالياً. تم إعادة المبلغ لمحفظتك.",
-      "time": "منذ ساعتين",
-      "isRead": false,
-      "type": "alert",
-    },
-    {
-      "title": "عرض خاص لمحبي الألعاب 🎮",
-      "body":
-          "احصل على خصم 15% عند شراء بطاقات Google Play باستخدام رصيد المحفظة. العرض ساري لـ 24 ساعة!",
-      "time": "أمس، 09:30 م",
-      "isRead": true,
-      "type": "promo",
-    },
-    {
-      "title": "تحديث أمني للحساب",
-      "body":
-          "لقد قمت بتغيير عنوان التوصيل الخاص بك بنجاح من إعدادات الملف الشخصي.",
-      "time": "15 مارس 2026",
-      "isRead": true,
-      "type": "info",
-    },
-  ];
+  String _formatTime(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    final date = timestamp.toDate();
+    final now = DateTime.now();
+    final diff = now.difference(date);
+
+    if (diff.inMinutes < 1) return 'الآن';
+    if (diff.inHours < 1) return 'منذ ${diff.inMinutes} دقيقة';
+    if (diff.inDays < 1) return 'منذ ${diff.inHours} ساعة';
+    if (diff.inDays < 7) return 'منذ ${diff.inDays} يوم';
+
+    return DateFormat('yyyy/MM/dd', 'en').format(date);
+  }
+
+  Future<void> _markAllAsRead() async {
+    HapticFeedback.mediumImpact();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final batch = FirebaseFirestore.instance.batch();
+    final unreadQuery = await FirebaseFirestore.instance
+        .collection('notifications')
+        .where('userId', isEqualTo: user.uid)
+        .where('isRead', isEqualTo: false)
+        .get();
+
+    for (var doc in unreadQuery.docs) {
+      batch.update(doc.reference, {'isRead': true});
+    }
+
+    if (unreadQuery.docs.isNotEmpty) {
+      await batch.commit();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           centerTitle: true,
           actions: [
             TextButton(
-              onPressed: () {},
+              onPressed: _markAllAsRead,
               style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
               child: const Text(
                 "تحديد الكل",
@@ -86,33 +89,72 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             onPressed: () => context.pop(),
           ),
         ),
-        body: _notifications.isEmpty
-            ? _buildEmptyState(theme)
-            : ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                itemCount: _notifications.length,
-                itemBuilder: (context, index) {
-                  return _buildNotificationItem(context, _notifications[index]);
-                },
-              ),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseAuth.instance.currentUser != null
+              ? FirebaseFirestore.instance
+                    .collection('notifications')
+                    .where(
+                      'userId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                    )
+                    .snapshots()
+              : null,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(color: colorScheme.primary),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('حدث خطأ في تحميل الإشعارات', style: TextStyle(fontFamily: 'Cairo')),
+              );
+            }
+
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return _buildEmptyState(theme);
+            }
+
+            final notifications = snapshot.data!.docs.toList();
+            notifications.sort((a, b) {
+              final aData = a.data() as Map<String, dynamic>;
+              final bData = b.data() as Map<String, dynamic>;
+              final aTime = (aData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.fromMillisecondsSinceEpoch(0);
+              final bTime = (bData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.fromMillisecondsSinceEpoch(0);
+              return bTime.compareTo(aTime);
+            });
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                final doc = notifications[index];
+                final data = doc.data() as Map<String, dynamic>;
+                return _buildNotificationItem(context, doc.id, data);
+              },
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildNotificationItem(
     BuildContext context,
-    Map<String, dynamic> item,
+    String docId,
+    Map<String, dynamic> data,
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     Color iconColor;
     IconData iconData;
-    final bool isRead = item['isRead'] as bool;
+    final bool isRead = data['isRead'] == true;
     final Color bgColor = isRead
         ? colorScheme.surface
         : colorScheme.primary.withOpacity(0.08);
 
-    switch (item['type']) {
+    switch (data['type']) {
       case 'success':
         iconColor = AppColors.success;
         iconData = Icons.check_circle_outline;
@@ -160,7 +202,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             Expanded(
               child: Text(
-                item['title'],
+                data['title'] ?? 'إشعار جديد',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontFamily: 'Cairo',
                   fontWeight: isRead ? FontWeight.w600 : FontWeight.bold,
@@ -178,7 +220,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           children: [
             const SizedBox(height: 5),
             Text(
-              item['body'],
+              data['body'] ?? '',
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontFamily: 'Cairo',
                 fontSize: 12,
@@ -188,7 +230,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              item['time'],
+              _formatTime(data['createdAt'] as Timestamp?),
               style: theme.textTheme.labelSmall?.copyWith(
                 color: colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -196,9 +238,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         ),
         onTap: () {
-          setState(() {
-            item['isRead'] = true;
-          });
+          if (!isRead) {
+            HapticFeedback.lightImpact();
+            FirebaseFirestore.instance
+                .collection('notifications')
+                .doc(docId)
+                .update({'isRead': true});
+          }
         },
       ),
     );

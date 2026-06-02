@@ -27,18 +27,30 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
 
   Future<void> _launchPhone(String phone) async {
     final uri = Uri(scheme: 'tel', path: phone);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
+    try {
+      await launchUrl(uri);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تعذر فتح تطبيق الاتصال')));
+    }
   }
 
   Future<void> _launchWhatsApp(String phone) async {
     final clean = phone.replaceAll(RegExp(r'[^0-9]'), '');
     final uri = Uri.parse('https://wa.me/967$clean');
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تعذر فتح تطبيق الواتساب')));
+    }
   }
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تعذر فتح الرابط')));
+    }
   }
 
   Future<void> _submitReview() async {

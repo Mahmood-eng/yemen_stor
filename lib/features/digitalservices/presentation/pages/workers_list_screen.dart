@@ -7,6 +7,7 @@ import 'package:yemen_stor/core/theme/app_colors.dart';
 import '../../core/professional_constants.dart';
 import '../providers/workers_providers.dart';
 import '../../domain/entities/worker_entity.dart';
+import '../../../../core/widgets/smart_search_delegate.dart';
 
 class WorkersListScreen extends ConsumerWidget {
   final String category;
@@ -80,7 +81,22 @@ class WorkersListScreen extends ConsumerWidget {
 
             IconButton(
               icon: Icon(Icons.search_rounded, color: theme.colorScheme.primary),
-              onPressed: () {},
+              onPressed: () async {
+                final result = await showSearch(
+                  context: context,
+                  delegate: SmartSearchDelegate(
+                    ref: ref,
+                    searchHint: "ابحث عن مهندس، سباك، نجار...",
+                  ),
+                );
+                if (result != null && result.isNotEmpty) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('جاري البحث عن: $result', style: const TextStyle(fontFamily: 'Cairo'))),
+                    );
+                  }
+                }
+              },
             ),
           ],
         ),

@@ -3,22 +3,28 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 
+import 'package:yemen_stor/features/markets/data/models/market_model.dart';
+
 class SubcategoriesScreen extends StatelessWidget {
-  final Map<String, dynamic> market;
-  final Map<String, dynamic> subcategory;
+  final String marketId;
+  final String marketName;
+  final String categoryId;
+  final String subcategoryName;
+  final String iconName;
 
   const SubcategoriesScreen({
     super.key,
-    required this.market,
-    required this.subcategory,
+    required this.marketId,
+    required this.marketName,
+    required this.categoryId,
+    required this.subcategoryName,
+    required this.iconName,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final marketName = market['name'] ?? '';
-    final subcategoryName = subcategory['title'] ?? '';
-    final subcategoryIcon = subcategory['icon'];
+    final subcategoryIcon = MarketModel.getIconData(iconName);
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -73,7 +79,12 @@ class SubcategoriesScreen extends StatelessWidget {
                 onPressed: () {
                   context.push(
                     AppRoutes.shopsList,
-                    extra: {'market': market, 'subcategory': subcategory},
+                    extra: {
+                      'marketId': marketId,
+                      'marketName': marketName,
+                      'categoryId': categoryId,
+                      'subcategoryName': subcategoryName,
+                    },
                   );
                 },
                 style: ElevatedButton.styleFrom(

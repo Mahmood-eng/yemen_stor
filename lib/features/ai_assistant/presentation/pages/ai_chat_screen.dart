@@ -18,7 +18,7 @@ class _ChatPageState extends State<ChatPage> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [
     ChatMessage(
-      text: 'مرحباً بك! انا نور مساعدك الذكي كيف أستطيع مساعدتك اليوم؟',
+      text: 'مرحباً بك! انا صراط مساعدك الذكي كيف أستطيع مساعدتك اليوم؟',
       isUser: false,
       hasProduct: false,
     ),
@@ -109,6 +109,10 @@ class _ChatPageState extends State<ChatPage> {
 
   PreferredSizeWidget _buildAppBar(ThemeData theme, bool isDark) {
     return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios),
+        onPressed: () => Navigator.pop(context),
+      ),
       elevation: 0,
       backgroundColor: theme.colorScheme.surface,
       iconTheme: IconThemeData(color: theme.colorScheme.onSurface),

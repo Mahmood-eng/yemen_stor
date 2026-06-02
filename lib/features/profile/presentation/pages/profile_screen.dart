@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
@@ -315,13 +316,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             );
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                _buildProfileHeader(user, isDark),
-                const SizedBox(height: 30),
-                _buildProfileField(
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+              child: Column(
+                children: [
+                  _buildProfileHeader(user, isDark),
+                  const SizedBox(height: 30),
+                  
+                  // أزرار الإجراءات السريعة
+                  _buildQuickActions(context, isDark),
+                  
+                  const SizedBox(height: 30),
+                  
+                  // نموذج تعديل البيانات
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: isDark ? Theme.of(context).cardColor : Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "المعلومات الشخصية",
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Cairo',
+                              ),
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProfileField(
                   label: "الاسم الكامل",
                   controller: _nameController,
                   focusNode: _nameFocus,
@@ -354,17 +386,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   icon: Icons.location_on_outlined,
                   maxLines: 2,
                 ),
-                const SizedBox(height: 30),
-                if (_isEdited)
-                  CustomButton(
-                    text: _isLoading ? "جاري التحديث..." : "حفظ التغييرات",
-                    onPressed: _isLoading ? null : _updateProfile,
+                        const SizedBox(height: 20),
+                        if (_isEdited)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 55,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _updateProfile,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(color: Colors.white)
+                                  : const Text("حفظ التغييرات", style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                const SizedBox(height: 20),
-                _buildInfoSection(user, isDark),
-              ],
-            ),
-          );
+                  const SizedBox(height: 20),
+                  _buildInfoSection(user, isDark),
+                ],
+              ),
+            );
         },
       ),
     );
@@ -473,10 +519,64 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               style: TextStyle(
                 color: isDark ? Colors.white70 : Colors.grey.shade600,
                 fontSize: 14,
+                fontFamily: 'Cairo',
               ),
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context, bool isDark) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _buildQuickActionBtn(
+          context,
+          icon: Icons.account_balance_wallet_rounded,
+          label: "محفظتي",
+          color: Colors.blueAccent,
+          onTap: () => context.push(AppRoutes.wallet),
+        ),
+        _buildQuickActionBtn(
+          context,
+          icon: Icons.home_work_rounded,
+          label: "دفع الإيجار",
+          color: Colors.deepPurpleAccent,
+          onTap: () => context.push(AppRoutes.rentPayment),
+        ),
+        _buildQuickActionBtn(
+          context,
+          icon: Icons.shopping_bag_rounded,
+          label: "مشترياتي",
+          color: Colors.orangeAccent,
+          onTap: () => context.push(AppRoutes.orders),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionBtn(BuildContext context, {required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? color.withValues(alpha: 0.15) : color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold, fontSize: 13)),
+        ],
+      ),
     );
   }
 
@@ -510,13 +610,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             keyboardType: keyboardType,
             maxLines: maxLines,
             readOnly: readOnly,
+            style: const TextStyle(fontFamily: 'Cairo'),
             decoration: InputDecoration(
-              prefixIcon: Icon(icon),
+              prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7)),
               suffixIcon: readOnly ? null : const Icon(Icons.edit, size: 16),
-              filled: readOnly,
-              fillColor: readOnly
-                  ? (isDark ? Colors.white10 : Colors.grey.shade100)
-                  : null,
+              filled: true,
+              fillColor: isDark ? Theme.of(context).colorScheme.surfaceContainerHighest : Colors.grey.shade50,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+              ),
             ),
           ),
         ],

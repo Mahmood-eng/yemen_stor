@@ -147,6 +147,9 @@ class RecommendationProductCard extends ConsumerWidget {
                                   imageUrl: imageUrl,
                                   shopId: product.shopId,
                                   shopName: product.shopName,
+                                  merchantId: product.merchantId,
+                                  marketId: product.marketId,
+                                  categoryId: product.categoryId,
                                 );
                             if (context.mounted) {
                               context.push(AppRoutes.cart);
@@ -195,6 +198,9 @@ class RecommendationProductCard extends ConsumerWidget {
                         imageUrl: imageUrl,
                         shopId: product.shopId,
                         shopName: product.shopName,
+                        merchantId: product.merchantId,
+                        marketId: product.marketId,
+                        categoryId: product.categoryId,
                       );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -288,6 +294,9 @@ class RecommendationProductCard extends ConsumerWidget {
                                 : product.originalPrice ?? product.price,
                             imageUrl: imageUrl,
                             description: product.description,
+                            merchantId: product.merchantId,
+                            marketId: product.marketId,
+                            categoryId: product.categoryId,
                           );
                     },
                   );

@@ -5,25 +5,64 @@ import '../../../../core/routes/app_routes.dart';
 import '../../../../core/widgets/yemen_store_app_bar.dart';
 import '../../data/models/shop_model.dart';
 
-class ShopsListScreen extends StatelessWidget {
-  final Map<String, dynamic> market;
-  final Map<String, dynamic> subcategory;
+class ShopsListScreen extends StatefulWidget {
+  final String marketId;
+  final String marketName;
+  final String categoryId;
+  final String subcategoryName;
 
   const ShopsListScreen({
     super.key,
-    required this.market,
-    required this.subcategory,
+    required this.marketId,
+    required this.marketName,
+    required this.categoryId,
+    required this.subcategoryName,
   });
+
+  @override
+  State<ShopsListScreen> createState() => _ShopsListScreenState();
+}
+
+class _ShopsListScreenState extends State<ShopsListScreen> {
+  late Stream<QuerySnapshot> _shopsStream;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    final marketId = widget.marketId;
+    _shopsStream = marketId.isNotEmpty 
+        ? FirebaseFirestore.instance
+            .collection('shops')
+            .where('marketId', isEqualTo: marketId)
+            .snapshots()
+        : FirebaseFirestore.instance
+            .collection('shops')
+            .snapshots();
+
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.toLowerCase();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     
-    final marketName = market['name'] ?? '';
-    final marketId = market['id'] ?? '';
-    final subcategoryName = subcategory['title'] ?? '';
-    final categoryId = subcategory['id'] ?? '';
+    final marketName = widget.marketName;
+    final marketId = widget.marketId;
+    final subcategoryName = widget.subcategoryName;
+    final categoryId = widget.categoryId;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -61,9 +100,7 @@ class ShopsListScreen extends StatelessWidget {
             // قائمة المحلات
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('shops')
-                    .snapshots(),
+                stream: _shopsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -75,7 +112,7 @@ class ShopsListScreen extends StatelessWidget {
                   }
 
                   final shops = snapshot.data!.docs.map((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
+                    final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
                     if (data['id'] == null || data['id'] == '') {
                       data['id'] = doc.id;
                     }
@@ -93,7 +130,11 @@ class ShopsListScreen extends StatelessWidget {
                         (subcategoryName.isNotEmpty && (shopCategoryName == subcategoryName || shop.marketType == subcategoryName)) ||
                         (categoryId.isEmpty && subcategoryName.isEmpty);
 
-                    return matchesMarket && matchesCategory;
+                    final bool matchesSearch = _searchQuery.isEmpty || 
+                        shop.name.toLowerCase().contains(_searchQuery) ||
+                        shop.description.toLowerCase().contains(_searchQuery);
+
+                    return matchesMarket && matchesCategory && matchesSearch;
                   }).toList();
 
                   if (shops.isEmpty) {
@@ -135,10 +176,20 @@ class ShopsListScreen extends StatelessWidget {
           ],
         ),
         child: TextField(
+          controller: _searchController,
           textAlign: TextAlign.right,
           decoration: InputDecoration(
             hintText: "ابحث عن محل...",
             prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: Icon(Icons.clear, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                    onPressed: () {
+                      _searchController.clear();
+                      FocusScope.of(context).unfocus();
+                    },
+                  )
+                : null,
             contentPadding: const EdgeInsets.symmetric(vertical: 0),
             filled: true,
             fillColor: theme.inputDecorationTheme.fillColor ?? theme.colorScheme.surface,

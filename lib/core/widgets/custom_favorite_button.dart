@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomFavoriteButton extends StatelessWidget {
   final bool isFavorite;
@@ -17,7 +18,10 @@ class CustomFavoriteButton extends StatelessWidget {
     final theme = Theme.of(context);
     
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,

@@ -21,6 +21,7 @@ import 'package:yemen_stor/features/digitalservices/presentation/pages/digital_s
 import 'package:yemen_stor/features/digitalservices/presentation/pages/top_up_screen.dart';
 import 'package:yemen_stor/features/digitalservices/presentation/pages/transaction_history_screen.dart';
 import 'package:yemen_stor/features/digitalservices/presentation/pages/wifi_networks_screen.dart';
+import 'package:yemen_stor/features/digitalservices/presentation/pages/rent_payment_screen.dart';
 import 'package:yemen_stor/features/merchant/presentation/pages/merchant_add_product_screen.dart';
 import 'package:yemen_stor/features/merchant/presentation/pages/merchant_dashboard_screen.dart';
 import 'package:yemen_stor/features/merchant/presentation/pages/merchant_orders_screen.dart';
@@ -91,6 +92,7 @@ class AppRoutes {
   static const String workerProfile = '/digital-services/workers/profile';
   static const String workerEditProfile = '/digital-services/workers/edit-profile';
   static const String wifiNetworkDetails = '/digital-services/wifi-networks/details';
+  static const String rentPayment = '/digital-services/rent-payment';
 
   static final router = GoRouter(
     initialLocation: FirebaseAuth.instance.currentUser != null
@@ -129,6 +131,10 @@ class AppRoutes {
         builder: (context, state) => const FavoritesScreen(),
       ),
       GoRoute(
+        path: rentPayment,
+        builder: (context, state) => const RentPaymentScreen(),
+      ),
+      GoRoute(
         path: notifications,
         builder: (context, state) => const NotificationsScreen(),
       ),
@@ -154,11 +160,12 @@ class AppRoutes {
         path: subcategories,
         builder: (context, state) {
           final extra = state.extra as Map? ?? {};
-          final market = extra['market'] as Map? ?? {};
-          final subcategory = extra['subcategory'] as Map? ?? {};
           return SubcategoriesScreen(
-            market: Map<String, dynamic>.from(market), 
-            subcategory: Map<String, dynamic>.from(subcategory),
+            marketId: extra['marketId']?.toString() ?? '',
+            marketName: extra['marketName']?.toString() ?? '',
+            categoryId: extra['categoryId']?.toString() ?? '',
+            subcategoryName: extra['subcategoryName']?.toString() ?? '',
+            iconName: extra['iconName']?.toString() ?? '',
           );
         },
       ),
@@ -166,11 +173,11 @@ class AppRoutes {
         path: shopsList,
         builder: (context, state) {
           final extra = state.extra as Map? ?? {};
-          final market = extra['market'] as Map? ?? {};
-          final subcategory = extra['subcategory'] as Map? ?? {};
           return ShopsListScreen(
-            market: Map<String, dynamic>.from(market), 
-            subcategory: Map<String, dynamic>.from(subcategory),
+            marketId: extra['marketId']?.toString() ?? '',
+            marketName: extra['marketName']?.toString() ?? '',
+            categoryId: extra['categoryId']?.toString() ?? '',
+            subcategoryName: extra['subcategoryName']?.toString() ?? '',
           );
         },
       ),

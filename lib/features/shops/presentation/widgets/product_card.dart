@@ -139,6 +139,9 @@ class ProductCard extends ConsumerWidget {
                             imageUrl: product.images.isNotEmpty ? product.images.first : '',
                             shopId: product.shopId,
                             shopName: product.shopName,
+                            merchantId: product.merchantId,
+                            marketId: product.marketId,
+                            categoryId: product.categoryId,
                           );
                           if (context.mounted) {
                             context.push(AppRoutes.cart);
@@ -184,6 +187,9 @@ class ProductCard extends ConsumerWidget {
                     imageUrl: product.images.isNotEmpty ? product.images.first : '',
                     shopId: product.shopId,
                     shopName: product.shopName,
+                    merchantId: product.merchantId,
+                    marketId: product.marketId,
+                    categoryId: product.categoryId,
                   );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -266,6 +272,9 @@ class ProductCard extends ConsumerWidget {
                         price: product.hasDiscount ? product.price : product.originalPrice ?? product.price,
                         imageUrl: product.images.isNotEmpty ? product.images.first : '',
                         description: product.description,
+                        merchantId: product.merchantId,
+                        marketId: product.marketId,
+                        categoryId: product.categoryId,
                       );
                     },
                   );

@@ -21,41 +21,74 @@ class OrderActions {
     required String deliveryAddress,
     required double deliveryFee,
   }) async {
-    // Build a summary title from first item
-    final title = cartItems.isNotEmpty
-        ? cartItems.first.productName
-        : 'طلب من اليمن ستور';
-    final totalPrice = cartItems.fold(
-      0.0,
-      (sum, i) => sum + i.price * i.quantity,
-    );
-    final imageUrl = cartItems.isNotEmpty ? cartItems.first.imageUrl : '';
-    final storeName = cartItems.isNotEmpty ? cartItems.first.shopName : '';
-    final storeAddress = deliveryAddress; // using passed address for simplicity
-    final marketName = '';
-    final categoryName = '';
-    final items = cartItems
-        .map(
-          (i) => {
-            'productId': i.id,
-            'productName': i.productName,
-            'quantity': i.quantity,
-            'price': i.price,
-            'imageUrl': i.imageUrl,
-          },
-        )
-        .toList();
-    final orderId = await remoteDatasource.placeOrder(
-      title: title,
-      totalPrice: totalPrice,
-      deliveryFee: deliveryFee,
-      imageUrl: imageUrl,
-      storeName: storeName,
-      storeAddress: storeAddress,
-      marketName: marketName,
-      categoryName: categoryName,
-      items: items,
-    );
-    return orderId;
+    if (cartItems.isEmpty) throw Exception('السلة فارغة');
+
+    // Group items by merchantId
+    final Map<String, List<CartItem>> groupedItems = {};
+    for (var item in cartItems) {
+      final merchantId = item.merchantId;
+      if (!groupedItems.containsKey(merchantId)) {
+        groupedItems[merchantId] = [];
+      }
+      groupedItems[merchantId]!.add(item);
+    }
+
+    String firstOrderId = '';
+
+    // Place an order for each merchant
+    for (var entry in groupedItems.entries) {
+      final merchantId = entry.key;
+      final itemsForMerchant = entry.value;
+
+      final title = itemsForMerchant.first.productName;
+      final totalPrice = itemsForMerchant.fold(
+        0.0,
+        (sum, i) => sum + i.price * i.quantity,
+      );
+      final imageUrl = itemsForMerchant.first.imageUrl;
+      final storeName = itemsForMerchant.first.shopName;
+      final shopId = itemsForMerchant.first.shopId;
+      final marketId = itemsForMerchant.first.marketId;
+      final categoryId = itemsForMerchant.first.categoryId;
+      final storeAddress = deliveryAddress; // using passed address for simplicity
+      final marketName = '';
+      final categoryName = '';
+
+      final mappedItems = itemsForMerchant
+          .map(
+            (i) => {
+              'productId': i.id, // using cart item id as productId is acceptable or i.productId
+              'productName': i.productName,
+              'quantity': i.quantity,
+              'price': i.price,
+              'imageUrl': i.imageUrl,
+            },
+          )
+          .toList();
+
+      final orderId = await remoteDatasource.placeOrder(
+        title: title,
+        totalPrice: totalPrice,
+        // Delivery fee applied to the first order or distributed. For now, apply to all or only first.
+        // Let's just apply it evenly or full.
+        deliveryFee: firstOrderId.isEmpty ? deliveryFee : 0.0, 
+        imageUrl: imageUrl,
+        storeName: storeName,
+        shopId: shopId,
+        storeAddress: storeAddress,
+        marketName: marketName,
+        categoryName: categoryName,
+        merchantId: merchantId,
+        marketId: marketId,
+        categoryId: categoryId,
+        items: mappedItems,
+      );
+
+      if (firstOrderId.isEmpty) {
+        firstOrderId = orderId;
+      }
+    }
+
+    return firstOrderId;
   }
 }

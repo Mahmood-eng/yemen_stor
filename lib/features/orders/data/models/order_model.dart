@@ -11,6 +11,10 @@ class OrderModel {
   final String storeAddress;
   final String marketName;
   final String categoryName;
+  final String merchantId;
+  final String shopId;
+  final String marketId;
+  final String categoryId;
   final OrderStatus status;
   final DateTime createdAt;
   final List<Map<String, dynamic>> items; // cart items snapshot
@@ -26,6 +30,10 @@ class OrderModel {
     this.storeAddress = '',
     this.marketName = '',
     this.categoryName = '',
+    this.merchantId = '',
+    this.shopId = '',
+    this.marketId = '',
+    this.categoryId = '',
     required this.status,
     required this.createdAt,
     this.items = const [],
@@ -74,6 +82,10 @@ class OrderModel {
       storeAddress: json['storeAddress'] ?? '',
       marketName: json['marketName'] ?? '',
       categoryName: json['categoryName'] ?? '',
+      merchantId: json['merchantId'] ?? '',
+      shopId: json['shopId'] ?? '',
+      marketId: json['marketId'] ?? '',
+      categoryId: json['categoryId'] ?? '',
       status: status,
       createdAt: createdAt,
       items: List<Map<String, dynamic>>.from(json['items'] ?? []),
@@ -91,6 +103,10 @@ class OrderModel {
       'storeAddress': storeAddress,
       'marketName': marketName,
       'categoryName': categoryName,
+      'merchantId': merchantId,
+      'shopId': shopId,
+      'marketId': marketId,
+      'categoryId': categoryId,
       'status': status.name,
       'createdAt': FieldValue.serverTimestamp(),
       'items': items,

@@ -431,7 +431,7 @@ class AppDrawer extends StatelessWidget {
                     context,
                     Icons.credit_card,
                     'دفع الإشتراك الشهري',
-                    () {},
+                    () => context.go(AppRoutes.rentPayment),
                   ),
 
                   Divider(

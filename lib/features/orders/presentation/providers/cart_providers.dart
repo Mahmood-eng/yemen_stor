@@ -12,6 +12,9 @@ class CartItem {
   final String shopId;
   final String shopName;
   final String userId;
+  final String merchantId;
+  final String marketId;
+  final String categoryId;
 
   CartItem({
     required this.id,
@@ -23,6 +26,9 @@ class CartItem {
     required this.shopId,
     required this.shopName,
     required this.userId,
+    required this.merchantId,
+    required this.marketId,
+    required this.categoryId,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json, String id) {
@@ -36,6 +42,9 @@ class CartItem {
       shopId: json['shopId'] ?? '',
       shopName: json['shopName'] ?? json['shop'] ?? '',
       userId: json['userId'] ?? '',
+      merchantId: json['merchantId'] ?? '',
+      marketId: json['marketId'] ?? '',
+      categoryId: json['categoryId'] ?? '',
     );
   }
 
@@ -49,6 +58,9 @@ class CartItem {
       'shopId': shopId,
       'shopName': shopName,
       'userId': userId,
+      'merchantId': merchantId,
+      'marketId': marketId,
+      'categoryId': categoryId,
     };
   }
 }
@@ -78,6 +90,9 @@ class CartNotifier {
     required String imageUrl,
     required String shopId,
     required String shopName,
+    required String merchantId,
+    required String marketId,
+    required String categoryId,
     int quantity = 1,
   }) async {
     final user = fb_auth.FirebaseAuth.instance.currentUser;
@@ -104,6 +119,9 @@ class CartNotifier {
         'imageUrl': imageUrl,
         'shopId': shopId,
         'shopName': shopName,
+        'merchantId': merchantId,
+        'marketId': marketId,
+        'categoryId': categoryId,
       });
     }
   }

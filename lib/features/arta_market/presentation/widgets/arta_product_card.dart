@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/entities/arta_product.dart';
@@ -20,6 +21,23 @@ class ArtaProductCard extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('عذراً، تعذر فتح تطبيق الاتصال', style: TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _whatsappSeller(BuildContext context, String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+    final uri = Uri.parse('https://wa.me/$cleanPhone');
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('عذراً، تعذر فتح تطبيق الواتساب', style: TextStyle(fontFamily: 'Cairo')),
             backgroundColor: Colors.red,
           ),
         );
@@ -140,9 +158,10 @@ class ArtaProductCard extends ConsumerWidget {
                   top: 10,
                   left: 10,
                   child: GestureDetector(
-                    onTap: () => ref
-                        .read(artaMarketNotifierProvider.notifier)
-                        .toggleFavorite(product),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref.read(artaMarketNotifierProvider.notifier).toggleFavorite(product);
+                    },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 36,
@@ -276,43 +295,85 @@ class ArtaProductCard extends ConsumerWidget {
                         ),
                       ),
 
-                      // زر التواصل
-                      GestureDetector(
-                        onTap: () => _callSeller(context, product.phone),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                primaryColor,
-                                primaryColor.withValues(alpha: 0.75),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.call_rounded, size: 14, color: Colors.white),
-                              SizedBox(width: 5),
-                              Text(
-                                'تواصل',
-                                style: TextStyle(
-                                  fontFamily: 'Cairo',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                      // أزرار التواصل (اتصال + واتساب)
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => _callSeller(context, product.phone),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    primaryColor,
+                                    primaryColor.withValues(alpha: 0.75),
+                                  ],
                                 ),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: primaryColor.withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.call_rounded, size: 14, color: Colors.white),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'اتصال',
+                                    style: TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => _whatsappSeller(context, product.phone),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF25D366), // WhatsApp Color
+                                    Color(0xFF128C7E),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF25D366).withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.wechat_rounded, size: 16, color: Colors.white),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'واتساب',
+                                    style: TextStyle(
+                                      fontFamily: 'Cairo',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

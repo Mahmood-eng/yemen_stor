@@ -93,7 +93,11 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
               ),
             ),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: theme.colorScheme.onSurface,
+                size: 20,
+              ),
               onPressed: () => context.pop(),
             ),
             bottom: TabBar(
@@ -101,7 +105,10 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
               unselectedLabelColor: Colors.grey,
               indicatorColor: theme.colorScheme.primary,
               indicatorWeight: 3,
-              labelStyle: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+              labelStyle: const TextStyle(
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.bold,
+              ),
               tabs: const [
                 Tab(text: 'الشبكات المتاحة'),
                 Tab(text: 'المفضلة'),
@@ -119,13 +126,16 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
               : const Center(child: CustomLoadingIndicator()),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
-              // TODO: Navigate to add network screen
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم تفعيل شاشة إضافة شبكة قريباً')),
-              );
+              context.push(AppRoutes.addPrivateNetwork);
             },
             icon: const Icon(Icons.wifi_tethering),
-            label: const Text('أضف شبكتك', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+            label: const Text(
+              'أضف شبكتك',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
       ),
@@ -134,7 +144,10 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
 
   Widget _buildWifiListStream(ThemeData theme, {required bool favoritesOnly}) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('networks').orderBy('createdAt', descending: true).snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('networks')
+          .orderBy('createdAt', descending: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CustomLoadingIndicator());
@@ -142,7 +155,10 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
 
         if (snapshot.hasError) {
           return Center(
-            child: Text('خطأ في تحميل الشبكات', style: theme.textTheme.bodyMedium?.copyWith(fontFamily: 'Cairo')),
+            child: Text(
+              'خطأ في تحميل الشبكات',
+              style: theme.textTheme.bodyMedium?.copyWith(fontFamily: 'Cairo'),
+            ),
           );
         }
 
@@ -155,7 +171,9 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
               'id': doc.id,
               'name': data['name'] ?? 'شبكة جديدة',
               'location': '${data['city'] ?? ''} - ${data['area'] ?? ''}',
-              'description': data['description'] ?? 'شبكة محلية لتغطية فائقة السرعة وكروت مميزة',
+              'description':
+                  data['description'] ??
+                  'شبكة محلية لتغطية فائقة السرعة وكروت مميزة',
               'ownerName': data['ownerName'] ?? 'مالك الشبكة',
               'whatsapp': data['whatsapp'] ?? '',
               'isFavorite': _favoriteIds.contains(doc.id),
@@ -173,13 +191,17 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  favoritesOnly ? Icons.favorite_border : Icons.wifi_off_rounded,
+                  favoritesOnly
+                      ? Icons.favorite_border
+                      : Icons.wifi_off_rounded,
                   size: 80,
                   color: Colors.grey[300],
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  favoritesOnly ? 'لا توجد شبكات في مفضلتك بعد' : 'لا توجد شبكات متاحة حالياً\nيمكنك إضافة شبكتك من القائمة',
+                  favoritesOnly
+                      ? 'لا توجد شبكات في مفضلتك بعد'
+                      : 'لا توجد شبكات متاحة حالياً\nيمكنك إضافة شبكتك من القائمة',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.grey[400],
@@ -194,7 +216,8 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: filtered.length,
-          itemBuilder: (context, index) => _buildWifiCard(filtered[index], theme),
+          itemBuilder: (context, index) =>
+              _buildWifiCard(filtered[index], theme),
         );
       },
     );
@@ -216,7 +239,9 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
             offset: const Offset(0, 4),
           ),
         ],
-        border: isDark ? Border.all(color: theme.dividerColor.withValues(alpha: 0.05)) : null,
+        border: isDark
+            ? Border.all(color: theme.dividerColor.withValues(alpha: 0.05))
+            : null,
       ),
       child: ListTile(
         onTap: () => context.push(AppRoutes.wifiNetworkDetails, extra: network),
@@ -238,7 +263,11 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
         ),
         subtitle: Row(
           children: [
-            const Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
+            const Icon(
+              Icons.location_on_outlined,
+              size: 12,
+              color: Colors.grey,
+            ),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
@@ -262,7 +291,14 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
                 color: Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text('متاح', style: TextStyle(color: Colors.green, fontSize: 12, fontFamily: 'Cairo')),
+              child: const Text(
+                'متاح',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 12,
+                  fontFamily: 'Cairo',
+                ),
+              ),
             ),
             IconButton(
               icon: Icon(
@@ -275,7 +311,9 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        isFav ? 'تمت الإزالة من المفضلة' : 'تمت الإضافة للمفضلة',
+                        isFav
+                            ? 'تمت الإزالة من المفضلة'
+                            : 'تمت الإضافة للمفضلة',
                         style: const TextStyle(fontFamily: 'Cairo'),
                       ),
                       duration: const Duration(seconds: 1),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
@@ -80,8 +81,10 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submitWithConfirmation() async {
     if (!_isFormValid) return;
+    
+    HapticFeedback.mediumImpact();
 
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
     if (amount <= 0) {
@@ -91,18 +94,45 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
       return;
     }
 
-    String currencyCode = "YER";
-    if (_selectedCurrency == "ر.س") currencyCode = "SAR";
-    if (_selectedCurrency == "\$") currencyCode = "USD";
-
-    ref
-        .read(depositNotifierProvider.notifier)
-        .submitDeposit(
-          amount: amount,
-          currency: currencyCode,
-          bankId: _selectedBank!,
-          uniqueCode: _uniqueCodeController.text.trim(),
+    // إظهار نافذة تأكيد
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("تأكيد العملية", style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+          content: Text("هل أنت متأكد من رغبتك بشحن مبلغ $amount $_selectedCurrency إلى محفظتك؟", style: const TextStyle(fontFamily: 'Cairo')),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text("إلغاء", style: TextStyle(color: Colors.redAccent, fontFamily: 'Cairo')),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text("نعم، اشحن رصيدي", style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold)),
+            ),
+          ],
         );
+      },
+    );
+
+    if (confirm == true) {
+      String currencyCode = "YER";
+      if (_selectedCurrency == "ر.س") currencyCode = "SAR";
+      if (_selectedCurrency == "\$") currencyCode = "USD";
+
+      ref
+          .read(depositNotifierProvider.notifier)
+          .submitDeposit(
+            amount: amount,
+            currency: currencyCode,
+            bankId: _selectedBank!,
+            uniqueCode: _uniqueCodeController.text.trim(),
+          );
+    }
   }
 
   @override
@@ -111,12 +141,15 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
 
     ref.listen<DepositState>(depositNotifierProvider, (previous, next) {
       if (next.isSuccess) {
+        HapticFeedback.heavyImpact(); // صوت أو اهتزاز نجاح
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'تم إرسال طلب التغذية بنجاح. سيتم مراجعة الطلب قريباً.',
+              'تم إضافة الرصيد إلى محفظتك بنجاح!',
+              style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
             ),
             backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
           ),
         );
         context.pop();
@@ -192,7 +225,7 @@ class _RechargeWalletScreenState extends ConsumerState<RechargeWalletScreen> {
               depositState.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
-                      onPressed: _isFormValid ? _submit : null,
+                      onPressed: _isFormValid ? _submitWithConfirmation : null,
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(50),
                         shape: RoundedRectangleBorder(

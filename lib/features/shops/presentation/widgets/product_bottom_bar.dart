@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yemen_stor/core/routes/app_routes.dart';
@@ -38,6 +39,7 @@ class ProductBottomBar extends ConsumerWidget {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () async {
+                  HapticFeedback.lightImpact();
                   // Buy now: Add to cart and navigate to CartScreen
                   await ref.read(cartActionsProvider).addToCart(
                     productId: product.id,
@@ -46,6 +48,9 @@ class ProductBottomBar extends ConsumerWidget {
                     imageUrl: product.images.isNotEmpty ? product.images.first : '',
                     shopId: product.shopId,
                     shopName: product.shopName,
+                    merchantId: product.merchantId,
+                    marketId: product.marketId,
+                    categoryId: product.categoryId,
                   );
                   if (context.mounted) {
                     context.push(AppRoutes.cart);
@@ -80,6 +85,7 @@ class ProductBottomBar extends ConsumerWidget {
               ),
               child: IconButton(
                 onPressed: () async {
+                  HapticFeedback.lightImpact();
                   // Add to cart and show nice snackbar
                   await ref.read(cartActionsProvider).addToCart(
                     productId: product.id,
@@ -88,6 +94,9 @@ class ProductBottomBar extends ConsumerWidget {
                     imageUrl: product.images.isNotEmpty ? product.images.first : '',
                     shopId: product.shopId,
                     shopName: product.shopName,
+                    merchantId: product.merchantId,
+                    marketId: product.marketId,
+                    categoryId: product.categoryId,
                   );
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

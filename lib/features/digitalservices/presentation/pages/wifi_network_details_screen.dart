@@ -328,24 +328,35 @@ class _WifiNetworkDetailsScreenState extends ConsumerState<WifiNetworkDetailsScr
                 itemBuilder: (context, index) {
                   final package = _packages[index];
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: theme.dividerColor.withOpacity(0.08)),
+                      gradient: LinearGradient(
+                        colors: [
+                          isDark ? theme.colorScheme.surfaceContainerHighest : Colors.white,
+                          isDark ? theme.colorScheme.surface : theme.colorScheme.primary.withValues(alpha: 0.03),
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.1), width: 1.5),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6),
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        ),
                       ],
                     ),
                     child: Row(
                       children: [
                         // أيقونة الباقة
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(14),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
                           ),
                           child: Icon(package['icon'] as IconData, color: theme.colorScheme.primary, size: 28),
                         ),
@@ -375,20 +386,24 @@ class _WifiNetworkDetailsScreenState extends ConsumerState<WifiNetworkDetailsScr
                           children: [
                             Text(
                               "${(package['price'] as double).toStringAsFixed(0)} ريال",
-                              style: TextStyle(color: theme.colorScheme.secondary, fontWeight: FontWeight.bold, fontSize: 15, fontFamily: 'Cairo'),
+                              style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Cairo'),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 10),
                             ElevatedButton(
-                              onPressed: _isPurchasing ? null : () => _handleCardPurchase(package),
+                              onPressed: _isPurchasing ? null : () {
+                                HapticFeedback.mediumImpact();
+                                _handleCardPurchase(package);
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                elevation: 0,
                               ),
                               child: _isPurchasing
                                   ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                  : const Text("شراء", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+                                  : const Text("شراء الآن", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
                             ),
                           ],
                         ),

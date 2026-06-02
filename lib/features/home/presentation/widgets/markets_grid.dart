@@ -75,17 +75,19 @@ class MarketsGrid extends StatelessWidget {
             width: 70,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withAlpha((0.05 * 255).round())
+                  ? Colors.white.withAlpha((0.08 * 255).round())
                   : AppColors.primary.withAlpha((0.05 * 255).round()),
               borderRadius: BorderRadius.circular(20),
               border: isArta
-                  ? Border.all(color: Colors.orange, width: 1.5)
+                  ? Border.all(color: isDark ? Colors.orangeAccent : Colors.orange, width: 1.5)
                   : null,
             ),
             child: Icon(
               market.icon,
               size: 32,
-              color: isArta ? Colors.orange : AppColors.primary,
+              color: isArta
+                  ? (isDark ? Colors.orangeAccent : Colors.orange)
+                  : (isDark ? Colors.white.withValues(alpha: 0.9) : AppColors.primary),
             ),
           ),
           const SizedBox(height: 8),
@@ -220,14 +222,23 @@ class MarketsGrid extends StatelessWidget {
                                   color: Colors.grey,
                                 ),
                                 onTap: () {
+                                  final extraData = {
+                                    'marketId': market.id,
+                                    'marketName': market.name,
+                                    'categoryId': legacySub['id']?.toString() ?? '',
+                                    'subcategoryName': legacySub['title']?.toString() ?? '',
+                                  };
+                                  
                                   Navigator.pop(context);
-                                  context.push(
-                                    AppRoutes.shopsList,
-                                    extra: {
-                                      'market': market.toJson(),
-                                      'subcategory': legacySub,
-                                    },
-                                  );
+                                  // Wait for the bottom sheet to close before pushing
+                                  Future.delayed(const Duration(milliseconds: 50), () {
+                                    if (!context.mounted) return;
+                                    // Use the root navigator or standard routing
+                                    AppRoutes.router.push(
+                                      AppRoutes.shopsList,
+                                      extra: extraData,
+                                    );
+                                  });
                                 },
                               ),
                             );
@@ -259,14 +270,14 @@ class MarketsGrid extends StatelessWidget {
             width: 70,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withAlpha((0.05 * 255).round())
+                  ? Colors.white.withAlpha((0.08 * 255).round())
                   : Colors.grey.withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.grid_view_rounded,
               size: 32,
-              color: Colors.blueGrey,
+              color: isDark ? Colors.white.withValues(alpha: 0.7) : Colors.blueGrey,
             ),
           ),
           const SizedBox(height: 8),

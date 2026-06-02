@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/widgets/custom_loading_indicator.dart';
+import '../../../../core/widgets/smart_search_delegate.dart';
 import '../providers/arta_market_providers.dart';
 import '../widgets/arta_add_sheet.dart';
 import '../widgets/arta_product_card.dart';
@@ -78,6 +79,51 @@ class ArtaMarketScreen extends ConsumerWidget {
         ),
         body: Column(
           children: [
+            // ── شريط البحث ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: GestureDetector(
+                onTap: () async {
+                  final result = await showSearch(
+                    context: context,
+                    delegate: SmartSearchDelegate(
+                      ref: ref,
+                      searchHint: "ابحث في سوق العرطة...",
+                    ),
+                  );
+                  if (result != null && result.isNotEmpty) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('جاري البحث عن: $result', style: const TextStyle(fontFamily: 'Cairo'))),
+                      );
+                    }
+                  }
+                },
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      Icon(Icons.search, color: primaryColor),
+                      const SizedBox(width: 10),
+                      Text(
+                        "ابحث في سوق العرطة...",
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          color: theme.hintColor,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
             // Strict Warning Banner
             Container(
               width: MediaQuery.of(context).size.width * 0.94,

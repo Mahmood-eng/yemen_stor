@@ -103,7 +103,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('products').doc(productId).snapshots(),
+        stream: productId.isNotEmpty
+            ? FirebaseFirestore.instance.collection('products').doc(productId).snapshots()
+            : const Stream.empty(),
         builder: (context, snapshot) {
           final productModel = snapshot.hasData && snapshot.data!.exists
               ? ProductModel.fromJson(snapshot.data!.data() as Map<String, dynamic>..['id'] = productId)
@@ -140,6 +142,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                       price: productModel.hasDiscount ? productModel.price : productModel.originalPrice ?? productModel.price,
                       imageUrl: productModel.images.isNotEmpty ? productModel.images.first : '',
                       description: productModel.description,
+                      merchantId: productModel.merchantId,
+                      marketId: productModel.marketId,
+                      categoryId: productModel.categoryId,
                     );
                   },
                 ),
@@ -160,7 +165,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
 
                   // معلومات المحل الديناميكية
                   StreamBuilder<DocumentSnapshot>(
-                    stream: FirebaseFirestore.instance.collection('shops').doc(productModel.shopId).snapshots(),
+                    stream: productModel.shopId.isNotEmpty
+                        ? FirebaseFirestore.instance.collection('shops').doc(productModel.shopId).snapshots()
+                        : null,
                     builder: (context, shopSnapshot) {
                       final shopData = shopSnapshot.hasData && shopSnapshot.data!.exists
                           ? shopSnapshot.data!.data() as Map<String, dynamic>
@@ -345,12 +352,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
               
               // دفق المراجعات
               StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('products')
-                    .doc(productId)
-                    .collection('reviews')
-                    .orderBy('createdAt', descending: true)
-                    .snapshots(),
+                stream: productId.isNotEmpty
+                    ? FirebaseFirestore.instance
+                        .collection('products')
+                        .doc(productId)
+                        .collection('reviews')
+                        .orderBy('createdAt', descending: true)
+                        .snapshots()
+                    : const Stream.empty(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
