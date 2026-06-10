@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/core/widgets/custom_button.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/widgets/custom_button.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_providers.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
   static const String id = 'onboarding_screen';
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
@@ -20,22 +22,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "title": "تسوق من منزلك",
       "desc": "كل المحلات والمتاجر المحلية أصبحت بين يديك في تطبيق واحد.",
-      "image": "assets/images/onboard1.png"
+      "image": "assets/images/onboard1.png",
     },
     {
       "title": "توصيل سريع",
       "desc": "نصل إليك في أسرع وقت ممكن إلى باب بيتك في جميع المحافظات.",
-      "image": "assets/images/onboard2.png"
+      "image": "assets/images/onboard2.png",
     },
     {
       "title": "دفع آمن",
       "desc": "طرق دفع متعددة وآمنة لتسهيل عملية الشراء وضمان حقوقك.",
-      "image": "assets/images/onboard3.png"
+      "image": "assets/images/onboard3.png",
     },
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+  }
+
+  void _checkAuthStatus() {
+    final authState = ref.read(authNotifierProvider);
+    if (authState.user != null && !authState.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(AppRoutes.home);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.listen(authNotifierProvider, (previous, next) {
+      if (next?.user != null && next?.isLoading == false) {
+        context.go(AppRoutes.home);
+      }
+    });
+
     final Size size = MediaQuery.of(context).size;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -70,18 +93,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   SizedBox(height: size.height * 0.05),
-                  
-                 
+
                   Text(
                     _onboardingData[index]["title"]!,
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      fontSize: 28,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.displayLarge?.copyWith(fontSize: 28),
                   ),
-                  
-                 
+
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 15,
+                    ),
                     child: Text(
                       _onboardingData[index]["desc"]!,
                       textAlign: TextAlign.center,
@@ -95,9 +119,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          
+
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30, vertical: size.height * 0.05),
+            padding: EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: size.height * 0.05,
+            ),
             child: Column(
               children: [
                 // مؤشرات الصفحات (Dots)
@@ -109,10 +136,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 SizedBox(height: size.height * 0.04),
-                
-               
+
                 CustomButton(
-                  text: _currentPage == _onboardingData.length - 1 ? "ابدأ الآن" : "التالي",
+                  text: _currentPage == _onboardingData.length - 1
+                      ? "ابدأ الآن"
+                      : "التالي",
                   onPressed: () {
                     if (_currentPage == _onboardingData.length - 1) {
                       context.go(AppRoutes.login);
@@ -139,8 +167,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: 8,
       width: _currentPage == index ? 24 : 8,
       decoration: BoxDecoration(
-        color: _currentPage == index 
-            ? AppColors.primary 
+        color: _currentPage == index
+            ? AppColors.primary
             : (isDark ? Colors.white24 : const Color(0xFFD8D8D8)),
         borderRadius: BorderRadius.circular(5),
       ),

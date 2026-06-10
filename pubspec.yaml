@@ -1,4 +1,4 @@
-name: yemen_store
+name: yemen_stor
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -11,6 +11,8 @@ dependencies:
   go_router: ^10.1.1
   lottie: ^2.3.0
   flutter_riverpod: ^2.4.9
+  flutter_bloc: ^8.1.0
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -19,6 +21,10 @@ dependencies:
   firebase_core: any
   cloud_firestore: any
   firebase_auth: any
+  shared_preferences: ^2.1.1
+  local_auth: ^3.0.1
+  url_launcher: ^6.3.1
+  flutter_ringtone_player: ^4.0.0+4
 
 dev_dependencies:
   flutter_test:

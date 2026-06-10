@@ -1,53 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:yemen_stor/core/widgets/yemen_store_app_bar.dart';
+import 'package:yemen_stor/core/widgets/notification_badge_icon.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../providers/order_providers.dart';
 import '../widgets/order_card.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_status.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final ordersAsync = ref.watch(userOrdersStreamProvider);
 
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "سجل طلباتي",
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
-          ),
-          elevation: 0,
+        appBar: YemenStoreAppBar(
+          title: const Text('سجل طلباتي'),
+          leading: const SizedBox.shrink(),
+          actions: [
+            NotificationBadgeIcon(
+              color: theme.appBarTheme.iconTheme?.color,
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.shopping_cart_outlined,
+                color: theme.appBarTheme.iconTheme?.color,
+              ),
+              onPressed: () => context.push(AppRoutes.cart),
+            ),
+          ],
           bottom: TabBar(
-            indicatorColor: theme.primaryColor,
-            labelColor: theme.primaryColor,
+            indicatorColor: theme.colorScheme.primary,
+            labelColor: theme.colorScheme.primary,
             unselectedLabelColor: theme.brightness == Brightness.dark
                 ? Colors.white38
                 : Colors.grey,
-            labelStyle: const TextStyle(
-              fontFamily: 'Cairo',
+            labelStyle: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 13,
             ),
             tabs: const [
-              Tab(text: "النشطة"),
-              Tab(text: "المكتملة"),
-              Tab(text: "الملغاة"),
+              Tab(text: 'النشطة'),
+              Tab(text: 'المكتملة'),
+              Tab(text: 'الملغاة'),
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildOrdersList(context, [
-              OrderStatus.onWay,
-              OrderStatus.processing,
-            ]),
-            _buildOrdersList(context, [OrderStatus.completed]),
-            _buildOrdersList(context, [OrderStatus.canceled]),
-          ],
+        body: ordersAsync.when(
+          loading: () =>
+              const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(
+            child: Text(
+              'حدث خطأ: $err',
+              style: const TextStyle(fontFamily: 'Cairo'),
+            ),
+          ),
+          data: (orders) => TabBarView(
+            children: [
+              _buildOrdersList(
+                context,
+                orders,
+                [OrderStatus.onWay, OrderStatus.processing],
+              ),
+              _buildOrdersList(
+                context,
+                orders,
+                [OrderStatus.completed],
+              ),
+              _buildOrdersList(
+                context,
+                orders,
+                [OrderStatus.canceled],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -55,47 +87,23 @@ class OrdersScreen extends StatelessWidget {
 
   Widget _buildOrdersList(
     BuildContext context,
+    List<OrderModel> allOrders,
     List<OrderStatus> filterStatus,
   ) {
-    final mockOrders = [
-      OrderModel(
-        id: "1",
-        title: "عطر ساواج ديور الرجالي - 100 مل",
-        price: "45,000",
-        status: OrderStatus.onWay,
-        imageset: Image.asset(
-          "assets/images/perfume.jpg",
-          width: 85,
-          height: 85,
-          fit: BoxFit.cover,
-        ),
-        storeName: "متجر النخبة للعطور",
-        storeAddress: "شارع جمال",
-        marketName: "سوق الجمال",
-        categoryName: "عطور",
-        time: "اليوم، 10:30 ص",
-      ),
-      // ... بقية البيانات
-    ];
+    final filtered =
+        allOrders.where((o) => filterStatus.contains(o.status)).toList();
 
-    final filteredOrders = mockOrders
-        .where((o) => filterStatus.contains(o.status))
-        .toList();
-
-    if (filteredOrders.isEmpty) return _buildEmptyState(context);
+    if (filtered.isEmpty) return _buildEmptyState(context);
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      itemCount: filteredOrders.length,
+      itemCount: filtered.length,
       itemBuilder: (context, index) {
-        final order = filteredOrders[index];
+        final order = filtered[index];
         return OrderCard(
           order: order,
           onTrackTap: () {
-            context.pushNamed(
-              AppRoutes.orderTracking,
-              pathParameters: {'orderId': order.id},
-            );
+            context.push('${AppRoutes.orders}/tracking/${order.id}');
           },
         );
       },
@@ -115,7 +123,7 @@ class OrdersScreen extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Text(
-            "لا توجد طلبات هنا بعد",
+            'لا توجد طلبات هنا بعد',
             style: TextStyle(
               color: isDark ? Colors.white38 : Colors.grey,
               fontFamily: 'Cairo',

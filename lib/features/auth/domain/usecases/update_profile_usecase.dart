@@ -1,4 +1,4 @@
-import 'package:yemen_store/features/auth/domain/repositories/auth_repository.dart';
+import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
 
 class UpdateProfileUseCase {
   final AuthRepository repository;

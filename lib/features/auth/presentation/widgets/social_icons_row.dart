@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SocialIconsRow extends StatelessWidget {
-  const SocialIconsRow({super.key});
+  final VoidCallback? onFingerprintTap;
+
+  const SocialIconsRow({super.key, this.onFingerprintTap});
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +26,13 @@ class SocialIconsRow extends StatelessWidget {
         _buildIcon(Icons.facebook, Colors.blue, isDark),
         const SizedBox(width: 15),
 
-        _buildIcon(
-          Icons.fingerprint,
-          Colors.teal,
-          isDark,
+        GestureDetector(
+          onTap: onFingerprintTap,
+          child: _buildIcon(
+            Icons.fingerprint,
+            Colors.teal,
+            isDark,
+          ),
         ), // إضافة خيار الهاتف كأيقونة تواصل
       ],
     );

@@ -1,142 +1,172 @@
 import 'package:flutter/material.dart';
 
-class MarketModel {
+class CategoryModel {
+  final String id;
   final String name;
-  final IconData icon;
-  final List<Map<String, dynamic>> subCategories;
+  final String iconName;
+  final String marketId;
 
-  MarketModel({
+  CategoryModel({
+    required this.id,
     required this.name,
-    required this.icon,
-    this.subCategories = const [],
+    required this.iconName,
+    required this.marketId,
   });
+
+  factory CategoryModel.fromFirestore(Map<String, dynamic> json, String id) {
+    return CategoryModel(
+      id: id,
+      name: json['categoryName'] ?? json['name'] ?? '',
+      iconName: json['iconName'] ?? json['icon'] ?? 'category',
+      marketId: json['marketId'] ?? '',
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
+      'categoryId': id,
       'name': name,
-      'icon': icon.codePoint, // IconData to int
-      'subCategories': subCategories,
+      'iconName': iconName,
+      'marketId': marketId,
     };
   }
 
-  factory MarketModel.fromJson(Map<String, dynamic> json) {
-    return MarketModel(
-      name: json['name'],
-      icon: IconData(json['icon'], fontFamily: 'MaterialIcons'),
-      subCategories: List<Map<String, dynamic>>.from(json['subCategories']),
-    );
+  // تحويل البيانات لشكل الخريطة القديم لضمان عمل الودجات الحالية
+  Map<String, dynamic> toLegacyMap() {
+    return {
+      'id': id,
+      'title': name,
+      'icon': MarketModel.getIconData(iconName),
+    };
   }
 }
 
-final List<MarketModel> mockMarkets = [
-  MarketModel(
-    name: "إلكترونيات",
-    icon: Icons.devices_other_rounded,
-    subCategories: [
-      {"title": "الهواتف الذكية", "icon": Icons.smartphone},
-      {"title": "أجهزة اللابتوب", "icon": Icons.laptop},
-      {"title": "الساعات الذكية", "icon": Icons.watch},
-    ],
-  ),
-  MarketModel(
-    name: "أزياء",
-    icon: Icons.checkroom_rounded,
-    subCategories: [
-      {"title": "ملابس رجالي", "icon": Icons.man},
-      {"title": "ملابس نسائي", "icon": Icons.woman},
-    ],
-  ),
-  MarketModel(
-    name: "الجمال",
-    icon: Icons.face_retouching_natural_rounded,
-    subCategories: [
-      {"title": "عطور", "icon": Icons.opacity},
-      {"title": "مكياج", "icon": Icons.brush},
-    ],
-  ),
-  MarketModel(
-    name: "غذاء",
-    icon: Icons.restaurant_rounded,
-    subCategories: [
-      {"title": "مطاعم وجبات سريعة", "icon": Icons.fastfood_rounded},
-      {"title": "مطاعم شعبية", "icon": Icons.kebab_dining_rounded},
-    ],
-  ),
-  MarketModel(
-    name: "عرطة",
-    icon: Icons.sell_rounded,
-    subCategories: [], // قسم العروض
-  ),
-  MarketModel(
-    name: "المنزل",
-    icon: Icons.chair_rounded,
-    subCategories: [
-      {"title": "أثاث", "icon": Icons.bed},
-      {"title": "أجهزة منزلية", "icon": Icons.kitchen},
-    ],
-  ),
-  MarketModel(
-    name: "أجهزة",
-    icon: Icons.settings_input_component_rounded,
-    subCategories: [
-      {"title": "أجهزة كهربائية", "icon": Icons.bolt},
-      {"title": "أدوات صيانة", "icon": Icons.build},
-    ],
-  ),
-  MarketModel(
-    name: "رياضة",
-    icon: Icons.fitness_center_rounded,
-    subCategories: [
-      {"title": "ملابس رياضية", "icon": Icons.sports_kabaddi},
-      {"title": "أدوات رياضية", "icon": Icons.sports_basketball},
-    ],
-  ),
-  MarketModel(
-    name: "ألعاب",
-    icon: Icons.sports_esports_rounded,
-    subCategories: [
-      {"title": "بلايستيشن", "icon": Icons.videogame_asset},
-      {"title": "ألعاب أطفال", "icon": Icons.toys},
-    ],
-  ),
-  MarketModel(
-    name: "صيدلية",
-    icon: Icons.medical_services_rounded,
-    subCategories: [
-      {"title": "أدوية", "icon": Icons.medication},
-      {"title": "عناية شخصية", "icon": Icons.health_and_safety},
-    ],
-  ),
-  MarketModel(
-    name: "كتب",
-    icon: Icons.menu_book_rounded,
-    subCategories: [
-      {"title": "روايات", "icon": Icons.auto_stories},
-      {"title": "كتب تعليمية", "icon": Icons.school},
-    ],
-  ),
-  MarketModel(
-    name: "حيوانات",
-    icon: Icons.pets_rounded,
-    subCategories: [
-      {"title": "طعام حيوانات", "icon": Icons.set_meal},
-      {"title": "إكسسوارات", "icon": Icons.shutter_speed},
-    ],
-  ),
+class MarketModel {
+  final String id;
+  final String name;
+  final String iconName;
+  final List<CategoryModel> categories;
 
-  MarketModel(
-    name: "بقالة",
-    icon: Icons.shopping_basket_rounded,
-    subCategories: [
-      {"title": "خضروات", "icon": Icons.eco},
-      {"title": "مواد غذائية", "icon": Icons.inventory_2},
-    ],
-  ),
-  MarketModel(
-    name: "سيارات",
-    icon: Icons.directions_car_rounded,
-    subCategories: [
-      {"title": "قطع غيار", "icon": Icons.settings},
-    ],
-  ),
-];
+  MarketModel({
+    required this.id,
+    required this.name,
+    required this.iconName,
+    this.categories = const [],
+  });
+
+  factory MarketModel.fromFirestore(
+    Map<String, dynamic> json,
+    String id, {
+    List<CategoryModel> categories = const [],
+  }) {
+    return MarketModel(
+      id: id,
+      name: json['marketName'] ?? json['name'] ?? '',
+      iconName: json['iconName'] ?? json['icon'] ?? 'category',
+      categories: categories,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'iconName': iconName,
+      'categories': categories.map((c) => c.toJson()).toList(),
+    };
+  }
+
+  IconData get icon => getIconData(iconName);
+
+  List<Map<String, dynamic>> get subCategories =>
+      categories.map((c) => c.toLegacyMap()).toList();
+
+  static IconData getIconData(String? name) {
+    switch (name) {
+      case 'devices_other_rounded':
+        return Icons.devices_other_rounded;
+      case 'smartphone':
+        return Icons.smartphone;
+      case 'laptop':
+        return Icons.laptop;
+      case 'router':
+        return Icons.router;
+      case 'checkroom_rounded':
+        return Icons.checkroom_rounded;
+      case 'man':
+        return Icons.man;
+      case 'woman':
+        return Icons.woman;
+      case 'child_care_outlined':
+        return Icons.child_care_outlined;
+      case 'face_retouching_natural_sharp':
+        return Icons.face_retouching_natural_sharp;
+      case 'opacity':
+        return Icons.opacity;
+      case 'brush':
+        return Icons.brush;
+      case 'restaurant_rounded':
+        return Icons.restaurant_rounded;
+      case 'fastfood_rounded':
+        return Icons.fastfood_rounded;
+      case 'kebab_dining_outlined':
+        return Icons.kebab_dining_outlined;
+      case 'sell_rounded':
+        return Icons.sell_rounded;
+      case 'chair_rounded':
+        return Icons.chair_rounded;
+      case 'bed':
+        return Icons.bed;
+      case 'kitchen':
+        return Icons.kitchen;
+      case 'settings_input_component_rounded':
+        return Icons.settings_input_component_rounded;
+      case 'bolt':
+        return Icons.bolt;
+      case 'build':
+        return Icons.build;
+      case 'fitness_center_rounded':
+        return Icons.fitness_center_rounded;
+      case 'sports_kabaddi':
+        return Icons.sports_kabaddi;
+      case 'sports_basketball':
+        return Icons.sports_basketball;
+      case 'sports_esports_rounded':
+        return Icons.sports_esports_rounded;
+      case 'videogame_asset':
+        return Icons.videogame_asset;
+      case 'toys':
+        return Icons.toys;
+      case 'medical_services_rounded':
+        return Icons.medical_services_rounded;
+      case 'medication':
+        return Icons.medication;
+      case 'health_and_safety':
+        return Icons.health_and_safety;
+      case 'menu_book_rounded':
+        return Icons.menu_book_rounded;
+      case 'auto_stories':
+        return Icons.auto_stories;
+      case 'school':
+        return Icons.school;
+      case 'pets_rounded':
+        return Icons.pets_rounded;
+      case 'set_meal':
+        return Icons.set_meal;
+      case 'shutter_speed':
+        return Icons.shutter_speed;
+      case 'shopping_basket_rounded':
+        return Icons.shopping_basket_rounded;
+      case 'eco':
+        return Icons.eco;
+      case 'inventory_2':
+        return Icons.inventory_2;
+      case 'directions_car_rounded':
+        return Icons.directions_car_rounded;
+      case 'settings':
+        return Icons.settings;
+      default:
+        return Icons.category;
+    }
+  }
+}

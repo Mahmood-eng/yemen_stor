@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/features/menu/presentation/widgets/menu_section_card.dart';
-import 'package:yemen_store/features/menu/presentation/widgets/menu_text_form_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/features/menu/presentation/widgets/menu_section_card.dart';
+import 'package:yemen_stor/features/menu/presentation/widgets/menu_text_form_field.dart';
 
 class AddPrivateNetworkScreen extends StatefulWidget {
   const AddPrivateNetworkScreen({super.key});
@@ -21,6 +23,7 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
   final _ownerNameController = TextEditingController();
   final _whatsappController = TextEditingController();
   final _idNumberController = TextEditingController();
+  final _documentUrlController = TextEditingController();
 
   String _networkType = 'شبكة واي فاي عامة';
   final List<String> _networkTypes = [
@@ -29,8 +32,43 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
     'نقطة اتصال متعددة المستخدمين',
   ];
 
+  bool _isFormValid = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _networkNameController.addListener(_validateForm);
+    _cityController.addListener(_validateForm);
+    _areaController.addListener(_validateForm);
+    _ownerNameController.addListener(_validateForm);
+    _whatsappController.addListener(_validateForm);
+    _idNumberController.addListener(_validateForm);
+    _documentUrlController.addListener(_validateForm);
+  }
+
+  void _validateForm() {
+    setState(() {
+      _isFormValid = _networkNameController.text.isNotEmpty &&
+          _cityController.text.isNotEmpty &&
+          _areaController.text.isNotEmpty &&
+          _ownerNameController.text.isNotEmpty &&
+          _whatsappController.text.isNotEmpty &&
+          _idNumberController.text.isNotEmpty &&
+          _documentUrlController.text.isNotEmpty;
+    });
+  }
+
   @override
   void dispose() {
+    _networkNameController.removeListener(_validateForm);
+    _cityController.removeListener(_validateForm);
+    _areaController.removeListener(_validateForm);
+    _ownerNameController.removeListener(_validateForm);
+    _whatsappController.removeListener(_validateForm);
+    _idNumberController.removeListener(_validateForm);
+    _documentUrlController.removeListener(_validateForm);
+    
     _networkNameController.dispose();
     _descriptionController.dispose();
     _cityController.dispose();
@@ -38,6 +76,7 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
     _ownerNameController.dispose();
     _whatsappController.dispose();
     _idNumberController.dispose();
+    _documentUrlController.dispose();
     super.dispose();
   }
 
@@ -49,7 +88,10 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading:IconButton(onPressed: () => context.go(AppRoutes.home), icon: const Icon(Icons.arrow_back_ios_new, size: 20)) ,
+        leading: IconButton(
+          onPressed: () => context.go(AppRoutes.home),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+        ),
         title: Text(
           'أضف شبكتك',
           style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -67,7 +109,7 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                 MenuSectionCard(
                   step: 1,
                   title: 'معلومات الشبكة الأساسية',
-                 
+
                   child: Column(
                     children: [
                       MenuTextFormField(
@@ -138,24 +180,7 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                   title: 'الموقع الجغرافي',
                   child: Column(
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.location_pin),
-                        label: Text(
-                          'حدد الموقع على الخريطة',
-                          style: textTheme.labelLarge?.copyWith(
-                            color: colorScheme.onPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          minimumSize: const Size.fromHeight(48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                      ),
+                      // map picker removed; use address fields instead
                       const SizedBox(height: 16),
                       MenuTextFormField(
                         label: 'المدينة/المحافظة',
@@ -211,11 +236,23 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                       ),
                       const SizedBox(height: 12),
                       MenuTextFormField(
-                        label: 'رقم الهوية الوطنية/جواز السفر',
+                        label: 'رقم الهوية الوطنية/جواز سفر',
                         controller: _idNumberController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'الرجاء إدخال رقم الهوية أو جواز السفر';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      MenuTextFormField(
+                        label: 'رابط صورة الهوية (URL)',
+                        controller: _documentUrlController,
+                        keyboardType: TextInputType.url,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'الرجاء إدخال رابط صورة الهوية';
                           }
                           return null;
                         },
@@ -225,11 +262,57 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      context.push(AppRoutes.manageCards);
-                    }
-                  },
+                  onPressed: (!_isFormValid || _isLoading)
+                      ? null
+                      : () async {
+                          if (!(_formKey.currentState?.validate() ?? false)) return;
+
+                          setState(() => _isLoading = true);
+                          try {
+                            final uid = FirebaseAuth.instance.currentUser?.uid;
+                            if (uid == null) throw Exception('المستخدم غير مسجل');
+
+                            final data = {
+                              'name': _networkNameController.text.trim(),
+                              'description': _descriptionController.text.trim(),
+                              'type': _networkType,
+                              'city': _cityController.text.trim(),
+                              'area': _areaController.text.trim(),
+                              'ownerName': _ownerNameController.text.trim(),
+                              'whatsapp': _whatsappController.text.trim(),
+                              'idNumber': _idNumberController.text.trim(),
+                              'documentUrl': _documentUrlController.text.trim(),
+                              'ownerId': uid,
+                              'status': 'pending',
+                              'createdAt': FieldValue.serverTimestamp(),
+                            };
+
+                            final ref = await FirebaseFirestore.instance
+                                .collection('networks')
+                                .add(data);
+
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(uid)
+                                .update({
+                                  'role': 'network_owner',
+                                  'networkId': ref.id,
+                                });
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('تم إضافة شبكتك ${data['name']} بنجاح'),
+                              ),
+                            );
+
+                            context.go(AppRoutes.manageCards);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('فشل في الإضافة: $e')),
+                            );
+                            setState(() => _isLoading = false);
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     minimumSize: const Size.fromHeight(52),
@@ -237,13 +320,19 @@ class _AddPrivateNetworkScreenState extends State<AddPrivateNetworkScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: Text(
-                    'تقديم طلب الإضافة',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          'تقديم طلب الإضافة',
+                          style: textTheme.labelLarge?.copyWith(
+                            color: colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 24),
               ],

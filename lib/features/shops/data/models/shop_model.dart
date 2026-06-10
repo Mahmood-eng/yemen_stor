@@ -1,15 +1,17 @@
-
-
 class ShopModel {
   final String id;
   final String name;
   final String description;
-  final String status; // "مفتوح الآن" أو "مغلق"
+  final String status; // "مفتوح الآن" أو "مغلق" أو "pending"
   final double rating;
   final String location;
   final String phone;
   final List<String> images;
-  final String marketType; // نوع السوق مثل "إلكترونيات", "أزياء", etc.
+  final String marketType; // اسم الفئة
+  final String marketId;   // معرف السوق
+  final String categoryId; // معرف الفئة
+  final String ownerId;    // معرف المالك (المستخدم)
+  final String logoUrl;    // شعار المتجر
 
   ShopModel({
     required this.id,
@@ -21,6 +23,10 @@ class ShopModel {
     required this.phone,
     required this.images,
     required this.marketType,
+    this.marketId = '',
+    this.categoryId = '',
+    this.ownerId = '',
+    this.logoUrl = '',
   });
 
   factory ShopModel.fromJson(Map<String, dynamic> json) {
@@ -29,11 +35,15 @@ class ShopModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       status: json['status'] ?? 'مغلق',
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      location: json['location'] ?? '',
+      rating: double.tryParse(json['rating']?.toString() ?? '0.0') ?? 0.0,
+      location: json['location'] ?? json['address'] ?? '',
       phone: json['phone'] ?? '',
-      images: List<String>.from(json['images'] ?? []),
-      marketType: json['marketType'] ?? '',
+      images: json['images'] is List ? List<String>.from(json['images']) : [],
+      marketType: json['marketType'] ?? json['categoryName'] ?? '',
+      marketId: json['marketId'] ?? '',
+      categoryId: json['categoryId'] ?? '',
+      ownerId: json['ownerId'] ?? '',
+      logoUrl: json['logoUrl'] ?? '',
     );
   }
 
@@ -45,73 +55,14 @@ class ShopModel {
       'status': status,
       'rating': rating,
       'location': location,
+      'address': location,
       'phone': phone,
       'images': images,
       'marketType': marketType,
+      'marketId': marketId,
+      'categoryId': categoryId,
+      'ownerId': ownerId,
+      'logoUrl': logoUrl,
     };
   }
 }
-
-// بيانات تجريبية للمحلات حسب نوع السوق
-final Map<String, List<ShopModel>> mockShopsByMarket = {
-  "إلكترونيات": [
-    ShopModel(
-      id: "1",
-      name: "سامي عدنان للأجهزة الذكية",
-      description: "شارع 26 - أحدث إصدارات iPhone و Samsung",
-      status: "مفتوح الآن",
-      rating: 5.0,
-      location: "شارع 26 سبتمبر، تعز",
-      phone: "+967-1-234567",
-      images: ["assets/images/shop1.jpg"],
-      marketType: "إلكترونيات",
-    ),
-    ShopModel(
-      id: "2",
-      name: "تيك جلاكسي (Tech Galaxy)",
-      description: "المسبح - متخصصون في إكسسوارات الألعاب",
-      status: "مغلق",
-      rating: 4.8,
-      location: "المسبح، تعز",
-      phone: "+967-1-345678",
-      images: ["assets/images/shop2.jpg"],
-      marketType: "إلكترونيات",
-    ),
-    ShopModel(
-      id: "3",
-      name: "أيفون هب تعز (iPhone Hub)",
-      description: "شارع جمال - وكيل معتمد لمنتجات Apple",
-      status: "مفتوح الآن",
-      rating: 4.9,
-      location: "شارع جمال، تعز",
-      phone: "+967-1-456789",
-      images: ["assets/images/shop3.jpg"],
-      marketType: "إلكترونيات",
-    ),
-  ],
-  "أزياء": [
-    ShopModel(
-      id: "4",
-      name: "فاشن وورلد (Fashion World)",
-      description: "التحرير - ملابس عصرية للرجال والنساء",
-      status: "مفتوح الآن",
-      rating: 4.7,
-      location: "التحرير، تعز",
-      phone: "+967-1-567890",
-      images: ["assets/images/shop4.jpg"],
-      marketType: "أزياء",
-    ),
-    ShopModel(
-      id: "5",
-      name: "زينة للأزياء",
-      description: "حي الروضة - فساتين زفاف ومناسبات",
-      status: "مفتوح الآن",
-      rating: 4.6,
-      location: "حي الروضة، تعز",
-      phone: "+967-1-678901",
-      images: ["assets/images/shop5.jpg"],
-      marketType: "أزياء",
-    ),
-  ],
-  // يمكن إضافة المزيد حسب الحاجة
-};

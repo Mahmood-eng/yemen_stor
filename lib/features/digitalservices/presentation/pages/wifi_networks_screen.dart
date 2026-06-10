@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:go_router/go_router.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/widgets/custom_loading_indicator.dart';
 
 class WifiNetworksScreen extends StatefulWidget {
   static const String id = 'wifi_networks_screen';
@@ -10,80 +14,63 @@ class WifiNetworksScreen extends StatefulWidget {
 }
 
 class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
-  final List<Map<String, dynamic>> _allNetworks = [
-    {
-      'id': 1,
-      'name': 'Yemen_4G_Free',
-      'location': 'شارع جمال - بجانب شركة النفط',
-      'isFavorite': false,
-    },
-    {
-      'id': 2,
-      'name': 'Taiz_Net_High',
-      'location': 'حي المسبح - عمارة الشريف',
-      'isFavorite': true,
-    },
-    {
-      'id': 3,
-      'name': 'Al-Saeed_Wifi',
-      'location': 'عصيفرة - سوق القات الجديد',
-      'isFavorite': false,
-    },
-    {
-      'id': 4,
-      'name': 'Saba_Gate_5G',
-      'location': 'بوابة تعز - الحوبان',
-      'isFavorite': false,
-    },
-    {
-      'id': 5,
-      'name': 'Sky_Link_Net',
-      'location': 'شارع 26 سبتمبر - الدور الثاني',
-      'isFavorite': false,
-    },
-    {
-      'id': 6,
-      'name': 'Al-Tahrir_Speed',
-      'location': 'وسط التحرير - سوق الصميل',
-      'isFavorite': true,
-    },
-    {
-      'id': 7,
-      'name': 'Education_Free',
-      'location': 'جامعة تعز - حبيل سلمان',
-      'isFavorite': false,
-    },
-    {
-      'id': 8,
-      'name': 'Golden_Wifi',
-      'location': 'شارع الستين - محطة القمامة',
-      'isFavorite': false,
-    },
-    {
-      'id': 9,
-      'name': 'Hospital_Public',
-      'location': 'مستشفى الثورة - قسم الطوارئ',
-      'isFavorite': false,
-    },
-    {
-      'id': 10,
-      'name': 'Dream_Net_2026',
-      'location': 'بئر باشا - جولة الصقر',
-      'isFavorite': false,
-    },
-    {
-      'id': 11,
-      'name': 'Flash_Connect',
-      'location': 'وادي القاضي - حارة النور',
-      'isFavorite': false,
-    },
-    {
-      'id': 12,
-      'name': 'Smart_Taiz',
-      'location': 'حي الروضة - بجانب الجامع',
-      'isFavorite': false,
-    },
-  ];
+  // الـ Favorites محفوظة في Firestore لكل مستخدم
+  Set<String> _favoriteIds = {};
+  bool _favoritesLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavorites();
+  }
+
+  /// جلب المفضلة من Firestore للمستخدم الحالي
+  Future<void> _loadFavorites() async {
+    final user = fb_auth.FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      setState(() => _favoritesLoaded = true);
+      return;
+    }
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('wifi_favorites')
+          .get();
+      setState(() {
+        _favoriteIds = doc.docs.map((d) => d.id).toSet();
+        _favoritesLoaded = true;
+      });
+    } catch (_) {
+      setState(() => _favoritesLoaded = true);
+    }
+  }
+
+  /// حفظ/إزالة المفضلة في Firestore
+  Future<void> _toggleFavorite(String networkId) async {
+    final user = fb_auth.FirebaseAuth.instance.currentUser;
+    final ref = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid ?? 'guest')
+        .collection('wifi_favorites')
+        .doc(networkId);
+
+    setState(() {
+      if (_favoriteIds.contains(networkId)) {
+        _favoriteIds.remove(networkId);
+      } else {
+        _favoriteIds.add(networkId);
+      }
+    });
+
+    if (user != null) {
+      if (_favoriteIds.contains(networkId)) {
+        await ref.set({'addedAt': FieldValue.serverTimestamp()});
+      } else {
+        await ref.delete();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +89,7 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
               'شبكات الواي فاي',
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
+                fontFamily: 'Cairo',
               ),
             ),
             leading: IconButton(
@@ -128,49 +116,117 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
             ),
           ),
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: TabBarView(
-            children: [
-              _buildWifiList(_allNetworks, theme),
-              _buildWifiList(
-                _allNetworks.where((n) => n['isFavorite'] == true).toList(),
-                theme,
+          body: _favoritesLoaded
+              ? TabBarView(
+                  children: [
+                    _buildWifiListStream(theme, favoritesOnly: false),
+                    _buildWifiListStream(theme, favoritesOnly: true),
+                  ],
+                )
+              : const Center(child: CustomLoadingIndicator()),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              context.push(AppRoutes.addPrivateNetwork);
+            },
+            icon: const Icon(Icons.wifi_tethering),
+            label: const Text(
+              'أضف شبكتك',
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.bold,
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildWifiList(List<Map<String, dynamic>> networks, ThemeData theme) {
-    if (networks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.wifi_off_rounded, size: 80, color: Colors.grey[300]),
-            const SizedBox(height: 10),
-            Text(
-              'لا توجد شبكات متاحة حالياً',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[400],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+  Widget _buildWifiListStream(ThemeData theme, {required bool favoritesOnly}) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('networks')
+          .orderBy('createdAt', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CustomLoadingIndicator());
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: networks.length,
-      itemBuilder: (context, index) {
-        return _buildWifiCard(networks[index], theme);
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'خطأ في تحميل الشبكات',
+              style: theme.textTheme.bodyMedium?.copyWith(fontFamily: 'Cairo'),
+            ),
+          );
+        }
+
+        final List<Map<String, dynamic>> allNetworks = [];
+
+        if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+          for (var doc in snapshot.data!.docs) {
+            final data = doc.data() as Map<String, dynamic>;
+            allNetworks.add({
+              'id': doc.id,
+              'name': data['name'] ?? 'شبكة جديدة',
+              'location': '${data['city'] ?? ''} - ${data['area'] ?? ''}',
+              'description':
+                  data['description'] ??
+                  'شبكة محلية لتغطية فائقة السرعة وكروت مميزة',
+              'ownerName': data['ownerName'] ?? 'مالك الشبكة',
+              'whatsapp': data['whatsapp'] ?? '',
+              'isFavorite': _favoriteIds.contains(doc.id),
+            });
+          }
+        }
+
+        final filtered = favoritesOnly
+            ? allNetworks.where((n) => n['isFavorite'] == true).toList()
+            : allNetworks;
+
+        if (filtered.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  favoritesOnly
+                      ? Icons.favorite_border
+                      : Icons.wifi_off_rounded,
+                  size: 80,
+                  color: Colors.grey[300],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  favoritesOnly
+                      ? 'لا توجد شبكات في مفضلتك بعد'
+                      : 'لا توجد شبكات متاحة حالياً\nيمكنك إضافة شبكتك من القائمة',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[400],
+                    fontFamily: 'Cairo',
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: filtered.length,
+          itemBuilder: (context, index) =>
+              _buildWifiCard(filtered[index], theme),
+        );
       },
     );
   }
 
   Widget _buildWifiCard(Map<String, dynamic> network, ThemeData theme) {
+    final isDark = theme.brightness == Brightness.dark;
+    final isFav = _favoriteIds.contains(network['id'].toString());
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -178,18 +234,22 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.04),
+            color: theme.shadowColor.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: isDark
+            ? Border.all(color: theme.dividerColor.withValues(alpha: 0.05))
+            : null,
       ),
       child: ListTile(
+        onTap: () => context.push(AppRoutes.wifiNetworkDetails, extra: network),
         contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.1),
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(Icons.wifi, color: theme.colorScheme.primary, size: 24),
@@ -198,52 +258,73 @@ class _WifiNetworksScreenState extends State<WifiNetworksScreen> {
           network['name'],
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
+            fontFamily: 'Cairo',
           ),
         ),
         subtitle: Row(
           children: [
-            Icon(Icons.location_on_outlined, size: 12, color: Colors.grey),
+            const Icon(
+              Icons.location_on_outlined,
+              size: 12,
+              color: Colors.grey,
+            ),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 network['location'],
-                style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.grey,
+                  fontFamily: 'Cairo',
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-        trailing: IconButton(
-          icon: Icon(
-            network['isFavorite'] ? Icons.favorite : Icons.favorite_border,
-            color: network['isFavorite'] ? Colors.red : Colors.grey[400],
-          ),
-          onPressed: () {
-            setState(() {
-              final originalIndex = _allNetworks.indexWhere(
-                (n) => n['id'] == network['id'],
-              );
-              if (originalIndex >= 0) {
-                _allNetworks[originalIndex]['isFavorite'] =
-                    !_allNetworks[originalIndex]['isFavorite'];
-              }
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  network['isFavorite']
-                      ? 'تمت الإزالة من المفضلة'
-                      : 'تمت الإضافة للمفضلة',
-                  style: const TextStyle(fontFamily: 'Cairo'),
-                ),
-                duration: const Duration(seconds: 1),
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: theme.colorScheme.primary,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
-            );
-          },
+              child: const Text(
+                'متاح',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 12,
+                  fontFamily: 'Cairo',
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                isFav ? Icons.favorite : Icons.favorite_border,
+                color: isFav ? Colors.red : Colors.grey[400],
+              ),
+              onPressed: () async {
+                await _toggleFavorite(network['id'].toString());
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isFav
+                            ? 'تمت الإزالة من المفضلة'
+                            : 'تمت الإضافة للمفضلة',
+                        style: const TextStyle(fontFamily: 'Cairo'),
+                      ),
+                      duration: const Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: theme.colorScheme.primary,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );

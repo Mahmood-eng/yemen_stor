@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:yemen_store/core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
-import 'package:yemen_store/core/widgets/custom_button.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_provider.dart';
-import 'package:yemen_store/features/auth/presentation/providers/auth_providers.dart';
-import 'package:yemen_store/features/auth/presentation/utils/auth_validation.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/auth_text_field.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/social_divider.dart';
-import 'package:yemen_store/features/auth/presentation/widgets/social_icons_row.dart';
+import 'package:yemen_stor/core/routes/app_routes.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/widgets/custom_button.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_provider.dart';
+import 'package:yemen_stor/features/auth/presentation/providers/auth_providers.dart';
+import 'package:yemen_stor/features/auth/presentation/utils/auth_validation.dart';
+import 'package:yemen_stor/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:yemen_stor/features/auth/presentation/widgets/social_divider.dart';
+import 'package:yemen_stor/features/auth/presentation/widgets/social_icons_row.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -27,8 +27,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscureText = true;
   bool _obscureConfirmText = true;
   bool _agreeToTerms = false;
-  String? _selectedCity;
+  String? _selectedCity = "تعز";
+  bool _isFormValid = false;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_validateForm);
+    _passwordController.addListener(_validateForm);
+    _confirmPasswordController.addListener(_validateForm);
+    _displayNameController.addListener(_validateForm);
+  }
+
+  void _validateForm() {
+    setState(() {
+      _isFormValid = AuthValidation.validateDisplayName(_displayNameController.text).isEmpty &&
+          AuthValidation.validateEmail(_emailController.text).isEmpty &&
+          AuthValidation.validatePassword(_passwordController.text).isEmpty &&
+          _confirmPasswordController.text == _passwordController.text &&
+          _selectedCity != null &&
+          _agreeToTerms;
+    });
+  }
 
   final List<String> _yemeniCities = [
     "صنعاء",
@@ -54,6 +75,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _emailController.removeListener(_validateForm);
+    _passwordController.removeListener(_validateForm);
+    _confirmPasswordController.removeListener(_validateForm);
+    _displayNameController.removeListener(_validateForm);
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -79,6 +104,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     ref
         .read(authNotifierProvider.notifier)
         .signUp(email, password, displayName, city);
+  }
+
+  void _handleBiometricAuth() {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('تنبيه', style: TextStyle(fontFamily: 'Cairo')),
+          content: const Text(
+            'لا يمكن استخدام البصمة لإنشاء حساب جديد. يرجى ملء البيانات المطلوبة أولاً، وبعد الدخول يمكنك تفعيل البصمة من الإعدادات لتسهيل دخولك مستقبلاً.',
+            style: TextStyle(fontFamily: 'Cairo', height: 1.5),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('حسناً', style: TextStyle(fontFamily: 'Cairo')),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -171,7 +217,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         // حقل اختيار المدينة
                         DropdownButtonFormField<String>(
-                          value: _selectedCity,
+                          initialValue: _selectedCity,
                           alignment: Alignment.centerRight,
                           hint: const Text(
                             "اختر المدينة",
@@ -186,8 +232,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             );
                           }).toList(),
-                          onChanged: (value) =>
-                              setState(() => _selectedCity = value),
+                          onChanged: (value) {
+                            setState(() => _selectedCity = value);
+                            _validateForm();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'يجب اختيار المدينة';
@@ -267,8 +315,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             Checkbox(
                               value: _agreeToTerms,
                               activeColor: AppColors.primary,
-                              onChanged: (value) =>
-                                  setState(() => _agreeToTerms = value!),
+                              onChanged: (value) {
+                                setState(() => _agreeToTerms = value!);
+                                _validateForm();
+                              },
                             ),
                             Expanded(
                               child: Text(
@@ -286,18 +336,38 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        CustomButton(
-                          text: authState.isLoading
-                              ? "جاري الإنشاء..."
-                              : "إنشاء حساب",
-                          onPressed: authState.isLoading ? null : _signUp,
+                        ElevatedButton(
+                          onPressed: (!_isFormValid || authState.isLoading) ? null : _signUp,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            minimumSize: const Size.fromHeight(50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: authState.isLoading
+                              ? const SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  "إنشاء حساب",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                         const SizedBox(height: 20),
 
                         const SocialDivider(),
                         const SizedBox(height: 20),
 
-                        const SocialIconsRow(),
+                        SocialIconsRow(
+                          onFingerprintTap: _handleBiometricAuth,
+                        ),
 
                         const SizedBox(height: 25),
 

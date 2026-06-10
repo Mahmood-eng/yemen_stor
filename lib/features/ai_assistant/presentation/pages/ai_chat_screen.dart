@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:yemen_store/features/ai_assistant/domain/models/chat_message.dart';
+import 'package:yemen_stor/features/ai_assistant/domain/models/chat_message.dart';
+import 'package:yemen_stor/features/ai_assistant/domain/services/ai_assistant_service.dart';
 
 import '../widgets/chat_input.dart';
 import '../widgets/message_list.dart';
@@ -16,9 +17,11 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final AiAssistantService _aiService = AiAssistantService();
+  
   final List<ChatMessage> _messages = [
     ChatMessage(
-      text: 'مرحباً بك! انا نور مساعدك الذكي كيف أستطيع مساعدتك اليوم؟',
+      text: 'مرحباً بك! أنا "صراط" مساعدك الذكي في المتجر. كيف أستطيع مساعدتك اليوم؟',
       isUser: false,
       hasProduct: false,
     ),
@@ -44,7 +47,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -57,22 +60,17 @@ class _ChatPageState extends State<ChatPage> {
 
     _scrollToEnd();
 
-    Timer(const Duration(milliseconds: 900), () {
-      setState(() {
-        _isBotTyping = false;
-        _messages.add(
-          ChatMessage(
-            text: 'إليك هذا الاختيار من المتجر، جاهز للمراجعة؟',
-            isUser: false,
-            hasProduct: true,
-            productName: 'سماعات بلوتوث لاسلكية',
-            productPrice: '299 ريال',
-            productDetails: 'تصميم مريح وجودة صوت عالية',
-          ),
-        );
-      });
-      _scrollToEnd();
+    // Call the AI Service
+    final responses = await _aiService.processUserInput(text);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isBotTyping = false;
+      _messages.addAll(responses);
     });
+    
+    _scrollToEnd();
   }
 
   @override
@@ -83,8 +81,21 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(theme, isDark),
-      body: Column(
-        children: [
+      body: Container(
+        decoration: isDark
+            ? null
+            : BoxDecoration(
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/chat_bg.png'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    theme.scaffoldBackgroundColor.withOpacity(0.95),
+                    BlendMode.lighten,
+                  ),
+                ),
+              ),
+        child: Column(
+          children: [
           Expanded(
             child: MessageList(
               messages: _messages,
@@ -104,11 +115,16 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
+      ),
     );
   }
 
   PreferredSizeWidget _buildAppBar(ThemeData theme, bool isDark) {
     return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new),
+        onPressed: () => Navigator.pop(context),
+      ),
       elevation: 0,
       backgroundColor: theme.colorScheme.surface,
       iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
@@ -119,36 +135,98 @@ class _ChatPageState extends State<ChatPage> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.12),
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary,
+                  theme.colorScheme.secondary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            child: Icon(
-              Icons.smart_toy_rounded,
-              color: theme.colorScheme.primary,
-              size: 24,
+            child: const Center(
+              child: Icon(
+                Icons.auto_awesome,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
           ),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'نور',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'صراط',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Cairo',
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Text(
+                      'AI',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 2),
-              Text(
-                'متصل الآن',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.72),
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.greenAccent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'متصل الآن',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                      fontFamily: 'Cairo',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ],
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.more_vert_rounded),
+          onPressed: () {},
+        ),
+      ],
     );
   }
 }

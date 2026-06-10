@@ -36,7 +36,7 @@ class ServicesBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "تفعيل فوري للاشتراكات",
+                    "عالم الخدمات الرقمية المتكامل",
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Cairo',
@@ -46,7 +46,7 @@ class ServicesBanner extends StatelessWidget {
                   ),
                   SizedBox(height: 6),
                   Text(
-                    "أدوات الذكاء الاصطناعي والتصميم في مكان واحد",
+                    "شحن رصيد، شبكات واي فاي، اشتراكات ذكاء اصطناعي وتوظيف أيدي عاملة.. كل ما تحتاجه في مكان واحد للتفعيل الفوري.",
                     style: TextStyle(
                       color: Colors.white70,
                       fontFamily: 'Cairo',

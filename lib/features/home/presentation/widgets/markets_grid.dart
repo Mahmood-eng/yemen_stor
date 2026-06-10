@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_routes.dart';
-import 'package:yemen_store/core/theme/app_colors.dart';
+import 'package:yemen_stor/core/theme/app_colors.dart';
 import '../../../../features/markets/data/models/market_model.dart';
 
 class MarketsGrid extends StatelessWidget {
@@ -10,30 +11,44 @@ class MarketsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // 1. نأخذ أول 5 أسواق فقط من الموديل
-    final List<MarketModel> displayMarkets = mockMarkets.take(5).toList();
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 15,
-        mainAxisSpacing: 15,
-        childAspectRatio: 0.85,
-      ),
-      // الإجمالي 6 (5 من الموديل + 1 "المزيد")
-      itemCount: displayMarkets.length + 1,
-      itemBuilder: (context, index) {
-        // إذا وصلنا للعنصر الأخير، نظهر "المزيد"
-        if (index == displayMarkets.length) {
-          return _buildMoreItem(context, isDark);
+    
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('app_data/main_config/markets')
+          .limit(5)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ));
         }
+        
+        final docs = snapshot.data?.docs ?? [];
+        final displayMarkets = docs.map((doc) => MarketModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id)).toList();
 
-        final market = displayMarkets[index];
-        bool isArta = market.name == "عرطة";
-        return _buildMarketItem(context, market, isArta, isDark);
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+            childAspectRatio: 0.85,
+          ),
+          
+          itemCount: displayMarkets.length + 1,
+          itemBuilder: (context, index) {
+            if (index == displayMarkets.length) {
+              return _buildMoreItem(context, isDark);
+            }
+
+            final market = displayMarkets[index];
+            bool isArta = market.name == "عرطة";
+            return _buildMarketItem(context, market, isArta, isDark);
+          },
+        );
       },
     );
   }
@@ -60,17 +75,19 @@ class MarketsGrid extends StatelessWidget {
             width: 70,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withAlpha((0.05 * 255).round())
+                  ? Colors.white.withAlpha((0.08 * 255).round())
                   : AppColors.primary.withAlpha((0.05 * 255).round()),
               borderRadius: BorderRadius.circular(20),
               border: isArta
-                  ? Border.all(color: Colors.orange, width: 1.5)
+                  ? Border.all(color: isDark ? Colors.orangeAccent : Colors.orange, width: 1.5)
                   : null,
             ),
             child: Icon(
               market.icon,
               size: 32,
-              color: isArta ? Colors.orange : AppColors.primary,
+              color: isArta
+                  ? (isDark ? Colors.orangeAccent : Colors.orange)
+                  : (isDark ? Colors.white.withValues(alpha: 0.9) : AppColors.primary),
             ),
           ),
           const SizedBox(height: 8),
@@ -145,54 +162,87 @@ class MarketsGrid extends StatelessWidget {
                   ),
                   const Divider(height: 1),
 
-                  // قائمة الأقسام مع ربط الـ scrollController
+                  // قائمة الأقسام مع جلب البيانات ومؤشر تحميل
                   Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      itemCount: market.subCategories.length,
-                      itemBuilder: (context, index) {
-                        final sub = market.subCategories[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.05)
-                                : Colors.grey[50],
-                            borderRadius: BorderRadius.circular(15),
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('app_data/main_config/markets/${market.id}/categories')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        
+                        if (snapshot.hasError) {
+                          return const Center(child: Text("خطأ في تحميل الأقسام"));
+                        }
+
+                        final categories = (snapshot.data?.docs ?? []).map((doc) {
+                          return CategoryModel.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+                        }).toList();
+
+                        if (categories.isEmpty) {
+                          return const Center(child: Text("لا توجد أقسام متوفرة"));
+                        }
+
+                        return ListView.builder(
+                          controller: scrollController,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 10,
                           ),
-                          child: ListTile(
-                            leading: Icon(
-                              sub['icon'] as IconData,
-                              color: AppColors.primary,
-                            ),
-                            title: Text(
-                              sub['title'] as String,
-                              style: const TextStyle(
-                                fontFamily: 'Cairo',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                          itemCount: categories.length,
+                          itemBuilder: (context, index) {
+                            final category = categories[index];
+                            final legacySub = category.toLegacyMap();
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.05)
+                                    : Colors.grey[50],
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 16,
-                              color: Colors.grey,
-                            ),
-                            onTap: () {
-                              Navigator.pop(context);
-                              context.push(
-                                AppRoutes.shopsList,
-                                extra: {
-                                  'market': market.toJson(),
-                                  'subcategory': sub,
+                              child: ListTile(
+                                leading: Icon(
+                                  legacySub['icon'] as IconData,
+                                  color: AppColors.primary,
+                                ),
+                                title: Text(
+                                  legacySub['title'] as String,
+                                  style: const TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                trailing: const Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: Colors.grey,
+                                ),
+                                onTap: () {
+                                  final extraData = {
+                                    'marketId': market.id,
+                                    'marketName': market.name,
+                                    'categoryId': legacySub['id']?.toString() ?? '',
+                                    'subcategoryName': legacySub['title']?.toString() ?? '',
+                                  };
+                                  
+                                  Navigator.pop(context);
+                                  // Wait for the bottom sheet to close before pushing
+                                  Future.delayed(const Duration(milliseconds: 50), () {
+                                    if (!context.mounted) return;
+                                    // Use the root navigator or standard routing
+                                    AppRoutes.router.push(
+                                      AppRoutes.shopsList,
+                                      extra: extraData,
+                                    );
+                                  });
                                 },
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -220,14 +270,14 @@ class MarketsGrid extends StatelessWidget {
             width: 70,
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.white.withAlpha((0.05 * 255).round())
+                  ? Colors.white.withAlpha((0.08 * 255).round())
                   : Colors.grey.withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.grid_view_rounded,
               size: 32,
-              color: Colors.blueGrey,
+              color: isDark ? Colors.white.withValues(alpha: 0.7) : Colors.blueGrey,
             ),
           ),
           const SizedBox(height: 8),

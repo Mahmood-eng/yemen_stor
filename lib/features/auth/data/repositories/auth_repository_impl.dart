@@ -1,6 +1,6 @@
-import 'package:yemen_store/features/auth/data/datasources/auth_data_source.dart';
-import 'package:yemen_store/features/auth/domain/entities/user.dart';
-import 'package:yemen_store/features/auth/domain/repositories/auth_repository.dart';
+import 'package:yemen_stor/features/auth/data/datasources/auth_data_source.dart';
+import 'package:yemen_stor/features/auth/domain/entities/user_entity.dart';
+import 'package:yemen_stor/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthDataSource dataSource;
@@ -8,12 +8,12 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.dataSource);
 
   @override
-  Future<User?> signInWithEmailAndPassword(String email, String password) {
+  Future<UserEntity?> signInWithEmailAndPassword(String email, String password) {
     return dataSource.signInWithEmailAndPassword(email, password);
   }
 
   @override
-  Future<User?> signUpWithEmailAndPassword(
+  Future<UserEntity?> signUpWithEmailAndPassword(
     String email,
     String password,
     String displayName,
@@ -33,7 +33,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User?> getCurrentUser() {
+  Future<UserEntity?> getCurrentUser() {
     return dataSource.getCurrentUser();
   }
 
