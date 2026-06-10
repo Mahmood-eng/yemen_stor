@@ -1,16 +1,38 @@
-# yemen_stor
+# 🛒 Yemen Store (متجر اليمن)
 
-[A new Flutter project.](https://console.firebase.google.com/project/yemen-store-app/firestore/databases/-default-/data)
+تطبيق تجارة إلكترونية متكامل ومتعدد التجار (Multi-Vendor E-commerce Platform) مصمم ومطور باستخدام إطار العمل **Flutter** وقاعدة بيانات **Firebase**. يهدف التطبيق إلى تنظيم وإدارة عملية البيع والشراء محلياً من خلال ربط الأسواق المركزية، الأقسام الفرعية، المحلات التجارية، والمنتجات في بيئة عمل سلسة وسريعة ومتوافقة تماماً مع الواجهات العربية (RTL Layouts).
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🏗️ هيكلية قاعدة البيانات (Database Architecture)
+يعتمد التطبيق على بنية بيانات مرنة في **Cloud Firestore** تعتمد على الدمج بين المجموعات الفرعية (Sub-collections) والمجموعات المستقلة (Root Collections) لتسريع عمليات الاستعلام (Queries):
 
-A few resources to get you started if this is your first Flutter project:
+* **الأسواق والأقسام (`app_data`):** مجموعة فرعية لتنظيم التكوين العام للتطبيق والأسواق المركزية والأقسام التابعة لكل سوق.
+* **المحلات (`stores`):** كوليكشن مستقل مربوط بـ `marketId` و `categoryId` لسهولة إدارة التجار والوصول السريع للمحلات.
+* **المنتجات (`products`):** كوليكشن مستقل يربط المنتجات بالمحلات والأسواق لتوفير ميزة البحث والتصفية الشاملة والذكية.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ✨ المميزات الرئيسية (Core Features)
+- 🏬 **تصفح الأسواق المركزية:** عرض الأسواق بشكل شجري ومنظم مع دعم كامل لأيقونات Material 3 العصرية وحوافها الدائرية (`_rounded`).
+- 📁 **تصنيف ذكي:** تقسيم كل سوق إلى أقسام فرعية (إلكترونيات، ملابس، إلخ) بسلاسة.
+- 🏪 **لوحة تحكم المحلات:** إدارة مستقلة لكل متجر وتخصيص بيانات التواصل مثل الـ WhatsApp والـ Delivery Agents.
+- الخدمات الرقمية المتعدده والذكيه وخدمات المهن العامله واليديوية وبيع كروت شبكات الواي الفاي المحليه وتعبىه الرصيد والباقات لشركات الاتصالات
+- 🚀 **أداء عالي وسرعة التحديث:** الاعتماد على الـ Auto-IDs لتجنب تعارض البيانات وتسهيل عمليات الـ Streams والـ Real-time updates.
+
+---
+
+## 🛠️ تقنيات التطوير المستخدمة (Tech Stack)
+- **Frontend:** Flutter (Dart)
+- **Design Pattern:** Clean Architecture
+- **Backend & Database:** Firebase (Cloud Firestore, Authentication)
+- **State Management:** Provider / Riverpod
+
+---
+
+## 🚀 طريقة التشغيل المحلية (Getting Started)
+
+1. **نسخ المشروع (Clone the repository):**
+   ```bash
+   git clone [https://github.com/Mahmood-eng/yemen_store.git](https://github.com/Mahmood-eng/yemen_store.git)
+   
